@@ -5,6 +5,8 @@ Currently, the focus of the package is restricted to clustering (or community de
 In particular, the package contains an implementation of the [Leiden algorithm](https://arxiv.org/abs/xxx.xxxx) and the [Louvain algorithm](https://arxiv.org/abs/0803.0476).
 Only undirected networks are supported.
 
+[![DOI](https://zenodo.org/badge/153760626.svg)](https://zenodo.org/badge/latestdoi/153760626)
+
 ## Usage
 
 To run the clustering algorithms, the command-line tool `RunNetworkClustering` is provided.
