@@ -5,10 +5,9 @@ build/
 build.xml
 manifest.mf
 nbproject/
-test/
 src/PublicationClustering.java
 /dist/
 test_network.ser
-test*
 *.txt
 .idea
+*.iml
