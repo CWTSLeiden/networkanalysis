@@ -136,6 +136,20 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
     }
 
     /**
+     * Sets the resolution parameter.
+     *
+     * Also sets the resolution parameter for the local moving algorithm.
+     *
+     * @param resolution Resolution parameter
+     */
+    @Override
+    public void setResolution(double resolution)
+    {
+        this.resolution = resolution;
+        this.localMovingAlgorithm.resolution = resolution;
+    }
+
+    /**
      * Sets the randomness parameter.
      *
      * @param randomness Randomness parameter
