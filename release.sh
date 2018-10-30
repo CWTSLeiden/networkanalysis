@@ -17,4 +17,4 @@ find src -type f -iname "*.java" -print0 | tar -czvf dist/RunNetworkClustering-s
 
 printf "\nBuilding javadoc\n"
 printf "================================================\n"
-javadoc -noindex -d docs/ src/cwts/networkanalysis/*.java src/cwts/util/*.java
+javadoc -noindex -d docs/ src/cwts/networkanalysis/*.java src/cwts/util/*.java src/cwts/networkanalysis/run/*.java
