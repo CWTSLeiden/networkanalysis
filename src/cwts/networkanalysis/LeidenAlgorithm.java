@@ -145,7 +145,7 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
     @Override
     public void setResolution(double resolution)
     {
-        this.resolution = resolution;
+        super.setResolution(resolution);
         this.localMovingAlgorithm.resolution = resolution;
     }
 
