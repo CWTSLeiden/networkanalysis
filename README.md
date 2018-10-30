@@ -110,15 +110,16 @@ In this case, clusters are identified using the Leiden algorithm based on the CP
 The resulting clustering is saved in the text file `clusters.txt`:
 
 ```text
-0
-0
-0
-1
-1
-1
+0	0
+1	0
+2	0
+3	1
+4	1
+5	1
 ```
 
 The file `clusters.txt` shows that two clusters have been identified.
+The first column in `clusters.txt` indicates the node, and the second column indicates the cluster to which the node belongs.
 Cluster 0 includes nodes 0, 1, and 2.
 Cluster 1 includes nodes 3, 4, and 5.
 In the above example, the edges in the file `network.txt` have not been sorted.
