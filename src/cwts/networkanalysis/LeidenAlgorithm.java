@@ -79,7 +79,7 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
      */
      public LeidenAlgorithm(double resolution, int nIterations, double randomness, Random random)
      {
-         //this(resolution, nIterations, randomness, new FastLocalMovingAlgorithm(random), random);
+        //this(resolution, nIterations, randomness, new FastLocalMovingAlgorithm(random), random);
         this(resolution, nIterations, randomness, new FastLocalMovingAlgorithmParallel(random), random);
      }
 

@@ -88,7 +88,6 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
      */
     protected boolean improveClusteringOneIteration(Network network, Clustering clustering)
     {
-        System.out.println("Using the experimental parallelization.");
         boolean update;
         boolean[] stableNodes;
         double maxQualityValueIncrement, qualityValueIncrement;
@@ -138,14 +137,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
 
             currentCluster = clustering.clusters[j];
 
-            // Remove the currently selected node from its current cluster.
-            clusterWeights[currentCluster] -= network.nodeWeights[j];
-            nNodesPerCluster[currentCluster]--;
-            if (nNodesPerCluster[currentCluster] == 0)
-            {
-                unusedClusters[nUnusedClusters] = currentCluster;
-                nUnusedClusters++;
-            }
+            
 
             /*
              * Identify the neighboring clusters of the currently selected
@@ -154,12 +146,18 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
              * of neighboring clusters. In this way, it is always possible that
              * the currently selected node will be moved to an empty cluster.
              */
-            neighboringClusters[0] = unusedClusters[nUnusedClusters - 1];
-            nNeighboringClusters = 1;
+            nNeighboringClusters = 0;
+            if(nUnusedClusters > 0)
+            {
+                neighboringClusters[0] = unusedClusters[nUnusedClusters - 1];
+                nNeighboringClusters = 1;
+            }
+            
             for (k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
             {
                 l = clustering.clusters[network.neighbors[k]];
-                if (edgeWeightPerCluster[l] == 0)
+
+                if (edgeWeightPerCluster[l] == 0 && l != currentCluster)
                 {
                     neighboringClusters[nNeighboringClusters] = l;
                     nNeighboringClusters++;
@@ -179,11 +177,10 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
              * currently selected node will be moved back to its old cluster.
              */
             bestCluster = currentCluster;
-            maxQualityValueIncrement = edgeWeightPerCluster[currentCluster] - network.nodeWeights[j] * clusterWeights[currentCluster] * resolution;
+            maxQualityValueIncrement = edgeWeightPerCluster[currentCluster] - network.nodeWeights[j] * (clusterWeights[currentCluster]-network.nodeWeights[j]) * resolution;
             for (k = 0; k < nNeighboringClusters; k++)
             {
                 l = neighboringClusters[k];
-
                 qualityValueIncrement = edgeWeightPerCluster[l] - network.nodeWeights[j] * clusterWeights[l] * resolution;
                 if (qualityValueIncrement > maxQualityValueIncrement)
                 {
@@ -193,15 +190,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
 
                 edgeWeightPerCluster[l] = 0;
             }
-
-            /*
-             * Move the currently selected node to its new cluster. Update the
-             * clustering statistics.
-             */
-            clusterWeights[bestCluster] += network.nodeWeights[j];
-            nNodesPerCluster[bestCluster]++;
-            if (bestCluster == unusedClusters[nUnusedClusters - 1])
-                nUnusedClusters--;
+            
 
             /*
              * Mark the currently selected node as stable and remove it from
@@ -219,6 +208,26 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
              */
             if (bestCluster != currentCluster)
             {
+                clusterWeights[currentCluster] -= network.nodeWeights[j];
+                nNodesPerCluster[currentCluster]--;
+                clusterWeights[bestCluster] += network.nodeWeights[j];
+                nNodesPerCluster[bestCluster]++;
+                if (nUnusedClusters > 0 && nNodesPerCluster[currentCluster] == 0 && bestCluster == unusedClusters[nUnusedClusters - 1])
+                {
+                    unusedClusters[nUnusedClusters - 1] = currentCluster;
+                }
+                else if (nNodesPerCluster[currentCluster] == 0)
+                {
+                    unusedClusters[nUnusedClusters] = currentCluster;
+                    nUnusedClusters++;
+                }
+                else if (bestCluster == unusedClusters[nUnusedClusters - 1])
+                {
+                    nUnusedClusters--;
+                }
+                
+                
+
                 clustering.clusters[j] = bestCluster;
                 if (bestCluster >= clustering.nClusters)
                     clustering.nClusters = bestCluster + 1;
