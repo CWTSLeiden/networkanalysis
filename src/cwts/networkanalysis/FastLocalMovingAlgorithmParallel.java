@@ -108,8 +108,8 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
             nNodesPerCluster[clustering.clusters[i]]++;
         }
 
-        nUnusedClusters = 0;
-        unusedClusters = new int[network.nNodes - 1];
+        nUnusedClusters = 1;
+        unusedClusters = new int[network.nNodes];
         for (i = network.nNodes - 1; i >= 0; i--)
             if (nNodesPerCluster[i] == 0)
             {
@@ -130,6 +130,9 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
         neighboringClusters = new int[network.nNodes];
         stableNodes = new boolean[network.nNodes];
         nUnstableNodes = network.nNodes;
+
+        ClusterDataManager clusterDataManager = new ClusterDataManager(network, clustering, stableNodes, clusterWeights, unusedClusters, nodeOrder, nNodesPerCluster, nUnstableNodes, nUnusedClusters);
+
         i = 0;
         do
         {
@@ -146,18 +149,16 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
              * of neighboring clusters. In this way, it is always possible that
              * the currently selected node will be moved to an empty cluster.
              */
-            nNeighboringClusters = 0;
-            if(nUnusedClusters > 0)
-            {
-                neighboringClusters[0] = unusedClusters[nUnusedClusters - 1];
-                nNeighboringClusters = 1;
-            }
+            //nNeighboringClusters = 0;
+
+            neighboringClusters[0] = unusedClusters[clusterDataManager.getnUnusedClusters() - 1];
+            nNeighboringClusters = 1;
             
             for (k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
             {
                 l = clustering.clusters[network.neighbors[k]];
 
-                if (edgeWeightPerCluster[l] == 0 && l != currentCluster)
+                if (edgeWeightPerCluster[l] == 0)
                 {
                     neighboringClusters[nNeighboringClusters] = l;
                     nNeighboringClusters++;
@@ -196,8 +197,8 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
              * Mark the currently selected node as stable and remove it from
              * the queue.
              */
-            stableNodes[j] = true;
-            nUnstableNodes--;
+            clusterDataManager.markDone(j);
+            nUnstableNodes = clusterDataManager.getnUnstableNodes();
 
             /*
              * If the new cluster of the currently selected node is different
@@ -208,38 +209,8 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
              */
             if (bestCluster != currentCluster)
             {
-                clusterWeights[currentCluster] -= network.nodeWeights[j];
-                nNodesPerCluster[currentCluster]--;
-                clusterWeights[bestCluster] += network.nodeWeights[j];
-                nNodesPerCluster[bestCluster]++;
-                if (nUnusedClusters > 0 && nNodesPerCluster[currentCluster] == 0 && bestCluster == unusedClusters[nUnusedClusters - 1])
-                {
-                    unusedClusters[nUnusedClusters - 1] = currentCluster;
-                }
-                else if (nNodesPerCluster[currentCluster] == 0)
-                {
-                    unusedClusters[nUnusedClusters] = currentCluster;
-                    nUnusedClusters++;
-                }
-                else if (bestCluster == unusedClusters[nUnusedClusters - 1])
-                {
-                    nUnusedClusters--;
-                }
                 
-                
-
-                clustering.clusters[j] = bestCluster;
-                if (bestCluster >= clustering.nClusters)
-                    clustering.nClusters = bestCluster + 1;
-
-                for (k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
-                    if (stableNodes[network.neighbors[k]] && (clustering.clusters[network.neighbors[k]] != bestCluster))
-                    {
-                        stableNodes[network.neighbors[k]] = false;
-                        nUnstableNodes++;
-                        nodeOrder[(i + nUnstableNodes < network.nNodes) ? (i + nUnstableNodes) : (i + nUnstableNodes - network.nNodes)] = network.neighbors[k];
-                    }
-
+                clusterDataManager.moveNode(currentCluster, bestCluster, i, j);
                 update = true;
             }
 
@@ -250,5 +221,73 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
             clustering.removeEmptyClusters();
 
         return update;
+    }
+}
+
+class ClusterDataManager {
+    Network network;
+    Clustering clustering;
+    boolean[] stableNodes;
+    double[] clusterWeights;
+    int[] unusedClusters, nodeOrder, nNodesPerCluster;
+    int nUnstableNodes, nUnusedClusters;
+
+    public ClusterDataManager (Network network, Clustering clustering, boolean[] stableNodes, double[] clusterWeights, int[] unusedClusters, int[] nodeOrder, int[] nNodesPerCluster, int nUnstableNodes, int nUnusedClusters) {
+        this.network = network;
+        this.clustering = clustering;
+        this.stableNodes = stableNodes;
+        this.clusterWeights = clusterWeights;
+        this.unusedClusters = unusedClusters;
+        this.nodeOrder = nodeOrder;
+        this.nNodesPerCluster = nNodesPerCluster;
+        this.nUnstableNodes = nUnstableNodes;
+        this.nUnusedClusters = nUnusedClusters;
+    }
+
+    public void markDone (int node) {
+        stableNodes[node] = true;
+        nUnstableNodes--;
+    }
+
+    public int getnUnstableNodes () {
+        return nUnstableNodes;
+    }
+
+    public int getnUnusedClusters () {
+        return nUnusedClusters;
+    }
+
+    public void moveNode(int clusterA, int clusterB, int i, int j) {
+        clusterWeights[clusterA] -= network.nodeWeights[j];
+        nNodesPerCluster[clusterA]--;
+        clusterWeights[clusterB] += network.nodeWeights[j];
+        nNodesPerCluster[clusterB]++;
+        if (nUnusedClusters > 0 && nNodesPerCluster[clusterA] == 0 && clusterB == unusedClusters[nUnusedClusters - 1])
+        {
+            unusedClusters[nUnusedClusters - 1] = clusterA;
+        }
+        else if (nNodesPerCluster[clusterA] == 0)
+        {
+            unusedClusters[nUnusedClusters] = clusterA;
+            nUnusedClusters++;
+        }
+        else if (clusterB == unusedClusters[nUnusedClusters - 1])
+        {
+            nUnusedClusters--;
+        }
+        
+        
+
+        clustering.clusters[j] = clusterB;
+        if (clusterB >= clustering.nClusters)
+            clustering.nClusters = clusterB + 1;
+
+        for (int k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
+            if (stableNodes[network.neighbors[k]] && (clustering.clusters[network.neighbors[k]] != clusterB))
+            {
+                stableNodes[network.neighbors[k]] = false;
+                nUnstableNodes++;
+                nodeOrder[(i + nUnstableNodes < network.nNodes) ? (i + nUnstableNodes) : (i + nUnstableNodes - network.nNodes)] = network.neighbors[k];
+            }
     }
 }
