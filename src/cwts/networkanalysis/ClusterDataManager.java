@@ -71,8 +71,8 @@ public class ClusterDataManager {
         nUnstableNodes--;
     }
 
-    public boolean unstableNodes () {
-        return nUnstableNodes > 0;
+    public int getnUnstableNodes () {
+        return nUnstableNodes;
     }
 
     public int getNextUnusedCluster () {

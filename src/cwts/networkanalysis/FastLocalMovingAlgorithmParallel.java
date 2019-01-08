@@ -89,7 +89,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
     protected boolean improveClusteringOneIteration(Network network, Clustering clustering)
     {
         boolean update;
-        boolean unstableNodes;
+        int nUnstableNodes;
 
         if (network.nNodes == 1)
             return false;
@@ -103,9 +103,9 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
         double[] edgeWeightPerCluster = new double[network.nNodes];
         int[] neighboringClusters = new int[network.nNodes];
 
-        unstableNodes = clusterDataManager.unstableNodes();
+        nUnstableNodes = clusterDataManager.getnUnstableNodes();
 
-        while(unstableNodes)
+        while(nUnstableNodes > 0)
         {
             
             double maxQualityValueIncrement, qualityValueIncrement;
@@ -188,7 +188,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
                 update = true;
             }
 
-            unstableNodes = clusterDataManager.unstableNodes();
+            nUnstableNodes = clusterDataManager.getnUnstableNodes();
         }
 
         if (update)
