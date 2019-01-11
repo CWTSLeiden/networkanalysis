@@ -12,6 +12,7 @@ public class ClusterDataManager {
     int[] unusedClusters, nodeOrder, nNodesPerCluster;
     int nUnstableNodes, nUnusedClusters;
     int nextNode = 0;
+    boolean someThingChanged;
 
     public ClusterDataManager (Network network, Clustering clustering, Random random) {
         this.network = network;
@@ -22,6 +23,7 @@ public class ClusterDataManager {
     }
 
     private void initialize () {
+        someThingChanged = false;
         stableNodes = new boolean[network.nNodes];
         nUnstableNodes = network.nNodes;
 
@@ -79,6 +81,10 @@ public class ClusterDataManager {
         return unusedClusters[nUnusedClusters - 1];
     }
 
+    public boolean getSomeThingChanged () {
+        return someThingChanged;
+    }
+
     public QueueElement getNextUnstableNode () {
         int nodeNumber = nodeOrder[nextNode];
         QueueElement node = new QueueElement(nextNode, nodeNumber);
@@ -118,5 +124,7 @@ public class ClusterDataManager {
                 nUnstableNodes++;
                 nodeOrder[(i + nUnstableNodes < network.nNodes) ? (i + nUnstableNodes) : (i + nUnstableNodes - network.nNodes)] = network.neighbors[k];
             }
+        
+        someThingChanged = true;
     }
 }
