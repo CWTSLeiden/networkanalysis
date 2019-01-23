@@ -2,6 +2,7 @@ package cwts.networkanalysis;
 
 import cwts.util.Arrays;
 import java.util.Random;
+import java.util.LinkedList;
 
 public class ClusterDataManager {
     Network network;
@@ -13,11 +14,15 @@ public class ClusterDataManager {
     int nUnstableNodes, nUnusedClusters;
     int nextNode = 0;
     boolean someThingChanged;
+    Runnable[] taskList;
+    LinkedList<Integer> taskQueue;
 
-    public ClusterDataManager (Network network, Clustering clustering, Random random) {
+    public ClusterDataManager (Network network, Clustering clustering, Runnable[] taskList, LinkedList<Integer> taskQueue) {
         this.network = network;
         this.clustering = clustering;
         this.random = random;
+        this.taskList = taskList;
+        this.taskQueue = taskQueue;
 
         initialize();
     }
@@ -44,8 +49,6 @@ public class ClusterDataManager {
                 unusedClusters[nUnusedClusters] = i;
                 nUnusedClusters++;
             }
-
-        nodeOrder = Arrays.generateRandomPermutation(network.nNodes, random);
     }
 
     public double[] getClusterWeights () {
@@ -56,28 +59,12 @@ public class ClusterDataManager {
         return nNodesPerCluster;
     }
 
-    public double[] getClusterWeightsCopy () {
-        return clusterWeights.clone();
-    }
+    // public synchronized void markDone (int node) {
+    //     stableNodes[node] = true;
+    //     nUnstableNodes--;
+    // }
 
-    public int[] getnNodesPerClusterCopy () {
-        return nNodesPerCluster.clone();
-    }
-
-    public Clustering getClusteringCopy () {
-        return clustering.clone();
-    }
-
-    public void markDone (int node) {
-        stableNodes[node] = true;
-        nUnstableNodes--;
-    }
-
-    public int getnUnstableNodes () {
-        return nUnstableNodes;
-    }
-
-    public int getNextUnusedCluster () {
+    public synchronized int getNextUnusedCluster () {
         return unusedClusters[nUnusedClusters - 1];
     }
 
@@ -85,14 +72,14 @@ public class ClusterDataManager {
         return someThingChanged;
     }
 
-    public QueueElement getNextUnstableNode () {
-        int nodeNumber = nodeOrder[nextNode];
-        QueueElement node = new QueueElement(nextNode, nodeNumber);
-        nextNode = (nextNode < network.nNodes - 1) ? (nextNode + 1) : 0;
-        return node;
-    }
+    // public synchronized QueueElement getNextUnstableNode () {
+    //     int nodeNumber = nodeOrder[nextNode];
+    //     QueueElement node = new QueueElement(nextNode, nodeNumber);
+    //     nextNode = (nextNode < network.nNodes - 1) ? (nextNode + 1) : 0;
+    //     return node;
+    // }
 
-    public void moveNode(int clusterA, int clusterB, int i, int j) {
+    public synchronized void moveNode(int clusterA, int clusterB, int j) {
         clusterWeights[clusterA] -= network.nodeWeights[j];
         nNodesPerCluster[clusterA]--;
         clusterWeights[clusterB] += network.nodeWeights[j];
@@ -120,9 +107,12 @@ public class ClusterDataManager {
         for (int k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
             if (stableNodes[network.neighbors[k]] && (clustering.clusters[network.neighbors[k]] != clusterB))
             {
-                stableNodes[network.neighbors[k]] = false;
-                nUnstableNodes++;
-                nodeOrder[(i + nUnstableNodes < network.nNodes) ? (i + nUnstableNodes) : (i + nUnstableNodes - network.nNodes)] = network.neighbors[k];
+                synchronized (taskQueue){
+                    if (!taskQueue.contains(k)) {
+                        taskQueue.add(k);
+                        taskQueue.notify();
+                    }
+                }
             }
         
         someThingChanged = true;

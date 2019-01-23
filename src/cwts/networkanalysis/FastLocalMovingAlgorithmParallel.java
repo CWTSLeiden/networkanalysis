@@ -2,6 +2,7 @@ package cwts.networkanalysis;
 
 import cwts.util.Arrays;
 import java.util.Random;
+import java.util.LinkedList;
 
 /**
  * Fast local moving algorithm.
@@ -93,23 +94,45 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
         if (network.nNodes == 1)
             return false;
 
-        ClusterDataManager clusterDataManager = new ClusterDataManager(network, clustering, random);
+        Runnable[] taskList = new Runnable[network.nNodes];
+        LinkedList<Integer> taskQueue = new LinkedList<Integer>();
+
+        ClusterDataManager clusterDataManager = new ClusterDataManager(network, clustering, taskList, taskQueue);
 
         double[] clusterWeights = clusterDataManager.getClusterWeights();
         int[] nNodesPerCluster = clusterDataManager.getnNodesPerCluster();
-        
-        Worker[] workers = new Worker[numberOfWorkers];
-        for (Worker worker : workers) {
-            worker = new Worker(network, clustering, clusterDataManager, clusterWeights, nNodesPerCluster, resolution);
+
+        for (int i = 0; i < network.nNodes; i++) {
+            taskList[i] = new MoveNodeTask (network, clustering, clusterDataManager, clusterWeights, nNodesPerCluster, resolution, i);
+        }
+
+        int[] nodeOrder = Arrays.generateRandomPermutation(network.nNodes, random);
+        for (int i = 0; i < nodeOrder.length; i++) {
+            taskQueue.add(nodeOrder[i]);
+        }
+
+        WorkerThread[] workers = new WorkerThread[numberOfWorkers];
+        for (WorkerThread worker : workers) {
+            worker = new WorkerThread(taskList, taskQueue);
             worker.start();
         }
 
-        for (Worker worker : workers) {
-            try {
-                if(null != worker) worker.join();
-            }catch (InterruptedException ex) {
-                for (Worker workerThatShouldStop : workers) {
-                    workerThatShouldStop.interrupt();
+        // for (Worker worker : workers) {
+        //     try {
+        //         if(null != worker) worker.join();
+        //     }catch (InterruptedException ex) {
+        //         for (Worker workerThatShouldStop : workers) {
+        //             workerThatShouldStop.interrupt();
+        //         }
+        //     }
+        // }
+
+        while (!taskQueue.isEmpty()) {
+            synchronized (taskQueue) {
+                try {
+                    taskQueue.wait(500);
+                } catch (InterruptedException ex) {
+                    System.out.println(ex);
                 }
             }
         }
