@@ -1,18 +1,19 @@
 package cwts.networkanalysis;
 
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class WorkerThread extends Thread {
 	Runnable[] taskList;
-	LinkedList<Integer> taskQueue;
+	Set<Runnable> taskQueue;
 
-	public WorkerThread (Runnable[] taskList, LinkedList<Integer> taskQueue) {
+	public WorkerThread (Runnable[] taskList, Set<Runnable> taskQueue) {
 		this.taskList = taskList;
 		this.taskQueue = taskQueue;
 	}
 
 	public void run() {
-		int node;
+		Runnable node;
 		while (true) {
 			synchronized (taskQueue) {
 				while (taskQueue.isEmpty()) {
@@ -22,10 +23,11 @@ public class WorkerThread extends Thread {
 						System.out.println(ex);
 					}
 				}
-				node = taskQueue.pop();
+				node = taskQueue.iterator().next();
+				taskQueue.remove(node);
 			}
 			try {
-				taskList[node].run();
+				node.run();
 			} catch (Exception e) {
 				System.out.println(e);
 			}

@@ -2,22 +2,22 @@ package cwts.networkanalysis;
 
 import cwts.util.Arrays;
 import java.util.Random;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class ClusterDataManager {
     Network network;
     Clustering clustering;
     Random random;
-    boolean[] stableNodes;
     double[] clusterWeights;
     int[] unusedClusters, nodeOrder, nNodesPerCluster;
-    int nUnstableNodes, nUnusedClusters;
+    int nUnusedClusters;
     int nextNode = 0;
     boolean someThingChanged;
     Runnable[] taskList;
-    LinkedList<Integer> taskQueue;
+    Set<Runnable> taskQueue;
 
-    public ClusterDataManager (Network network, Clustering clustering, Runnable[] taskList, LinkedList<Integer> taskQueue) {
+    public ClusterDataManager (Network network, Clustering clustering, Runnable[] taskList, Set<Runnable> taskQueue) {
         this.network = network;
         this.clustering = clustering;
         this.random = random;
@@ -29,8 +29,6 @@ public class ClusterDataManager {
 
     private void initialize () {
         someThingChanged = false;
-        stableNodes = new boolean[network.nNodes];
-        nUnstableNodes = network.nNodes;
 
         clusterWeights = new double[network.nNodes];
         nNodesPerCluster = new int[network.nNodes];
@@ -103,17 +101,16 @@ public class ClusterDataManager {
         clustering.clusters[j] = clusterB;
         if (clusterB >= clustering.nClusters)
             clustering.nClusters = clusterB + 1;
-
-        for (int k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
-            if (stableNodes[network.neighbors[k]] && (clustering.clusters[network.neighbors[k]] != clusterB))
+        
+        for (int k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++) {
+            if (clustering.clusters[network.neighbors[k]] != clusterB)
             {
                 synchronized (taskQueue){
-                    if (!taskQueue.contains(k)) {
-                        taskQueue.add(k);
-                        taskQueue.notify();
-                    }
+                    taskQueue.add(taskList[network.neighbors[k]]);
+                    taskQueue.notify();
                 }
             }
+        }
         
         someThingChanged = true;
     }

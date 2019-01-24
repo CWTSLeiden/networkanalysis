@@ -2,7 +2,8 @@ package cwts.networkanalysis;
 
 import cwts.util.Arrays;
 import java.util.Random;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Fast local moving algorithm.
@@ -95,7 +96,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
             return false;
 
         Runnable[] taskList = new Runnable[network.nNodes];
-        LinkedList<Integer> taskQueue = new LinkedList<Integer>();
+        Set<Runnable> taskQueue = new LinkedHashSet<Runnable>();
 
         ClusterDataManager clusterDataManager = new ClusterDataManager(network, clustering, taskList, taskQueue);
 
@@ -108,7 +109,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
 
         int[] nodeOrder = Arrays.generateRandomPermutation(network.nNodes, random);
         for (int i = 0; i < nodeOrder.length; i++) {
-            taskQueue.add(nodeOrder[i]);
+            taskQueue.add(taskList[nodeOrder[i]]);
         }
 
         WorkerThread[] workers = new WorkerThread[numberOfWorkers];
@@ -130,6 +131,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
         while (!taskQueue.isEmpty()) {
             synchronized (taskQueue) {
                 try {
+                    System.out.println("Queue length: " + taskQueue.size());
                     taskQueue.wait(500);
                 } catch (InterruptedException ex) {
                     System.out.println(ex);
