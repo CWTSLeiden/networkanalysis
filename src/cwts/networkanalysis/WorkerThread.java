@@ -27,7 +27,10 @@ public class WorkerThread extends Thread {
 				taskQueue.remove(node);
 			}
 			try {
+				long start = System.nanoTime();
 				node.run();
+				long end = System.nanoTime();
+				System.out.println(Thread.currentThread().getId() + " Run time:\t\t" + (end-start));
 			} catch (Exception e) {
 				System.out.println(e);
 			}

@@ -21,6 +21,7 @@ public class MoveNodeTask implements Runnable {
 
 	@Override
 	public void run() {
+		long start = System.nanoTime();
 		double[] edgeWeightPerCluster = new double[network.nNodes];
         int[] neighboringClusters = new int[network.nNodes];
 
@@ -94,9 +95,13 @@ public class MoveNodeTask implements Runnable {
          * selected node that do not belong to the new cluster are marked
          * as unstable and are added to the queue.
          */
+        long endOfCalc = System.nanoTime();
         if (bestCluster != currentCluster)
         {
             clusterDataManager.moveNode(currentCluster, bestCluster, node);
         }
+        long end = System.nanoTime();
+        System.out.println(Thread.currentThread().getId() + " Calc time:\t\t" + (endOfCalc-start));
+        System.out.println(Thread.currentThread().getId() + " Move time:\t\t" + (end-endOfCalc));
 	}
 }
