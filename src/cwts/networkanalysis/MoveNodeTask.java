@@ -5,16 +5,14 @@ public class MoveNodeTask implements Runnable {
 	Clustering clustering;
 	ClusterDataManager clusterDataManager;
 	double[] clusterWeights;
-	int[] nNodesPerCluster;
 	double resolution;
 	int node;
 
-	public MoveNodeTask (Network network, Clustering clustering, ClusterDataManager clusterDataManager, double[] clusterWeights, int[] nNodesPerCluster, double resolution, int node) {
+	public MoveNodeTask (Network network, Clustering clustering, ClusterDataManager clusterDataManager, double[] clusterWeights, double resolution, int node) {
 		this.network = network;
 		this.clustering = clustering;
 		this.clusterDataManager = clusterDataManager;
 		this.clusterWeights = clusterWeights;
-		this.nNodesPerCluster = nNodesPerCluster;
 		this.resolution = resolution;
 		this.node = node;
 	}

@@ -4,11 +4,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class WorkerThread extends Thread {
-	Runnable[] taskList;
 	Set<Runnable> taskQueue;
 
-	public WorkerThread (Runnable[] taskList, Set<Runnable> taskQueue) {
-		this.taskList = taskList;
+	public WorkerThread (Set<Runnable> taskQueue) {
 		this.taskQueue = taskQueue;
 	}
 
