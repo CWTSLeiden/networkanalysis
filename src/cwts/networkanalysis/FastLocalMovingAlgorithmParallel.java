@@ -95,26 +95,21 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
         if (network.nNodes == 1)
             return false;
 
-        Runnable[] taskList = new Runnable[network.nNodes];
-        Set<Runnable> taskQueue = new LinkedHashSet<Runnable>();
+        Set<Integer> taskQueue = new LinkedHashSet<Integer>();
 
-        ClusterDataManager clusterDataManager = new ClusterDataManager(network, clustering, taskList, taskQueue);
+        ClusterDataManager clusterDataManager = new ClusterDataManager(network, clustering, taskQueue);
 
         double[] clusterWeights = clusterDataManager.getClusterWeights();
         int[] nNodesPerCluster = clusterDataManager.getnNodesPerCluster();
 
-        for (int i = 0; i < network.nNodes; i++) {
-            taskList[i] = new MoveNodeTask (network, clustering, clusterDataManager, clusterWeights, resolution, i);
-        }
-
         int[] nodeOrder = Arrays.generateRandomPermutation(network.nNodes, random);
         for (int i = 0; i < nodeOrder.length; i++) {
-            taskQueue.add(taskList[nodeOrder[i]]);
+            taskQueue.add(nodeOrder[i]);
         }
 
-        WorkerThread[] workers = new WorkerThread[numberOfWorkers];
-        for (WorkerThread worker : workers) {
-            worker = new WorkerThread(taskQueue);
+        NodeMover[] workers = new NodeMover[numberOfWorkers];
+        for (NodeMover worker : workers) {
+            worker = new NodeMover(taskQueue, network, clustering, clusterDataManager, clusterWeights, resolution);
             worker.start();
         }
 

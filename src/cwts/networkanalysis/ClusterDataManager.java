@@ -14,14 +14,12 @@ public class ClusterDataManager {
     int nUnusedClusters;
     int nextNode = 0;
     boolean someThingChanged;
-    Runnable[] taskList;
-    Set<Runnable> taskQueue;
+    Set<Integer> taskQueue;
 
-    public ClusterDataManager (Network network, Clustering clustering, Runnable[] taskList, Set<Runnable> taskQueue) {
+    public ClusterDataManager (Network network, Clustering clustering, Set<Integer> taskQueue) {
         this.network = network;
         this.clustering = clustering;
         this.random = random;
-        this.taskList = taskList;
         this.taskQueue = taskQueue;
 
         initialize();
@@ -106,7 +104,7 @@ public class ClusterDataManager {
             if (clustering.clusters[network.neighbors[k]] != clusterB)
             {
                 synchronized (taskQueue){
-                    taskQueue.add(taskList[network.neighbors[k]]);
+                    taskQueue.add(network.neighbors[k]);
                     taskQueue.notify();
                 }
             }
