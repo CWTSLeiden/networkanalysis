@@ -8,9 +8,10 @@ public class NodeMover extends Thread {
 	Network network;
 	Clustering clustering;
 	ClusterDataManager clusterDataManager;
-	double[] clusterWeights;
-	double resolution;
-	int node;
+	double[] clusterWeights, edgeWeightPerCluster;
+	double resolution, maxQualityValueIncrement, qualityValueIncrement;
+    int[] neighboringClusters;
+    int bestCluster, currentCluster, k, l, nNeighboringClusters, node;
 
 	public NodeMover (Set<Integer> taskQueue, Network network, Clustering clustering, ClusterDataManager clusterDataManager, double[] clusterWeights, double resolution) {
 		this.taskQueue = taskQueue;
@@ -20,80 +21,57 @@ public class NodeMover extends Thread {
 		this.clusterWeights = clusterWeights;
 		this.resolution = resolution;
 		this.node = node;
+		edgeWeightPerCluster = new double[network.nNodes];
+    	neighboringClusters = new int[network.nNodes];
 	}
 
 	public void run() {
-		int node;
 		while (true) {
 			synchronized (taskQueue) {
-				while (taskQueue.isEmpty()) {
+				if(!taskQueue.isEmpty()) {
+					node = taskQueue.iterator().next();
+					taskQueue.remove(node);
+				}
+				else {
 					try {
-						taskQueue.wait();
+						taskQueue.wait(1);
 					} catch (InterruptedException ex) {
 						System.out.println(ex);
 					}
+					if(!taskQueue.isEmpty()) {
+						node = taskQueue.iterator().next();
+						taskQueue.remove(node);
+					}
+					else {
+						node = 0;
+						Thread.currentThread().interrupt();
+						return;
+					}
 				}
-				node = taskQueue.iterator().next();
-				taskQueue.remove(node);
 			}
 			try {
-				long start = System.nanoTime();
-				moveNode(node);
-				long end = System.nanoTime();
-				System.out.println(Thread.currentThread().getId() + " Run time:\t\t" + (end-start));
+				optimizeNodeCluster();
 			} catch (Exception e) {
 				System.out.println(e);
 			}
 		}
 	}
 
-	private void moveNode(int node) {
-		long start = System.nanoTime();
-		double[] edgeWeightPerCluster = new double[network.nNodes];
-        int[] neighboringClusters = new int[network.nNodes];
-
-        double maxQualityValueIncrement, qualityValueIncrement;
-        int bestCluster, currentCluster, k, l, nNeighboringClusters;
-
+	private void optimizeNodeCluster() {
         currentCluster = clustering.clusters[node];
 
-        
+        identifyNeighbours();
 
-        /*
-         * Identify the neighboring clusters of the currently selected
-         * node, that is, the clusters with which the currently selected
-         * node is connected. An empty cluster is also included in the set
-         * of neighboring clusters. In this way, it is always possible that
-         * the currently selected node will be moved to an empty cluster.
-         */
+        findBestCluster();
 
-        neighboringClusters[0] = clusterDataManager.getNextUnusedCluster();
-        nNeighboringClusters = 1;
-        
-        for (k = network.firstNeighborIndices[node]; k < network.firstNeighborIndices[node + 1]; k++)
+        if (bestCluster != currentCluster)
         {
-            l = clustering.clusters[network.neighbors[k]];
-
-            if (edgeWeightPerCluster[l] == 0)
-            {
-                neighboringClusters[nNeighboringClusters] = l;
-                nNeighboringClusters++;
-            }
-            edgeWeightPerCluster[l] += network.edgeWeights[k];
+            clusterDataManager.moveNode(currentCluster, bestCluster, node);
         }
+	}
 
-        /*
-         * For each neighboring cluster of the currently selected node,
-         * calculate the increment of the quality function obtained by
-         * moving the currently selected node to the neighboring cluster.
-         * Determine the neighboring cluster for which the increment of the
-         * quality function is largest. The currently selected node will be
-         * moved to this optimal cluster. In order to guarantee convergence
-         * of the algorithm, if the old cluster of the currently selected
-         * node is optimal but there are also other optimal clusters, the
-         * currently selected node will be moved back to its old cluster.
-         */
-        bestCluster = currentCluster;
+	private void findBestCluster() {
+		bestCluster = currentCluster;
         maxQualityValueIncrement = edgeWeightPerCluster[currentCluster] - network.nodeWeights[node] * (clusterWeights[currentCluster]-network.nodeWeights[node]) * resolution;
         for (k = 0; k < nNeighboringClusters; k++)
         {
@@ -107,28 +85,22 @@ public class NodeMover extends Thread {
 
             edgeWeightPerCluster[l] = 0;
         }
+	}
+
+	private void identifyNeighbours() {
+		neighboringClusters[0] = clusterDataManager.getNextUnusedCluster();
+        nNeighboringClusters = 1;
         
-
-        /*
-         * Mark the currently selected node as stable and remove it from
-         * the queue.
-         */
-        //clusterDataManager.markDone(j);
-
-        /*
-         * If the new cluster of the currently selected node is different
-         * from the old cluster, some further updating of the clustering
-         * statistics is performed. Also, the neighbors of the currently
-         * selected node that do not belong to the new cluster are marked
-         * as unstable and are added to the queue.
-         */
-        long endOfCalc = System.nanoTime();
-        if (bestCluster != currentCluster)
+        for (k = network.firstNeighborIndices[node]; k < network.firstNeighborIndices[node + 1]; k++)
         {
-            clusterDataManager.moveNode(currentCluster, bestCluster, node);
+            l = clustering.clusters[network.neighbors[k]];
+
+            if (edgeWeightPerCluster[l] == 0)
+            {
+                neighboringClusters[nNeighboringClusters] = l;
+                nNeighboringClusters++;
+            }
+            edgeWeightPerCluster[l] += network.edgeWeights[k];
         }
-        long end = System.nanoTime();
-        System.out.println(Thread.currentThread().getId() + " Calc time:\t\t" + (endOfCalc-start));
-        System.out.println(Thread.currentThread().getId() + " Move time:\t\t" + (end-endOfCalc));
 	}
 }

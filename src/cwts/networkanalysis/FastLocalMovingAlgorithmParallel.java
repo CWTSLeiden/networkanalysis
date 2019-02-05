@@ -113,21 +113,10 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
             worker.start();
         }
 
-        // for (Worker worker : workers) {
-        //     try {
-        //         if(null != worker) worker.join();
-        //     }catch (InterruptedException ex) {
-        //         for (Worker workerThatShouldStop : workers) {
-        //             workerThatShouldStop.interrupt();
-        //         }
-        //     }
-        // }
-
         while (!taskQueue.isEmpty()) {
             synchronized (taskQueue) {
                 try {
-                    //System.out.println("Queue length: " + taskQueue.size());
-                    taskQueue.wait(500);
+                    taskQueue.wait(1);
                 } catch (InterruptedException ex) {
                     System.out.println(ex);
                 }
