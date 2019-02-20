@@ -60,7 +60,7 @@ public class ClusterDataManager {
     //     nUnstableNodes--;
     // }
 
-    public synchronized int getNextUnusedCluster () {
+    public int getNextUnusedCluster () {
         return unusedClusters[nUnusedClusters - 1];
     }
 
@@ -75,7 +75,7 @@ public class ClusterDataManager {
     //     return node;
     // }
 
-    public synchronized void moveNode(int clusterA, int clusterB, int j) {
+    public void moveNode(int clusterA, int clusterB, int j) {
         clusterWeights[clusterA] -= network.nodeWeights[j];
         nNodesPerCluster[clusterA]--;
         clusterWeights[clusterB] += network.nodeWeights[j];
@@ -105,7 +105,7 @@ public class ClusterDataManager {
             {
                 synchronized (taskQueue){
                     taskQueue.add(network.neighbors[k]);
-                    taskQueue.notify();
+                    //taskQueue.notify();
                 }
             }
         }

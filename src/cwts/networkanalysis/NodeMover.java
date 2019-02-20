@@ -20,7 +20,6 @@ public class NodeMover extends Thread {
 		this.clusterDataManager = clusterDataManager;
 		this.clusterWeights = clusterWeights;
 		this.resolution = resolution;
-		this.node = node;
 		edgeWeightPerCluster = new double[network.nNodes];
     	neighboringClusters = new int[network.nNodes];
 	}
@@ -33,27 +32,10 @@ public class NodeMover extends Thread {
 					taskQueue.remove(node);
 				}
 				else {
-					try {
-						taskQueue.wait(1);
-					} catch (InterruptedException ex) {
-						System.out.println(ex);
-					}
-					if(!taskQueue.isEmpty()) {
-						node = taskQueue.iterator().next();
-						taskQueue.remove(node);
-					}
-					else {
-						node = 0;
-						Thread.currentThread().interrupt();
-						return;
-					}
+					return;
 				}
 			}
-			try {
-				optimizeNodeCluster();
-			} catch (Exception e) {
-				System.out.println(e);
-			}
+			optimizeNodeCluster();
 		}
 	}
 
