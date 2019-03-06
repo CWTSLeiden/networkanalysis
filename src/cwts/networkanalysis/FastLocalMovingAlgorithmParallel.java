@@ -108,18 +108,16 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
         }
 
         NodeMover[] workers = new NodeMover[numberOfWorkers];
-        for (NodeMover worker : workers) {
-            worker = new NodeMover(taskQueue, network, clustering, clusterDataManager, clusterWeights, resolution);
-            worker.start();
+        for (int i = 0; i < numberOfWorkers; i++) {
+            workers[i] = new NodeMover(taskQueue, network, clustering, clusterDataManager, clusterWeights, resolution);
+            workers[i].start();
         }
 
-        while (!taskQueue.isEmpty()) {
-            synchronized (taskQueue) {
-                try {
-                    taskQueue.wait(1);
-                } catch (InterruptedException ex) {
-                    System.out.println(ex);
-                }
+        for(NodeMover worker: workers) {
+            try {
+                worker.join();
+            } catch (InterruptedException ex) {
+                System.out.println(ex);
             }
         }
 
