@@ -223,15 +223,16 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
             localMergingAlgorithm = new LocalMergingAlgorithm(resolution, randomness, random);
             subnetworks = network.createSubnetworks(clustering);
             nodesPerCluster = clustering.getNodesPerCluster();
-            clustering.nClusters = 0;
+            refinement = new Clustering(network.nNodes);
+            refinement.nClusters = 0;
             nNodesPerClusterReducedNetwork = new int[subnetworks.length];
             for (i = 0; i < subnetworks.length; i++)
             {
                 clusteringSubnetwork = localMergingAlgorithm.findClustering(subnetworks[i]);
 
                 for (j = 0; j < subnetworks[i].nNodes; j++)
-                    clustering.clusters[nodesPerCluster[i][j]] = clustering.nClusters + clusteringSubnetwork.clusters[j];
-                clustering.nClusters += clusteringSubnetwork.nClusters;
+                    refinement.clusters[nodesPerCluster[i][j]] = refinement.nClusters + clusteringSubnetwork.clusters[j];
+                refinement.nClusters += clusteringSubnetwork.nClusters;
                 nNodesPerClusterReducedNetwork[i] = clusteringSubnetwork.nClusters;
             }
 
@@ -239,21 +240,32 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
              * Create an aggregate network based on the refined clustering of
              * the non-aggregate network.
              */
-            reducedNetwork = network.createReducedNetwork(clustering);
-
-            /*
-             * Create an initial clustering for the aggregate network based on
-             * the non-refined clustering of the non-aggregate network.
-             */
-            clustersReducedNetwork = new int[clustering.nClusters];
-            i = 0;
-            for (j = 0; j < nNodesPerClusterReducedNetwork.length; j++)
+            if (refinement.nClusters < network.nNodes)
             {
-                Arrays.fill(clustersReducedNetwork, i, i + nNodesPerClusterReducedNetwork[j], j);
-                i += nNodesPerClusterReducedNetwork[j];
-            }
-            clusteringReducedNetwork = new Clustering(clustersReducedNetwork);
+                reducedNetwork = network.createReducedNetwork(refinement);
+                /*
+                 * Create an initial clustering for the aggregate network based on
+                 * the non-refined clustering of the non-aggregate network.
+                 */
+                clustersReducedNetwork = new int[refinement.nClusters];
+                i = 0;
+                for (j = 0; j < nNodesPerClusterReducedNetwork.length; j++)
+                {
+                    Arrays.fill(clustersReducedNetwork, i, i + nNodesPerClusterReducedNetwork[j], j);
+                    i += nNodesPerClusterReducedNetwork[j];
+                }
+                clusteringReducedNetwork = new Clustering(clustersReducedNetwork);
 
+                clustering.clusters = refinement.clusters;
+            }
+            else
+            {
+                /* No aggregation took place, so we now aggregate on the basis
+                 * of the original clustering.
+                 */
+                reducedNetwork = network.createReducedNetwork(clustering);
+                clusteringReducedNetwork = new Clustering(reducedNetwork.nNodes);
+            }
             /*
              * Recursively apply the algorithm to the aggregate network,
              * starting from the initial clustering created for this network.
@@ -266,6 +278,7 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
              * network.
              */
             clustering.mergeClusters(clusteringReducedNetwork);
+            System.out.println("Merged " + clusteringReducedNetwork.nClusters + " clusters from reduced network to " + clustering.nClusters + " clusters.");
         }
 
         return update;
