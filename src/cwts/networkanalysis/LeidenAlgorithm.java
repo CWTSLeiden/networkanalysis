@@ -246,7 +246,7 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
                  * on the non-refined clustering of the non-aggregate network.
                  */
                 clusteringReducedNetwork = new Clustering(refinement.nClusters);
-
+                clusteringReducedNetwork.nClusters = clustering.nClusters;
                 for (i = 0; i < network.nNodes; i++)
                     clusteringReducedNetwork.clusters[refinement.clusters[i]] = clustering.clusters[i];
 
