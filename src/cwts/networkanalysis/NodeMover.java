@@ -1,10 +1,9 @@
 package cwts.networkanalysis;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public class NodeMover extends Thread {
-	Set<Integer> taskQueue;
+    IntList taskQueue;
 	Network network;
 	Clustering clustering;
 	ClusterDataManager clusterDataManager;
@@ -13,7 +12,7 @@ public class NodeMover extends Thread {
     int[] neighboringClusters;
     int bestCluster, currentCluster, k, l, nNeighboringClusters, node;
 
-	public NodeMover (Set<Integer> taskQueue, Network network, Clustering clustering, ClusterDataManager clusterDataManager, double[] clusterWeights, double resolution) {
+	public NodeMover (IntList taskQueue, Network network, Clustering clustering, ClusterDataManager clusterDataManager, double[] clusterWeights, double resolution) {
 		this.taskQueue = taskQueue;
 		this.network = network;
 		this.clustering = clustering;
@@ -28,8 +27,8 @@ public class NodeMover extends Thread {
 		while (true) {
 			synchronized (taskQueue) {
 				if(!taskQueue.isEmpty()) {
-					node = taskQueue.iterator().next();
-					taskQueue.remove(node);
+					node = taskQueue.getInt(0);
+					taskQueue.removeInt(0);
 				}
 				else {
 					return;
