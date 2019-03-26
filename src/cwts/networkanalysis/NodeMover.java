@@ -2,13 +2,14 @@ package cwts.networkanalysis;
 
 public class NodeMover extends Thread {
 	GeertensIntList taskQueue;
+	GeertensIntList threadQueue;
 	Network network;
 	Clustering clustering;
 	ClusterDataManager clusterDataManager;
 	double[] clusterWeights, edgeWeightPerCluster;
 	double resolution, maxQualityValueIncrement, qualityValueIncrement;
     int[] neighboringClusters;
-    int bestCluster, currentCluster, k, l, nNeighboringClusters, node;
+    int bestCluster, currentCluster, k, l, nNeighboringClusters;
 
 	public NodeMover (GeertensIntList taskQueue, Network network, Clustering clustering, ClusterDataManager clusterDataManager, double[] clusterWeights, double resolution) {
 		this.taskQueue = taskQueue;
@@ -25,30 +26,33 @@ public class NodeMover extends Thread {
 		while (true) {
 			synchronized (taskQueue) {
 				if(!taskQueue.isEmpty()) {
-					node = taskQueue.popInt();
+					threadQueue = taskQueue.popSubList(7);
 				}
 				else {
 					return;
 				}
 			}
-			optimizeNodeCluster();
+			processQueue();
 		}
 	}
 
-	private void optimizeNodeCluster() {
-        currentCluster = clustering.clusters[node];
-
-        identifyNeighbours();
-
-        findBestCluster();
-
-        if (bestCluster != currentCluster)
-        {
-            clusterDataManager.moveNode(currentCluster, bestCluster, node);
-        }
+	private void processQueue(){
+		while(!threadQueue.isEmpty()){
+			optimizeNodeCluster(threadQueue.popInt());
+		}
 	}
 
-	private void findBestCluster() {
+	private void optimizeNodeCluster(int node) {
+        currentCluster = clustering.clusters[node];
+
+        identifyNeighbours(node);
+
+        findBestCluster(node);
+
+        clusterDataManager.moveNode(currentCluster, bestCluster, node);
+	}
+
+	private void findBestCluster(int node) {
 		bestCluster = currentCluster;
         maxQualityValueIncrement = edgeWeightPerCluster[currentCluster] - network.nodeWeights[node] * (clusterWeights[currentCluster]-network.nodeWeights[node]) * resolution;
         for (k = 0; k < nNeighboringClusters; k++)
@@ -65,7 +69,7 @@ public class NodeMover extends Thread {
         }
 	}
 
-	private void identifyNeighbours() {
+	private void identifyNeighbours(int node) {
 		neighboringClusters[0] = clusterDataManager.getNextUnusedCluster();
         nNeighboringClusters = 1;
         

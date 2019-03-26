@@ -27,6 +27,10 @@ public class GeertensIntList extends AbstractIntList {
         return size;
     }
 
+    public void setSize(int size){
+        this.size = size;
+    }
+
     @Override
     public boolean add(int k){
         if(head == null){
@@ -74,50 +78,79 @@ public class GeertensIntList extends AbstractIntList {
     public boolean addAll(GeertensIntList l){
         if(l.size() > 1){
             if(size == 0){
-                head = l.getFirstInt();
+                head = l.getHead();
             }
             else if(size == 1){
-                head.setNextNode(l.getFirstInt());
+                head.setNextNode(l.getHead());
             }
             else{
-                tail.setNextNode(l.getFirstInt());
-                l.getFirstInt().setPrevNode(tail);
+                tail.setNextNode(l.getHead());
+                l.getHead().setPrevNode(tail);
             }
-            tail = l.getLastInt();
+            tail = l.getTail();
         }
         else if(l.size == 1){
             if(size == 0){
-                head = l.getFirstInt();
+                head = l.getHead();
             }
-            else if(size == 1){
-                head.setNextNode(l.getFirstInt());
-                tail = l.getFirstInt();
+            else {
+                if(size == 1){
+                    head.setNextNode(l.getHead());
+                }
+                else{
+                    tail.setNextNode(l.getHead());
+                }
+                tail = l.getHead();
                 tail.setPrevNode(head);
             }
-            else{
-                tail.setNextNode(l.getFirstInt());
-                l.getFirstInt().setPrevNode(tail);
-            }
         }
+
         size += l.size();
 
         return true;
     }
 
-    public Node getFirstInt(){
+    public Node getHead(){
         return head;
     }
 
-    public Node getLastInt(){
+    public void setHead(Node head){
+        this.head = head;
+    }
+
+    public Node getTail(){
         return tail;
     }
 
-    public void printList(){
-        Node pointer = head;
-        while(pointer != null){
-            System.out.println(pointer.getValue());
-            pointer = pointer.getNextNode();
+    public void setTail(Node tail){
+        this.tail = tail;
+    }
+
+    public GeertensIntList popSubList(int fraction){
+        GeertensIntList subList = new GeertensIntList();
+        if(2*fraction >= size){
+            subList.setSize(size);
+            subList.setHead(head);
+            subList.setTail(tail);
+            size = 0;
+            head = null;
+            tail = null;
         }
+        else {
+            int newSize = (size+fraction-1) / fraction;
+            subList.setSize(newSize);
+            subList.setHead(head);
+            Node pointer = head;
+            for(int i = 1; i < newSize; i++){
+                pointer = pointer.getNextNode();
+            }
+            subList.setTail(pointer);
+            head = pointer.getNextNode();
+            pointer.setNextNode(null);
+            head.setPrevNode(null);
+            size -= newSize;
+        }
+        return subList;
     }
 }
 

@@ -14,12 +14,14 @@ public class ClusterDataManager {
     int nextNode = 0;
     boolean someThingChanged;
     GeertensIntList taskQueue;
+    boolean[] nodeNotInQueue;
 
     public ClusterDataManager (Network network, Clustering clustering, GeertensIntList taskQueue) {
         this.network = network;
         this.clustering = clustering;
         this.random = random;
         this.taskQueue = taskQueue;
+        nodeNotInQueue = new boolean[network.nNodes];
 
         initialize();
     }
@@ -75,43 +77,43 @@ public class ClusterDataManager {
     // }
 
     public void moveNode(int clusterA, int clusterB, int j) {
-        clusterWeights[clusterA] -= network.nodeWeights[j];
-        nNodesPerCluster[clusterA]--;
-        clusterWeights[clusterB] += network.nodeWeights[j];
-        nNodesPerCluster[clusterB]++;
-        if (nUnusedClusters > 0 && nNodesPerCluster[clusterA] == 0 && clusterB == unusedClusters[nUnusedClusters - 1])
-        {
-            unusedClusters[nUnusedClusters - 1] = clusterA;
-        }
-        else if (nNodesPerCluster[clusterA] == 0)
-        {
-            unusedClusters[nUnusedClusters] = clusterA;
-            nUnusedClusters++;
-        }
-        else if (clusterB == unusedClusters[nUnusedClusters - 1])
-        {
-            nUnusedClusters--;
-        }
-        
-        
-
-        clustering.clusters[j] = clusterB;
-        if (clusterB >= clustering.nClusters)
-            clustering.nClusters = clusterB + 1;
-
-        GeertensIntList newQueueElements = new GeertensIntList();
-
-        for (int k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++) {
-            if (clustering.clusters[network.neighbors[k]] != clusterB)
-            {
-                newQueueElements.add(network.neighbors[k]);
+        nodeNotInQueue[j] = true;
+        if (clusterA != clusterB) {
+            clusterWeights[clusterA] -= network.nodeWeights[j];
+            nNodesPerCluster[clusterA]--;
+            clusterWeights[clusterB] += network.nodeWeights[j];
+            nNodesPerCluster[clusterB]++;
+            if (nUnusedClusters > 0 && nNodesPerCluster[clusterA] == 0 && clusterB == unusedClusters[nUnusedClusters - 1]) {
+                unusedClusters[nUnusedClusters - 1] = clusterA;
+            } else if (nNodesPerCluster[clusterA] == 0) {
+                unusedClusters[nUnusedClusters] = clusterA;
+                nUnusedClusters++;
+            } else if (clusterB == unusedClusters[nUnusedClusters - 1]) {
+                nUnusedClusters--;
             }
-        }
 
-        synchronized (taskQueue){
-            taskQueue.addAll(newQueueElements);
+
+            clustering.clusters[j] = clusterB;
+            if (clusterB >= clustering.nClusters)
+                clustering.nClusters = clusterB + 1;
+
+            GeertensIntList newQueueElements = new GeertensIntList();
+
+            int neighbor = 0;
+
+            for (int k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++) {
+                neighbor = network.neighbors[k];
+                if (clustering.clusters[network.neighbors[k]] != clusterB && nodeNotInQueue[neighbor]) {
+                    nodeNotInQueue[neighbor] = false;
+                    newQueueElements.add(network.neighbors[k]);
+                }
+            }
+
+            synchronized (taskQueue) {
+                taskQueue.addAll(newQueueElements);
+            }
+
+            someThingChanged = true;
         }
-        
-        someThingChanged = true;
     }
 }
