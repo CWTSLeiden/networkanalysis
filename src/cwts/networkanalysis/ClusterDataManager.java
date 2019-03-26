@@ -76,8 +76,9 @@ public class ClusterDataManager {
     //     return node;
     // }
 
-    public void moveNode(int clusterA, int clusterB, int j) {
+    public GeertensIntList moveNode(int clusterA, int clusterB, int j) {
         nodeNotInQueue[j] = true;
+        GeertensIntList newQueueElements = new GeertensIntList();
         if (clusterA != clusterB) {
             clusterWeights[clusterA] -= network.nodeWeights[j];
             nNodesPerCluster[clusterA]--;
@@ -97,8 +98,6 @@ public class ClusterDataManager {
             if (clusterB >= clustering.nClusters)
                 clustering.nClusters = clusterB + 1;
 
-            GeertensIntList newQueueElements = new GeertensIntList();
-
             int neighbor = 0;
 
             for (int k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++) {
@@ -109,11 +108,12 @@ public class ClusterDataManager {
                 }
             }
 
-            synchronized (taskQueue) {
+            /*synchronized (taskQueue) {
                 taskQueue.addAll(newQueueElements);
-            }
+            }*/
 
             someThingChanged = true;
         }
+        return newQueueElements;
     }
 }

@@ -37,19 +37,23 @@ public class NodeMover extends Thread {
 	}
 
 	private void processQueue(){
+		GeertensIntList newQueueElements = new GeertensIntList();
 		while(!threadQueue.isEmpty()){
-			optimizeNodeCluster(threadQueue.popInt());
+			newQueueElements.addAll(optimizeNodeCluster(threadQueue.popInt()));
 		}
+		synchronized (taskQueue) {
+        	taskQueue.addAll(newQueueElements);
+        }
 	}
 
-	private void optimizeNodeCluster(int node) {
+	private GeertensIntList optimizeNodeCluster(int node) {
         currentCluster = clustering.clusters[node];
 
         identifyNeighbours(node);
 
         findBestCluster(node);
 
-        clusterDataManager.moveNode(currentCluster, bestCluster, node);
+        return clusterDataManager.moveNode(currentCluster, bestCluster, node);
 	}
 
 	private void findBestCluster(int node) {
