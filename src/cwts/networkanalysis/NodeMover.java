@@ -1,9 +1,7 @@
 package cwts.networkanalysis;
 
-import it.unimi.dsi.fastutil.ints.IntList;
-
 public class NodeMover extends Thread {
-    IntList taskQueue;
+	GeertensIntList taskQueue;
 	Network network;
 	Clustering clustering;
 	ClusterDataManager clusterDataManager;
@@ -12,7 +10,7 @@ public class NodeMover extends Thread {
     int[] neighboringClusters;
     int bestCluster, currentCluster, k, l, nNeighboringClusters, node;
 
-	public NodeMover (IntList taskQueue, Network network, Clustering clustering, ClusterDataManager clusterDataManager, double[] clusterWeights, double resolution) {
+	public NodeMover (GeertensIntList taskQueue, Network network, Clustering clustering, ClusterDataManager clusterDataManager, double[] clusterWeights, double resolution) {
 		this.taskQueue = taskQueue;
 		this.network = network;
 		this.clustering = clustering;
@@ -27,8 +25,7 @@ public class NodeMover extends Thread {
 		while (true) {
 			synchronized (taskQueue) {
 				if(!taskQueue.isEmpty()) {
-					node = taskQueue.getInt(0);
-					taskQueue.removeInt(0);
+					node = taskQueue.popInt();
 				}
 				else {
 					return;

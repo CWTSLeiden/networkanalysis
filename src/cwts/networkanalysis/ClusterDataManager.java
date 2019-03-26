@@ -2,8 +2,6 @@ package cwts.networkanalysis;
 
 import cwts.util.Arrays;
 import java.util.Random;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.Set;
 
 public class ClusterDataManager {
@@ -15,9 +13,9 @@ public class ClusterDataManager {
     int nUnusedClusters;
     int nextNode = 0;
     boolean someThingChanged;
-    IntList taskQueue;
+    GeertensIntList taskQueue;
 
-    public ClusterDataManager (Network network, Clustering clustering, IntList taskQueue) {
+    public ClusterDataManager (Network network, Clustering clustering, GeertensIntList taskQueue) {
         this.network = network;
         this.clustering = clustering;
         this.random = random;
@@ -101,7 +99,7 @@ public class ClusterDataManager {
         if (clusterB >= clustering.nClusters)
             clustering.nClusters = clusterB + 1;
 
-        IntList newQueueElements = new IntArrayList();
+        GeertensIntList newQueueElements = new GeertensIntList();
 
         for (int k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++) {
             if (clustering.clusters[network.neighbors[k]] != clusterB)
@@ -111,7 +109,7 @@ public class ClusterDataManager {
         }
 
         synchronized (taskQueue){
-            taskQueue.addAll(taskQueue.size(), newQueueElements);
+            taskQueue.addAll(newQueueElements);
         }
         
         someThingChanged = true;
