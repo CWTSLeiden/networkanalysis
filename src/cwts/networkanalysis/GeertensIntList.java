@@ -1,9 +1,6 @@
 package cwts.networkanalysis;
 
-import it.unimi.dsi.fastutil.ints.AbstractIntList;
-import it.unimi.dsi.fastutil.ints.IntList;
-
-public class GeertensIntList extends AbstractIntList {
+public class GeertensIntList{
     private Node head;
     private Node tail;
     private int size;
@@ -12,17 +9,6 @@ public class GeertensIntList extends AbstractIntList {
 
     }
 
-    @Override
-    public int getInt(int index){
-        if(index >= size) return -2147483648;
-        Node pointer = head;
-        for(int i = 0; i < index; i++){
-            pointer = pointer.getNextNode();
-        }
-        return pointer.getValue();
-    }
-
-    @Override
     public int size() {
         return size;
     }
@@ -31,7 +17,6 @@ public class GeertensIntList extends AbstractIntList {
         this.size = size;
     }
 
-    @Override
     public boolean add(int k){
         if(head == null){
             head = new Node(k, null, null);
@@ -49,13 +34,11 @@ public class GeertensIntList extends AbstractIntList {
         return true;
     }
 
-    @Override
     public boolean isEmpty(){
         if(head == null) return true;
         return false;
     }
 
-    @Override
     public int popInt(){
         if(size == 0) return -2147483648;
         int value = head.getValue();
@@ -165,10 +148,6 @@ class Node {
         this.prevNode = prevNode;
     }
 
-    public void setValue(int value){
-        this.value = value;
-    }
-
     public int getValue(){
         return value;
     }
@@ -183,9 +162,5 @@ class Node {
 
     public void setPrevNode(Node prevNode){
         this.prevNode = prevNode;
-    }
-
-    public Node getPrevNode(){
-        return prevNode;
     }
 }
