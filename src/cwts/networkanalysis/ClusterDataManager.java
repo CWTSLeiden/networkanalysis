@@ -76,7 +76,7 @@ public class ClusterDataManager {
     //     return node;
     // }
 
-    public void moveNode(int clusterA, int clusterB, int j) {
+    public GeertensIntList moveNode(int clusterA, int clusterB, int j) {
         nodeNotInQueue[j] = true;
         GeertensIntList newQueueElements = new GeertensIntList();
         if (clusterA != clusterB) {
@@ -108,11 +108,12 @@ public class ClusterDataManager {
                 }
             }
 
-            synchronized (taskQueue) {
+            /*synchronized (taskQueue) {
                 taskQueue.addAll(newQueueElements);
-            }
+            }*/
 
             someThingChanged = true;
         }
+        return newQueueElements;
     }
 }

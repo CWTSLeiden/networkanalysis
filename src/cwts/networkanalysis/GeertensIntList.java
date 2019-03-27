@@ -111,7 +111,7 @@ public class GeertensIntList{
 
     public GeertensIntList popSubList(int fraction){
         GeertensIntList subList = new GeertensIntList();
-        if(2*fraction >= size || fraction == 1){
+        if(2*fraction >= size){
             subList.setSize(size);
             subList.setHead(head);
             subList.setTail(tail);

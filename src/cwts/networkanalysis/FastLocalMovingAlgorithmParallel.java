@@ -90,7 +90,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
     protected boolean improveClusteringOneIteration(Network network, Clustering clustering)
     {
         long start = System.nanoTime();
-        int numberOfWorkers = 8;
+        int numberOfWorkers = 7;
 
         if (network.nNodes == 1)
             return false;
@@ -109,7 +109,7 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
 
         NodeMover[] workers = new NodeMover[numberOfWorkers];
         for (int i = 0; i < numberOfWorkers; i++) {
-            workers[i] = new NodeMover(taskQueue, network, clustering, clusterDataManager, clusterWeights, resolution, numberOfWorkers);
+            workers[i] = new NodeMover(taskQueue, network, clustering, clusterDataManager, clusterWeights, resolution);
             workers[i].start();
         }
 
