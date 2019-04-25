@@ -108,10 +108,6 @@ public class ClusterDataManager {
                 }
             }
 
-            /*synchronized (taskQueue) {
-                taskQueue.addAll(newQueueElements);
-            }*/
-
             someThingChanged = true;
         }
         return newQueueElements;

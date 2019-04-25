@@ -111,7 +111,8 @@ public class GeertensIntList{
 
     public GeertensIntList popSubList(int fraction){
         GeertensIntList subList = new GeertensIntList();
-        if(size < 1000 || fraction == 1){
+        int newSize = (size+fraction-1) / fraction;
+        if(newSize < 10 || fraction == 1){
             subList.setSize(size);
             subList.setHead(head);
             subList.setTail(tail);
@@ -120,7 +121,6 @@ public class GeertensIntList{
             tail = null;
         }
         else {
-            int newSize = (size+fraction-1) / fraction;
             subList.setSize(newSize);
             subList.setHead(head);
             Node pointer = head;
