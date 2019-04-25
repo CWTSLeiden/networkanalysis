@@ -89,7 +89,6 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
      */
     protected boolean improveClusteringOneIteration(Network network, Clustering clustering)
     {
-        long start = System.nanoTime();
         int numberOfWorkers = 8;
 
         if (network.nNodes == 1)
@@ -125,9 +124,6 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
 
         if (update)
             clustering.removeEmptyClusters();
-
-        long end = System.nanoTime();
-        System.out.print((end-start)+",");
 
         return update;
     }
