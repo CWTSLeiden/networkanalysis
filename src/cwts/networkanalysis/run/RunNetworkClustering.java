@@ -153,7 +153,7 @@ public final class RunNetworkClustering
         boolean sortedEdgeList = false;
         String initialClusteringFilename = null;
         String finalClusteringFilename = null;
-        String serialisedNetworkFileName = null;
+        String edgeListFilename = null;
 
         int argIndex = 0;
         while (argIndex < args.length - 1)
@@ -292,14 +292,15 @@ public final class RunNetworkClustering
             System.err.print("Error while processing command line arguments: Incorrect number of command line arguments.\n\n" + USAGE);
             System.exit(-1);
         }
-        serialisedNetworkFileName = args[argIndex];
+        edgeListFilename = args[argIndex];
 
         // Read edge list from file.
-        System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + serialisedNetworkFileName + "'.");
+        System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
         long startTimeEdgeListFile = System.currentTimeMillis();
+        //Network network = readEdgeList(edgeListFilename, useModularity, weightedEdges, sortedEdgeList);
         Network network = null;
         try {
-            network = Network.load(serialisedNetworkFileName);
+            network = Network.load(edgeListFilename);
         }
         catch (Exception e) {
             System.err.print(e);
@@ -307,6 +308,15 @@ public final class RunNetworkClustering
         }
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
         System.err.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
+
+        /*/get largest component and save network
+        network =  network.createSubnetworkLargestComponent();
+        try{
+            network.save(edgeListFilename.replace(".txt" , ".ser"));
+        }
+        catch (Exception e){
+            System.err.println(e);
+        }*/
 
         // Read initial clustering from file.
         Clustering initialClustering = null;
