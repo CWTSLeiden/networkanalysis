@@ -1,5 +1,11 @@
 package cwts.networkanalysis;
 
+import java.nio.file.Files;
+import java.io.File;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 /**
  * Abstract base class for iterative clustering algorithms that use the CPM
  * quality function.
@@ -103,11 +109,16 @@ public abstract class IterativeCPMClusteringAlgorithm extends IncrementalCPMClus
             qualities = qualities.replace('.', ',') + '\n';
             System.out.println(times);
             System.out.println(qualities);
-            /*filename = "measurements_" + FilenameUtils.getBaseName(filename) + ".txt";
+            String filename = "measurements.txt";
             Path path = Paths.get(filename);
             if (Files.notExists(path)) {
                 File file = new File(filename);
-                file.createNewFile();
+                try {
+                    file.createNewFile();
+                }
+                catch (Exception e) {
+                    System.err.println(e);
+                }
             }
             if (Files.exists(path)) {
                 try {
@@ -116,7 +127,7 @@ public abstract class IterativeCPMClusteringAlgorithm extends IncrementalCPMClus
                 }catch (Exception e) {
                     System.err.println(e);
                 }
-            }*/
+            }
         }
         else if(nIterations == 1) update |= improveClusteringOneIteration(network, clustering);
         else {
