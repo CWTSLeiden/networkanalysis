@@ -93,22 +93,19 @@ public abstract class IterativeCPMClusteringAlgorithm extends IncrementalCPMClus
 
         update = false;
         if (nIterations > 1) {
-            String times = "duration 0";
-            String qualities = "quality 0";
+            String measurement = "duration quality";
             long time = 0;
             for (i = 0; i < nIterations; i++) {
                 long start = System.nanoTime();
                 update |= improveClusteringOneIteration(network, clustering);
                 long duration = System.nanoTime() - start;
                 time += duration;
-                times = times + " " + time;
+                measurement = measurement + "\n" + time;
                 double quality = calcQuality(network, clustering);
-                qualities = qualities + " " + quality;
+                String qualityStr = " " + quality;
+                measurement = measurement + qualityStr.replace('.', ',');
             }
-            times = times + '\n';
-            qualities = qualities.replace('.', ',') + '\n';
-            System.out.println(times);
-            System.out.println(qualities);
+            System.out.println(measurement);
             String filename = "measurements.txt";
             Path path = Paths.get(filename);
             if (Files.notExists(path)) {
@@ -122,8 +119,7 @@ public abstract class IterativeCPMClusteringAlgorithm extends IncrementalCPMClus
             }
             if (Files.exists(path)) {
                 try {
-                    Files.write(Paths.get(filename), times.getBytes(), StandardOpenOption.APPEND);
-                    Files.write(Paths.get(filename), qualities.getBytes(), StandardOpenOption.APPEND);
+                    Files.write(Paths.get(filename), measurement.getBytes(), StandardOpenOption.APPEND);
                 }catch (Exception e) {
                     System.err.println(e);
                 }
