@@ -371,8 +371,8 @@ public final class RunNetworkClustering
         System.err.println("Final clustering consists of " + finalClustering.getNClusters() + " clusters.");
 
         // Write final clustering to file (or to standard output).
-        System.err.println("Writing final clustering to " + ((finalClusteringFilename == null) ? "standard output." : "'" + finalClusteringFilename + "'."));
-        writeClustering(finalClusteringFilename, finalClustering);
+        //System.err.println("Writing final clustering to " + ((finalClusteringFilename == null) ? "standard output." : "'" + finalClusteringFilename + "'."));
+        //writeClustering(finalClusteringFilename, finalClustering);
     }
 
     /**
