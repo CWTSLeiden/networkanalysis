@@ -106,24 +106,6 @@ public abstract class IterativeCPMClusteringAlgorithm extends IncrementalCPMClus
                 measurement = measurement + qualityStr.replace('.', ',');
             }
             System.out.println(measurement);
-            String filename = "measurements.txt";
-            Path path = Paths.get(filename);
-            if (Files.notExists(path)) {
-                File file = new File(filename);
-                try {
-                    file.createNewFile();
-                }
-                catch (Exception e) {
-                    System.err.println(e);
-                }
-            }
-            if (Files.exists(path)) {
-                try {
-                    Files.write(Paths.get(filename), measurement.getBytes(), StandardOpenOption.APPEND);
-                }catch (Exception e) {
-                    System.err.println(e);
-                }
-            }
         }
         else if(nIterations == 1) update |= improveClusteringOneIteration(network, clustering);
         else {

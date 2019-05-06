@@ -145,6 +145,7 @@ public final class RunNetworkClustering
         boolean useLouvain = DEFAULT_USE_LOUVAIN;
         int nRandomStarts = DEFAULT_N_RANDOM_STARTS;
         int nIterations = DEFAULT_N_ITERATIONS;
+        int numberOfWorkers = 0;
         double randomness = DEFAULT_RANDOMNESS;
 
         long seed = 0;
@@ -278,6 +279,13 @@ public final class RunNetworkClustering
                     finalClusteringFilename = args[argIndex + 1];
                     argIndex += 2;
                 }
+                else if (arg.equals("--parallel-workers"))
+                {
+                    if ((argIndex + 1) >= args.length)
+                        throw new IllegalArgumentException("Missing value.");
+                    numberOfWorkers = Integer.parseInt(args[argIndex + 1]);
+                    argIndex += 2;
+                }
                 else
                     throw new IllegalArgumentException("Invalid command line argument.");
             }
@@ -344,10 +352,17 @@ public final class RunNetworkClustering
             System.err.println("Randomness parameter:         " + randomness);
         System.err.println("Random number generator seed: " + (useSeed ? seed : "random"));
 
+        System.out.println("Data file: " + edgeListFilename);
+        System.out.println("Number of threads: " + numberOfWorkers);
+
         long startTimeAlgorithm = System.currentTimeMillis();
         double resolution2 = useModularity ? (resolution / (2 * network.getTotalEdgeWeight() + network.getTotalEdgeWeightSelfLinks())) : resolution;
         Random random = useSeed ? new Random(seed) : new Random();
-        IterativeCPMClusteringAlgorithm algorithm = useLouvain ? new LouvainAlgorithm(resolution2, nIterations, random) : new LeidenAlgorithm(resolution2, nIterations, randomness, random);
+        IterativeCPMClusteringAlgorithm algorithm;
+        if(useLouvain) algorithm = new LouvainAlgorithm(resolution2, nIterations, random);
+        else if(numberOfWorkers>0) algorithm = new LeidenAlgorithm(resolution2, nIterations, randomness, random, numberOfWorkers);
+        else algorithm = new LeidenAlgorithm(resolution2, nIterations, randomness, random);
+
         Clustering finalClustering = null;
         double maxQuality = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < nRandomStarts; i++)

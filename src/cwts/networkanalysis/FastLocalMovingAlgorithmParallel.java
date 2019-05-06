@@ -34,22 +34,17 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
      */
     protected Random random;
 
-    /**
-     * Constructs a fast local moving algorithm.
-     */
-    public FastLocalMovingAlgorithmParallel()
-    {
-        this(new Random());
-    }
+    protected int numberOfWorkers;
+
 
     /**
      * Constructs a fast local moving algorithm.
      *
      * @param random Random number generator
      */
-    public FastLocalMovingAlgorithmParallel(Random random)
+    public FastLocalMovingAlgorithmParallel(Random random, int numberOfWorkers)
     {
-        this(DEFAULT_RESOLUTION, DEFAULT_N_ITERATIONS, random);
+        this(DEFAULT_RESOLUTION, DEFAULT_N_ITERATIONS, random, numberOfWorkers);
     }
 
     /**
@@ -60,11 +55,13 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
      * @param nIterations Number of iterations
      * @param random      Random number generator
      */
-    public FastLocalMovingAlgorithmParallel(double resolution, int nIterations, Random random)
+    public FastLocalMovingAlgorithmParallel(double resolution, int nIterations, Random random, int numberOfWorkers)
     {
         super(resolution, nIterations);
 
         this.random = random;
+
+        this.numberOfWorkers = numberOfWorkers;
     }
 
     /**
@@ -89,8 +86,6 @@ public class FastLocalMovingAlgorithmParallel extends IterativeCPMClusteringAlgo
      */
     protected boolean improveClusteringOneIteration(Network network, Clustering clustering)
     {
-        int numberOfWorkers = 8;
-
         if (network.nNodes == 1)
             return false;
 
