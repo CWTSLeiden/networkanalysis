@@ -93,19 +93,16 @@ public abstract class IterativeCPMClusteringAlgorithm extends IncrementalCPMClus
 
         update = false;
         if (nIterations > 1) {
-            String measurement = "duration quality";
             long time = 0;
             for (i = 0; i < nIterations; i++) {
                 long start = System.nanoTime();
                 update |= improveClusteringOneIteration(network, clustering);
                 long duration = System.nanoTime() - start;
                 time += duration;
-                measurement = measurement + "\n" + time;
+                System.out.print("\n" + time);
                 double quality = calcQuality(network, clustering);
-                String qualityStr = " " + quality;
-                measurement = measurement + qualityStr.replace('.', ',');
+                System.out.print( "," + quality + "\n");
             }
-            System.out.println(measurement);
         }
         else if(nIterations == 1) update |= improveClusteringOneIteration(network, clustering);
         else {

@@ -13,8 +13,10 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -351,6 +353,15 @@ public final class RunNetworkClustering
         if (!useLouvain)
             System.err.println("Randomness parameter:         " + randomness);
         System.err.println("Random number generator seed: " + (useSeed ? seed : "random"));
+
+        edgeListFilename = new File(edgeListFilename).getName();
+
+        try {
+            PrintStream fileOut = new PrintStream(edgeListFilename + "_" + numberOfWorkers + "_" + "measurement" + System.currentTimeMillis() + ".txt");
+            System.setOut(fileOut);
+        } catch (FileNotFoundException ex){
+            ex.printStackTrace();
+        }
 
         System.out.println("Data file: " + edgeListFilename);
         System.out.println("Number of threads: " + numberOfWorkers);
