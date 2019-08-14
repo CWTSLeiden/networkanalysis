@@ -88,8 +88,6 @@ public class FastLocalMovingAlgorithm extends IterativeCPMClusteringAlgorithm
      */
     protected boolean improveClusteringOneIteration(Network network, Clustering clustering)
     {
-        long start = System.nanoTime();
-
         boolean update;
         boolean[] stableNodes;
         double maxQualityValueIncrement, qualityValueIncrement;
@@ -240,10 +238,6 @@ public class FastLocalMovingAlgorithm extends IterativeCPMClusteringAlgorithm
 
         if (update)
             clustering.removeEmptyClusters();
-
-        long duration = System.nanoTime() - start;
-
-        System.out.print(duration + ",");
 
         return update;
     }

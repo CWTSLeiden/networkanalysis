@@ -13,10 +13,8 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -307,17 +305,10 @@ public final class RunNetworkClustering
         // Read edge list from file.
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
         long startTimeEdgeListFile = System.currentTimeMillis();
-        //Network network = readEdgeList(edgeListFilename, useModularity, weightedEdges, sortedEdgeList);
-        Network network = null;
-        try {
-            network = Network.load(edgeListFilename);
-        }
-        catch (Exception e) {
-            System.err.print(e);
-            System.exit(-1);
-        }
+        Network network = readEdgeList(edgeListFilename, useModularity, weightedEdges, sortedEdgeList);
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
         System.err.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
+        System.err.println("Using " + numberOfWorkers + " worker threads. 0 workers means original sequential algorithm.");
 
         /*/get largest component and save network
         network =  network.createSubnetworkLargestComponent();
@@ -354,18 +345,6 @@ public final class RunNetworkClustering
             System.err.println("Randomness parameter:         " + randomness);
         System.err.println("Random number generator seed: " + (useSeed ? seed : "random"));
 
-        edgeListFilename = new File(edgeListFilename).getName();
-
-        try {
-            PrintStream fileOut = new PrintStream(edgeListFilename + "_" + numberOfWorkers + "_" + "measurement" + System.currentTimeMillis() + ".txt");
-            System.setOut(fileOut);
-        } catch (FileNotFoundException ex){
-            ex.printStackTrace();
-        }
-
-        System.out.println("Data file: " + edgeListFilename);
-        System.out.println("Number of threads: " + numberOfWorkers);
-
         long startTimeAlgorithm = System.currentTimeMillis();
         double resolution2 = useModularity ? (resolution / (2 * network.getTotalEdgeWeight() + network.getTotalEdgeWeightSelfLinks())) : resolution;
         Random random = useSeed ? new Random(seed) : new Random();
@@ -397,8 +376,8 @@ public final class RunNetworkClustering
         System.err.println("Final clustering consists of " + finalClustering.getNClusters() + " clusters.");
 
         // Write final clustering to file (or to standard output).
-        //System.err.println("Writing final clustering to " + ((finalClusteringFilename == null) ? "standard output." : "'" + finalClusteringFilename + "'."));
-        //writeClustering(finalClusteringFilename, finalClustering);
+        System.err.println("Writing final clustering to " + ((finalClusteringFilename == null) ? "standard output." : "'" + finalClusteringFilename + "'."));
+        writeClustering(finalClusteringFilename, finalClustering);
     }
 
     /**
