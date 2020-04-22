@@ -122,16 +122,16 @@ public class VOSLayoutTechnique
         qualityFunction = 0;
 
         for (i = 0; i < network.nNodes; i++)
-            for (j = network.firstNeighborIndex[i]; j < network.firstNeighborIndex[i + 1]; j++)
-                if (network.neighbor[j] < i)
+            for (j = network.firstNeighborIndices[i]; j < network.firstNeighborIndices[i + 1]; j++)
+                if (network.neighbors[j] < i)
                 {
-                    distance1 = layout.coordinate[0][i] - layout.coordinate[0][network.neighbor[j]];
-                    distance2 = layout.coordinate[1][i] - layout.coordinate[1][network.neighbor[j]];
+                    distance1 = layout.coordinate[0][i] - layout.coordinate[0][network.neighbors[j]];
+                    distance2 = layout.coordinate[1][i] - layout.coordinate[1][network.neighbors[j]];
                     distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                     if (attraction != 0)
-                        qualityFunction += network.edgeWeight[j] * pow(distance, attraction) / attraction;
+                        qualityFunction += network.edgeWeights[j] * pow(distance, attraction) / attraction;
                     else
-                        qualityFunction += network.edgeWeight[j] * Math.log(distance);
+                        qualityFunction += network.edgeWeights[j] * Math.log(distance);
                 }
 
         for (i = 0; i < network.nNodes; i++)
@@ -141,9 +141,9 @@ public class VOSLayoutTechnique
                 distance2 = layout.coordinate[1][i] - layout.coordinate[1][j];
                 distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                 if (repulsion != 0)
-                    qualityFunction -= network.nodeWeight[i] * network.nodeWeight[j] * pow(distance, repulsion) / repulsion;
+                    qualityFunction -= network.nodeWeights[i] * network.nodeWeights[j] * pow(distance, repulsion) / repulsion;
                 else
-                    qualityFunction -= network.nodeWeight[i] * network.nodeWeight[j] * Math.log(distance);
+                    qualityFunction -= network.nodeWeights[i] * network.nodeWeights[j] * Math.log(distance);
             }
 
         if (edgeWeightIncrement > 0)
@@ -174,7 +174,7 @@ public class VOSLayoutTechnique
         int i, j, k, l, nQualityFunctionImprovements;
         int[] nodePermutation;
 
-        nodePermutation = Arrays2.generateRandomPermutation(network.nNodes, random);
+        nodePermutation = cwts.util.Arrays.generateRandomPermutation(network.nNodes, random);
 
         stepLength = initialStepLength;
         qualityFunction = Double.POSITIVE_INFINITY;
@@ -193,10 +193,10 @@ public class VOSLayoutTechnique
                 gradient1 = 0;
                 gradient2 = 0;
 
-                for (l = network.firstNeighborIndex[k]; l < network.firstNeighborIndex[k + 1]; l++)
+                for (l = network.firstNeighborIndices[k]; l < network.firstNeighborIndices[k + 1]; l++)
                 {
-                    distance1 = layout.coordinate[0][k] - layout.coordinate[0][network.neighbor[l]];
-                    distance2 = layout.coordinate[1][k] - layout.coordinate[1][network.neighbor[l]];
+                    distance1 = layout.coordinate[0][k] - layout.coordinate[0][network.neighbors[l]];
+                    distance2 = layout.coordinate[1][k] - layout.coordinate[1][network.neighbors[l]];
                     squaredDistance = distance1 * distance1 + distance2 * distance2;
 
                     distance = Math.sqrt(squaredDistance);
@@ -204,16 +204,16 @@ public class VOSLayoutTechnique
 
                     if (squaredDistance > 0)
                     {
-                        b = network.edgeWeight[l] * a / squaredDistance;
+                        b = network.edgeWeights[l] * a / squaredDistance;
                         gradient1 += b * distance1;
                         gradient2 += b * distance2;
                     }
 
-                    if (!nodeVisited[network.neighbor[l]])
+                    if (!nodeVisited[network.neighbors[l]])
                         if (attraction != 0)
-                            qualityFunction += network.edgeWeight[l] * a / attraction;
+                            qualityFunction += network.edgeWeights[l] * a / attraction;
                         else
-                            qualityFunction += network.edgeWeight[l] * Math.log(distance);
+                            qualityFunction += network.edgeWeights[l] * Math.log(distance);
                 }
 
                 for (l = 0; l < network.nNodes; l++)
@@ -227,16 +227,16 @@ public class VOSLayoutTechnique
 
                         if (squaredDistance > 0)
                         {
-                            b = network.nodeWeight[k] * network.nodeWeight[l] * a / squaredDistance;
+                            b = network.nodeWeights[k] * network.nodeWeights[l] * a / squaredDistance;
                             gradient1 -= b * distance1;
                             gradient2 -= b * distance2;
                         }
 
                         if (!nodeVisited[l])
                             if (repulsion != 0)
-                                qualityFunction -= network.nodeWeight[k] * network.nodeWeight[l] * a / repulsion;
+                                qualityFunction -= network.nodeWeights[k] * network.nodeWeights[l] * a / repulsion;
                             else
-                                qualityFunction -= network.nodeWeight[k] * network.nodeWeight[l] * Math.log(distance);
+                                qualityFunction -= network.nodeWeights[k] * network.nodeWeights[l] * Math.log(distance);
                     }
 
                 if (edgeWeightIncrement > 0)

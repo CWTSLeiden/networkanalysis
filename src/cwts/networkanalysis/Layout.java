@@ -15,6 +15,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Random;
 
+import cwts.util.Arrays;
+
 public class Layout implements Cloneable, Serializable
 {
     private static final long serialVersionUID = 1;
@@ -109,8 +111,8 @@ public class Layout implements Cloneable, Serializable
         double[] minCoordinate;
 
         minCoordinate = new double[2];
-        minCoordinate[0] = Arrays2.calcMinimum(coordinate[0]);
-        minCoordinate[1] = Arrays2.calcMinimum(coordinate[1]);
+        minCoordinate[0] = Arrays.calcMinimum(coordinate[0]);
+        minCoordinate[1] = Arrays.calcMinimum(coordinate[1]);
         return minCoordinate;
     }
 
@@ -119,8 +121,8 @@ public class Layout implements Cloneable, Serializable
         double[] maxCoordinate;
 
         maxCoordinate = new double[2];
-        maxCoordinate[0] = Arrays2.calcMaximum(coordinate[0]);
-        maxCoordinate[1] = Arrays2.calcMaximum(coordinate[1]);
+        maxCoordinate[0] = Arrays.calcMaximum(coordinate[0]);
+        maxCoordinate[1] = Arrays.calcMaximum(coordinate[1]);
         return maxCoordinate;
     }
 
@@ -168,8 +170,8 @@ public class Layout implements Cloneable, Serializable
         double averageCoordinate1, averageCoordinate2, averageDistance, coordinateOld1, coordinateOld2, covariance, discriminant, eigenvalue1, eigenvalue2, normalizedEigenvector11, normalizedEigenvector12, normalizedEigenvector21, normalizedEigenvector22, variance1, variance2, vectorLength;
         int i, j;
 
-        averageCoordinate1 = Arrays2.calcAverage(coordinate[0]);
-        averageCoordinate2 = Arrays2.calcAverage(coordinate[1]);
+        averageCoordinate1 = Arrays.calcAverage(coordinate[0]);
+        averageCoordinate2 = Arrays.calcAverage(coordinate[1]);
         for (i = 0; i < nNodes; i++)
         {
             coordinate[0][i] -= averageCoordinate1;
@@ -210,7 +212,7 @@ public class Layout implements Cloneable, Serializable
         }
 
         for (i = 0; i < 2; i++)
-            if (Arrays2.calcMedian(coordinate[i]) > 0)
+            if (Arrays.calcMedian(coordinate[i]) > 0)
                 for (j = 0; j < nNodes; j++)
                     coordinate[i][j] *= -1;
 
