@@ -10,6 +10,8 @@ package cwts.networkanalysis;
 import java.util.Arrays;
 import java.util.Random;
 
+import cwts.util.FastMath;
+
 public class VOSLayoutTechnique
 {
     protected Network network;
@@ -17,28 +19,6 @@ public class VOSLayoutTechnique
     protected int attraction;
     protected int repulsion;
     protected double edgeWeightIncrement;
-
-    private static double pow(double base, int exponent)
-    {
-        double power;
-        int i;
-
-        if (exponent > 0)
-        {
-            power = base;
-            for (i = 1; i < exponent; i++)
-                power *= base;
-        }
-        else if (exponent < 0)
-        {
-            power = 1 / base;
-            for (i = -1; i > exponent; i--)
-                power /= base;
-        }
-        else
-            power = 1;
-        return power;
-    }
 
     public VOSLayoutTechnique(Network network, int attraction, int repulsion, double edgeWeightIncrement)
     {
@@ -129,7 +109,7 @@ public class VOSLayoutTechnique
                     distance2 = layout.coordinate[1][i] - layout.coordinate[1][network.neighbors[j]];
                     distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                     if (attraction != 0)
-                        qualityFunction += network.edgeWeights[j] * pow(distance, attraction) / attraction;
+                        qualityFunction += network.edgeWeights[j] * FastMath.fastPow(distance, attraction) / attraction;
                     else
                         qualityFunction += network.edgeWeights[j] * Math.log(distance);
                 }
@@ -141,7 +121,7 @@ public class VOSLayoutTechnique
                 distance2 = layout.coordinate[1][i] - layout.coordinate[1][j];
                 distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                 if (repulsion != 0)
-                    qualityFunction -= network.nodeWeights[i] * network.nodeWeights[j] * pow(distance, repulsion) / repulsion;
+                    qualityFunction -= network.nodeWeights[i] * network.nodeWeights[j] * FastMath.fastPow(distance, repulsion) / repulsion;
                 else
                     qualityFunction -= network.nodeWeights[i] * network.nodeWeights[j] * Math.log(distance);
             }
@@ -154,7 +134,7 @@ public class VOSLayoutTechnique
                     distance2 = layout.coordinate[1][i] - layout.coordinate[1][j];
                     distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                     if (attraction != 0)
-                        qualityFunction += edgeWeightIncrement * pow(distance, attraction) / attraction;
+                        qualityFunction += edgeWeightIncrement * FastMath.fastPow(distance, attraction) / attraction;
                     else
                         qualityFunction += edgeWeightIncrement * Math.log(distance);
                 }
@@ -200,7 +180,7 @@ public class VOSLayoutTechnique
                     squaredDistance = distance1 * distance1 + distance2 * distance2;
 
                     distance = Math.sqrt(squaredDistance);
-                    a = pow(distance, attraction);
+                    a = FastMath.fastPow(distance, attraction);
 
                     if (squaredDistance > 0)
                     {
@@ -223,7 +203,7 @@ public class VOSLayoutTechnique
                         distance2 = layout.coordinate[1][k] - layout.coordinate[1][l];
                         squaredDistance = distance1 * distance1 + distance2 * distance2;
                         distance = Math.sqrt(squaredDistance);
-                        a = pow(distance, repulsion);
+                        a = FastMath.fastPow(distance, repulsion);
 
                         if (squaredDistance > 0)
                         {
@@ -247,7 +227,7 @@ public class VOSLayoutTechnique
                             distance2 = layout.coordinate[1][k] - layout.coordinate[1][l];
                             squaredDistance = distance1 * distance1 + distance2 * distance2;
                             distance = Math.sqrt(squaredDistance);
-                            a = pow(distance, attraction);
+                            a = FastMath.fastPow(distance, attraction);
 
                             if (squaredDistance > 0)
                             {
