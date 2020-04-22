@@ -22,7 +22,7 @@ public class Layout implements Cloneable, Serializable
     private static final long serialVersionUID = 1;
 
     protected int nNodes;
-    protected double[][] coordinate;
+    protected double[][] coordinates;
 
     public static Layout load(String fileName) throws ClassNotFoundException, IOException
     {
@@ -41,15 +41,15 @@ public class Layout implements Cloneable, Serializable
     public Layout(int nNodes)
     {
         this.nNodes = nNodes;
-        coordinate = new double[2][nNodes];
+        coordinates = new double[2][nNodes];
     }
 
-    public Layout(double[][] coordinate)
+    public Layout(double[][] coordinates)
     {
-        nNodes = coordinate[0].length;
-        this.coordinate = new double[2][];
-        this.coordinate[0] = coordinate[0].clone();
-        this.coordinate[1] = coordinate[1].clone();
+        nNodes = coordinates[0].length;
+        this.coordinates = new double[2][];
+        this.coordinates[0] = coordinates[0].clone();
+        this.coordinates[1] = coordinates[1].clone();
     }
 
     public Layout clone()
@@ -59,9 +59,9 @@ public class Layout implements Cloneable, Serializable
         try
         {
             clonedLayout = (Layout)super.clone();
-            clonedLayout.coordinate = new double[2][];
-            clonedLayout.coordinate[0] = coordinate[0].clone();
-            clonedLayout.coordinate[1] = coordinate[1].clone();
+            clonedLayout.coordinates = new double[2][];
+            clonedLayout.coordinates[0] = coordinates[0].clone();
+            clonedLayout.coordinates[1] = coordinates[1].clone();
             return clonedLayout;
         }
         catch (CloneNotSupportedException e)
@@ -88,42 +88,42 @@ public class Layout implements Cloneable, Serializable
 
     public double[][] getCoordinates()
     {
-        double[][] clonedCoordinate;
+        double[][] clonedCoordinates;
 
-        clonedCoordinate = new double[2][];
-        clonedCoordinate[0] = coordinate[0].clone();
-        clonedCoordinate[1] = coordinate[1].clone();
-        return clonedCoordinate;
+        clonedCoordinates = new double[2][];
+        clonedCoordinates[0] = coordinates[0].clone();
+        clonedCoordinates[1] = coordinates[1].clone();
+        return clonedCoordinates;
     }
 
     public double[] getCoordinates(int node)
     {
-        double[] coordinate;
+        double[] coordinates;
 
-        coordinate = new double[2];
-        coordinate[0] = this.coordinate[0][node];
-        coordinate[1] = this.coordinate[1][node];
-        return coordinate;
+        coordinates = new double[2];
+        coordinates[0] = this.coordinates[0][node];
+        coordinates[1] = this.coordinates[1][node];
+        return coordinates;
     }
 
     public double[] getMinCoordinates()
     {
-        double[] minCoordinate;
+        double[] minCoordinates;
 
-        minCoordinate = new double[2];
-        minCoordinate[0] = Arrays.calcMinimum(coordinate[0]);
-        minCoordinate[1] = Arrays.calcMinimum(coordinate[1]);
-        return minCoordinate;
+        minCoordinates = new double[2];
+        minCoordinates[0] = Arrays.calcMinimum(coordinates[0]);
+        minCoordinates[1] = Arrays.calcMinimum(coordinates[1]);
+        return minCoordinates;
     }
 
     public double[] getMaxCoordinates()
     {
-        double[] maxCoordinate;
+        double[] maxCoordinates;
 
-        maxCoordinate = new double[2];
-        maxCoordinate[0] = Arrays.calcMaximum(coordinate[0]);
-        maxCoordinate[1] = Arrays.calcMaximum(coordinate[1]);
-        return maxCoordinate;
+        maxCoordinates = new double[2];
+        maxCoordinates[0] = Arrays.calcMaximum(coordinates[0]);
+        maxCoordinates[1] = Arrays.calcMaximum(coordinates[1]);
+        return maxCoordinates;
     }
 
     public double getAverageDistance()
@@ -135,18 +135,18 @@ public class Layout implements Cloneable, Serializable
         for (i = 0; i < nNodes; i++)
             for (j = 0; j < i; j++)
             {
-                distance1 = coordinate[0][i] - coordinate[0][j];
-                distance2 = coordinate[1][i] - coordinate[1][j];
+                distance1 = coordinates[0][i] - coordinates[0][j];
+                distance2 = coordinates[1][i] - coordinates[1][j];
                 averageDistance += Math.sqrt(distance1 * distance1 + distance2 * distance2);
             }
         averageDistance /= nNodes * (nNodes - 1) / 2;
         return averageDistance;
     }
 
-    public void setCoordinates(int node, double[] coordinate)
+    public void setCoordinates(int node, double[] coordinates)
     {
-        this.coordinate[0][node] = coordinate[0];
-        this.coordinate[1][node] = coordinate[1];
+        this.coordinates[0][node] = coordinates[0];
+        this.coordinates[1][node] = coordinates[1];
     }
 
     public void initRandomCoordinates()
@@ -160,8 +160,8 @@ public class Layout implements Cloneable, Serializable
 
         for (i = 0; i < nNodes; i++)
         {
-            coordinate[0][i] = 2 * random.nextDouble() - 1;
-            coordinate[1][i] = 2 * random.nextDouble() - 1;
+            coordinates[0][i] = 2 * random.nextDouble() - 1;
+            coordinates[1][i] = 2 * random.nextDouble() - 1;
         }
     }
 
@@ -170,12 +170,12 @@ public class Layout implements Cloneable, Serializable
         double averageCoordinate1, averageCoordinate2, averageDistance, coordinateOld1, coordinateOld2, covariance, discriminant, eigenvalue1, eigenvalue2, normalizedEigenvector11, normalizedEigenvector12, normalizedEigenvector21, normalizedEigenvector22, variance1, variance2, vectorLength;
         int i, j;
 
-        averageCoordinate1 = Arrays.calcAverage(coordinate[0]);
-        averageCoordinate2 = Arrays.calcAverage(coordinate[1]);
+        averageCoordinate1 = Arrays.calcAverage(coordinates[0]);
+        averageCoordinate2 = Arrays.calcAverage(coordinates[1]);
         for (i = 0; i < nNodes; i++)
         {
-            coordinate[0][i] -= averageCoordinate1;
-            coordinate[1][i] -= averageCoordinate2;
+            coordinates[0][i] -= averageCoordinate1;
+            coordinates[1][i] -= averageCoordinate2;
         }
 
         variance1 = 0;
@@ -183,9 +183,9 @@ public class Layout implements Cloneable, Serializable
         covariance = 0;
         for (i = 0; i < nNodes; i++)
         {
-            variance1 += coordinate[0][i] * coordinate[0][i];
-            variance2 += coordinate[1][i] * coordinate[1][i];
-            covariance += coordinate[0][i] * coordinate[1][i];
+            variance1 += coordinates[0][i] * coordinates[0][i];
+            variance2 += coordinates[1][i] * coordinates[1][i];
+            covariance += coordinates[0][i] * coordinates[1][i];
         }
         variance1 /= nNodes;
         variance2 /= nNodes;
@@ -205,24 +205,24 @@ public class Layout implements Cloneable, Serializable
         normalizedEigenvector22 /= vectorLength;
         for (i = 0; i < nNodes; i++)
         {
-            coordinateOld1 = coordinate[0][i];
-            coordinateOld2 = coordinate[1][i];
-            coordinate[0][i] = normalizedEigenvector11 * coordinateOld1 + normalizedEigenvector12 * coordinateOld2;
-            coordinate[1][i] = normalizedEigenvector21 * coordinateOld1 + normalizedEigenvector22 * coordinateOld2;
+            coordinateOld1 = coordinates[0][i];
+            coordinateOld2 = coordinates[1][i];
+            coordinates[0][i] = normalizedEigenvector11 * coordinateOld1 + normalizedEigenvector12 * coordinateOld2;
+            coordinates[1][i] = normalizedEigenvector21 * coordinateOld1 + normalizedEigenvector22 * coordinateOld2;
         }
 
         for (i = 0; i < 2; i++)
-            if (Arrays.calcMedian(coordinate[i]) > 0)
+            if (Arrays.calcMedian(coordinates[i]) > 0)
                 for (j = 0; j < nNodes; j++)
-                    coordinate[i][j] *= -1;
+                    coordinates[i][j] *= -1;
 
         if (standardizeDistances)
         {
             averageDistance = getAverageDistance();
             for (i = 0; i < nNodes; i++)
             {
-                coordinate[0][i] /= averageDistance;
-                coordinate[1][i] /= averageDistance;
+                coordinates[0][i] /= averageDistance;
+                coordinates[1][i] /= averageDistance;
             }
         }
     }
@@ -236,10 +236,10 @@ public class Layout implements Cloneable, Serializable
         cos = Math.cos(-angle * Math.PI / 180);
         for (i = 0; i < nNodes; i++)
         {
-            coordinateOld1 = coordinate[0][i];
-            coordinateOld2 = coordinate[1][i];
-            coordinate[0][i] = cos * coordinateOld1 - sin * coordinateOld2;
-            coordinate[1][i] = sin * coordinateOld1 + cos * coordinateOld2;
+            coordinateOld1 = coordinates[0][i];
+            coordinateOld2 = coordinates[1][i];
+            coordinates[0][i] = cos * coordinateOld1 - sin * coordinateOld2;
+            coordinates[1][i] = sin * coordinateOld1 + cos * coordinateOld2;
         }
     }
 
@@ -248,6 +248,6 @@ public class Layout implements Cloneable, Serializable
         int i;
 
         for (i = 0; i < nNodes; i++)
-            coordinate[dimension][i] *= -1;
+            coordinates[dimension][i] *= -1;
     }
 }

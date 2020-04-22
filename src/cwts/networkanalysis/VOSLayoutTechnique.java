@@ -105,8 +105,8 @@ public class VOSLayoutTechnique
             for (j = network.firstNeighborIndices[i]; j < network.firstNeighborIndices[i + 1]; j++)
                 if (network.neighbors[j] < i)
                 {
-                    distance1 = layout.coordinate[0][i] - layout.coordinate[0][network.neighbors[j]];
-                    distance2 = layout.coordinate[1][i] - layout.coordinate[1][network.neighbors[j]];
+                    distance1 = layout.coordinates[0][i] - layout.coordinates[0][network.neighbors[j]];
+                    distance2 = layout.coordinates[1][i] - layout.coordinates[1][network.neighbors[j]];
                     distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                     if (attraction != 0)
                         qualityFunction += network.edgeWeights[j] * FastMath.fastPow(distance, attraction) / attraction;
@@ -117,8 +117,8 @@ public class VOSLayoutTechnique
         for (i = 0; i < network.nNodes; i++)
             for (j = 0; j < i; j++)
             {
-                distance1 = layout.coordinate[0][i] - layout.coordinate[0][j];
-                distance2 = layout.coordinate[1][i] - layout.coordinate[1][j];
+                distance1 = layout.coordinates[0][i] - layout.coordinates[0][j];
+                distance2 = layout.coordinates[1][i] - layout.coordinates[1][j];
                 distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                 if (repulsion != 0)
                     qualityFunction -= network.nodeWeights[i] * network.nodeWeights[j] * FastMath.fastPow(distance, repulsion) / repulsion;
@@ -130,8 +130,8 @@ public class VOSLayoutTechnique
             for (i = 0; i < network.nNodes; i++)
                 for (j = 0; j < i; j++)
                 {
-                    distance1 = layout.coordinate[0][i] - layout.coordinate[0][j];
-                    distance2 = layout.coordinate[1][i] - layout.coordinate[1][j];
+                    distance1 = layout.coordinates[0][i] - layout.coordinates[0][j];
+                    distance2 = layout.coordinates[1][i] - layout.coordinates[1][j];
                     distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                     if (attraction != 0)
                         qualityFunction += edgeWeightIncrement * FastMath.fastPow(distance, attraction) / attraction;
@@ -175,8 +175,8 @@ public class VOSLayoutTechnique
 
                 for (l = network.firstNeighborIndices[k]; l < network.firstNeighborIndices[k + 1]; l++)
                 {
-                    distance1 = layout.coordinate[0][k] - layout.coordinate[0][network.neighbors[l]];
-                    distance2 = layout.coordinate[1][k] - layout.coordinate[1][network.neighbors[l]];
+                    distance1 = layout.coordinates[0][k] - layout.coordinates[0][network.neighbors[l]];
+                    distance2 = layout.coordinates[1][k] - layout.coordinates[1][network.neighbors[l]];
                     squaredDistance = distance1 * distance1 + distance2 * distance2;
 
                     distance = Math.sqrt(squaredDistance);
@@ -199,8 +199,8 @@ public class VOSLayoutTechnique
                 for (l = 0; l < network.nNodes; l++)
                     if (l != k)
                     {
-                        distance1 = layout.coordinate[0][k] - layout.coordinate[0][l];
-                        distance2 = layout.coordinate[1][k] - layout.coordinate[1][l];
+                        distance1 = layout.coordinates[0][k] - layout.coordinates[0][l];
+                        distance2 = layout.coordinates[1][k] - layout.coordinates[1][l];
                         squaredDistance = distance1 * distance1 + distance2 * distance2;
                         distance = Math.sqrt(squaredDistance);
                         a = FastMath.fastPow(distance, repulsion);
@@ -223,8 +223,8 @@ public class VOSLayoutTechnique
                     for (l = 0; l < network.nNodes; l++)
                         if (l != k)
                         {
-                            distance1 = layout.coordinate[0][k] - layout.coordinate[0][l];
-                            distance2 = layout.coordinate[1][k] - layout.coordinate[1][l];
+                            distance1 = layout.coordinates[0][k] - layout.coordinates[0][l];
+                            distance2 = layout.coordinates[1][k] - layout.coordinates[1][l];
                             squaredDistance = distance1 * distance1 + distance2 * distance2;
                             distance = Math.sqrt(squaredDistance);
                             a = FastMath.fastPow(distance, attraction);
@@ -244,8 +244,8 @@ public class VOSLayoutTechnique
                         }
 
                 gradientLength = Math.sqrt(gradient1 * gradient1 + gradient2 * gradient2);
-                layout.coordinate[0][k] -= stepLength * gradient1 / gradientLength;
-                layout.coordinate[1][k] -= stepLength * gradient2 / gradientLength;
+                layout.coordinates[0][k] -= stepLength * gradient1 / gradientLength;
+                layout.coordinates[1][k] -= stepLength * gradient2 / gradientLength;
 
                 nodeVisited[k] = true;
             }
