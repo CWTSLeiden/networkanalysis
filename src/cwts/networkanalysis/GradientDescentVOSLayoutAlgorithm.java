@@ -34,9 +34,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     public static final double DEFAULT_STEP_SIZE_REDUCTION = 0.75;
 
     /**
-     * Default required number of quality function improvements.
+     * Default required number of quality value improvements.
      */
-    public static final int DEFAULT_REQUIRED_N_QUALITY_FUNTION_IMPROVEMENTS = 5;
+    public static final int DEFAULT_REQUIRED_N_QUALITY_VALUE_IMPROVEMENTS = 5;
 
     /**
      * Maximum number of iterations.
@@ -46,22 +46,22 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     /**
      * Initial step size.
      */
-    protected double initialStepLength;
+    protected double initialStepSize;
 
     /**
      * Minimum step size.
      */
-    protected double minStepLength;
+    protected double minStepSize;
 
     /**
      * Step size reduction.
      */
-    protected double stepLengthReduction;
+    protected double stepSizeReduction;
 
     /**
-     * Required number of quality function improvements.
+     * Required number of quality value improvements.
      */
-    protected int requiredNQualityFunctionImprovements;
+    protected int requiredNQualityValueImprovements;
 
     /**
      * Random number generator.
@@ -99,37 +99,39 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     public GradientDescentVOSLayoutAlgorithm(int attraction, int repulsion, double edgeWeightIncrement, Random random)
     {
         this(attraction, repulsion, edgeWeightIncrement, DEFAULT_MAX_N_ITERATIONS, DEFAULT_INITIAL_STEP_SIZE,
-                DEFAULT_MIN_STEP_SIZE, DEFAULT_STEP_SIZE_REDUCTION, DEFAULT_REQUIRED_N_QUALITY_FUNTION_IMPROVEMENTS,
+                DEFAULT_MIN_STEP_SIZE, DEFAULT_STEP_SIZE_REDUCTION, DEFAULT_REQUIRED_N_QUALITY_VALUE_IMPROVEMENTS,
                 random);
     }
 
     /**
      * Constructs a gradient descend VOS layout algorithm for a specified
-     * attraction parameter, repulsion parameter, and edge weight increment
-     * parameter.
+     * attraction parameter, repulsion parameter, edge weight increment
+     * parameter, maximum number of iterations, initial step size, minimum step
+     * size, Step size reduction, and required number of quality value
+     * improvements.
      *
-     * @param attraction                           Attraction parameter
-     * @param repulsion                            Repulsion parameter
-     * @param edgeWeightIncrement                  Edge weight increment parameter
-     * @param maxNIterations                       Maximum number of iterations
-     * @param initialStepLength                    Initial step length
-     * @param minStepLength                        Minimum step length
-     * @param stepLengthReduction                  Step length reduction
-     * @param requiredNQualityFunctionImprovements Required number of quality
-     *            function improvements
-     * @param random                               Random number generator
+     * @param attraction                        Attraction parameter
+     * @param repulsion                         Repulsion parameter
+     * @param edgeWeightIncrement               Edge weight increment parameter
+     * @param maxNIterations                    Maximum number of iterations
+     * @param initialStepSize                   Initial step size
+     * @param minStepSize                       Minimum step size
+     * @param stepSizeReduction                 Step size reduction
+     * @param requiredNQualityValueImprovements Required number of quality value
+     *            improvements
+     * @param random                            Random number generator
      */
     public GradientDescentVOSLayoutAlgorithm(int attraction, int repulsion, double edgeWeightIncrement,
-            int maxNIterations, double initialStepLength, double minStepLength, double stepLengthReduction,
-            int requiredNQualityFunctionImprovements, Random random)
+            int maxNIterations, double initialStepSize, double minStepSize, double stepSizeReduction,
+            int requiredNQualityValueImprovements, Random random)
     {
         super(attraction, repulsion, edgeWeightIncrement);
 
         this.maxNIterations = maxNIterations;
-        this.initialStepLength = initialStepLength;
-        this.minStepLength = minStepLength;
-        this.stepLengthReduction = stepLengthReduction;
-        this.requiredNQualityFunctionImprovements = requiredNQualityFunctionImprovements;
+        this.initialStepSize = initialStepSize;
+        this.minStepSize = minStepSize;
+        this.stepSizeReduction = stepSizeReduction;
+        this.requiredNQualityValueImprovements = requiredNQualityValueImprovements;
         this.random = random;
     }
 
@@ -162,9 +164,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
      *
      * @return Initial step size
      */
-    public double getInitialStepLength()
+    public double getInitialStepSize()
     {
-        return initialStepLength;
+        return initialStepSize;
     }
 
     /**
@@ -172,9 +174,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
      *
      * @return Minimum step size
      */
-    public double getMinStepLength()
+    public double getMinStepSize()
     {
-        return minStepLength;
+        return minStepSize;
     }
 
     /**
@@ -182,19 +184,19 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
      *
      * @return Step size reduction
      */
-    public double getStepLengthReduction()
+    public double getStepSizeReduction()
     {
-        return stepLengthReduction;
+        return stepSizeReduction;
     }
 
     /**
-     * Returns the required number of quality function improvements.
+     * Returns the required number of quality value improvements.
      *
-     * @return Required number of quality function improvements
+     * @return Required number of quality value improvements
      */
-    public int getRequiredNQualityFunctionImprovements()
+    public int getRequiredNQualityValueImprovements()
     {
-        return requiredNQualityFunctionImprovements;
+        return requiredNQualityValueImprovements;
     }
 
     /**
@@ -212,9 +214,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
      *
      * @return Initial step size
      */
-    public void setInitialStepLength(double initialStepLength)
+    public void setInitialStepSize(double initialStepSize)
     {
-        this.initialStepLength = initialStepLength;
+        this.initialStepSize = initialStepSize;
     }
 
     /**
@@ -222,9 +224,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
      *
      * @return Minimum step size
      */
-    public void setMinStepLength(double minStepLength)
+    public void setMinStepSize(double minStepSize)
     {
-        this.minStepLength = minStepLength;
+        this.minStepSize = minStepSize;
     }
 
     /**
@@ -232,19 +234,19 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
      *
      * @return Step size reduction
      */
-    public void setStepLengthReduction(double stepLengthReduction)
+    public void setStepSizeReduction(double stepSizeReduction)
     {
-        this.stepLengthReduction = stepLengthReduction;
+        this.stepSizeReduction = stepSizeReduction;
     }
 
     /**
-     * Returns the required number of quality function improvements.
+     * Returns the required number of quality value improvements.
      *
-     * @return Required number of quality function improvements
+     * @return Required number of quality value improvements
      */
-    public void setRequiredNQualityFunctionImprovements(int requiredNQualityFunctionImprovements)
+    public void setRequiredNQualityValueImprovements(int requiredNQualityValueImprovements)
     {
-        this.requiredNQualityFunctionImprovements = requiredNQualityFunctionImprovements;
+        this.requiredNQualityValueImprovements = requiredNQualityValueImprovements;
     }
 
     /**
@@ -279,27 +281,27 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
      */
     public void improveLayout(Network network, Layout layout)
     {
-        boolean[] nodeVisited;
-        double a, b, distance, distance1, distance2, gradient1, gradient2, gradientLength, qualityFunction,
-                qualityFunctionOld, squaredDistance, stepLength;
-        int i, j, k, l, nQualityFunctionImprovements;
-        int[] nodePermutation;
+        boolean[] visitedNodes;
+        double a, b, distance, distance1, distance2, gradient1, gradient2, gradientLength, qualityValue,
+                oldQualityValue, squaredDistance, stepSize;
+        int i, j, k, l, nQualityValueImprovements;
+        int[] nodeOrder;
 
-        nodePermutation = cwts.util.Arrays.generateRandomPermutation(network.nNodes, random);
+        nodeOrder = cwts.util.Arrays.generateRandomPermutation(network.nNodes, random);
 
-        stepLength = initialStepLength;
-        qualityFunction = Double.POSITIVE_INFINITY;
-        nQualityFunctionImprovements = 0;
-        nodeVisited = new boolean[network.nNodes];
+        stepSize = initialStepSize;
+        qualityValue = Double.POSITIVE_INFINITY;
+        nQualityValueImprovements = 0;
+        visitedNodes = new boolean[network.nNodes];
         i = 0;
-        while ((i < maxNIterations) && (stepLength >= minStepLength))
+        while ((i < maxNIterations) && (stepSize >= minStepSize))
         {
-            qualityFunctionOld = qualityFunction;
-            qualityFunction = 0;
-            Arrays.fill(nodeVisited, false);
+            oldQualityValue = qualityValue;
+            qualityValue = 0;
+            Arrays.fill(visitedNodes, false);
             for (j = 0; j < network.nNodes; j++)
             {
-                k = nodePermutation[j];
+                k = nodeOrder[j];
 
                 gradient1 = 0;
                 gradient2 = 0;
@@ -320,11 +322,11 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
                         gradient2 += b * distance2;
                     }
 
-                    if (!nodeVisited[network.neighbors[l]])
+                    if (!visitedNodes[network.neighbors[l]])
                         if (attraction != 0)
-                            qualityFunction += network.edgeWeights[l] * a / attraction;
+                            qualityValue += network.edgeWeights[l] * a / attraction;
                         else
-                            qualityFunction += network.edgeWeights[l] * Math.log(distance);
+                            qualityValue += network.edgeWeights[l] * Math.log(distance);
                 }
 
                 for (l = 0; l < network.nNodes; l++)
@@ -343,11 +345,11 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
                             gradient2 -= b * distance2;
                         }
 
-                        if (!nodeVisited[l])
+                        if (!visitedNodes[l])
                             if (repulsion != 0)
-                                qualityFunction -= network.nodeWeights[k] * network.nodeWeights[l] * a / repulsion;
+                                qualityValue -= network.nodeWeights[k] * network.nodeWeights[l] * a / repulsion;
                             else
-                                qualityFunction -= network.nodeWeights[k] * network.nodeWeights[l] * Math.log(distance);
+                                qualityValue -= network.nodeWeights[k] * network.nodeWeights[l] * Math.log(distance);
                     }
 
                 if (edgeWeightIncrement > 0)
@@ -367,33 +369,33 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
                                 gradient2 += b * distance2;
                             }
 
-                            if (!nodeVisited[l])
+                            if (!visitedNodes[l])
                                 if (attraction != 0)
-                                    qualityFunction += edgeWeightIncrement * a / attraction;
+                                    qualityValue += edgeWeightIncrement * a / attraction;
                                 else
-                                    qualityFunction += edgeWeightIncrement * Math.log(distance);
+                                    qualityValue += edgeWeightIncrement * Math.log(distance);
                         }
 
                 gradientLength = Math.sqrt(gradient1 * gradient1 + gradient2 * gradient2);
-                layout.coordinates[0][k] -= stepLength * gradient1 / gradientLength;
-                layout.coordinates[1][k] -= stepLength * gradient2 / gradientLength;
+                layout.coordinates[0][k] -= stepSize * gradient1 / gradientLength;
+                layout.coordinates[1][k] -= stepSize * gradient2 / gradientLength;
 
-                nodeVisited[k] = true;
+                visitedNodes[k] = true;
             }
 
-            if (qualityFunction < qualityFunctionOld)
+            if (qualityValue < oldQualityValue)
             {
-                nQualityFunctionImprovements++;
-                if (nQualityFunctionImprovements >= requiredNQualityFunctionImprovements)
+                nQualityValueImprovements++;
+                if (nQualityValueImprovements >= requiredNQualityValueImprovements)
                 {
-                    stepLength /= stepLengthReduction;
-                    nQualityFunctionImprovements = 0;
+                    stepSize /= stepSizeReduction;
+                    nQualityValueImprovements = 0;
                 }
             }
             else
             {
-                stepLength *= stepLengthReduction;
-                nQualityFunctionImprovements = 0;
+                stepSize *= stepSizeReduction;
+                nQualityValueImprovements = 0;
             }
 
             i++;
