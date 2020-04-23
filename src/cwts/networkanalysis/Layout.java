@@ -34,14 +34,14 @@ public class Layout implements Cloneable, Serializable
     /**
      * Loads a layout from a file.
      *
-     * @param filename File from which a layout is loaded
+     * @param fileName File from which a layout is loaded
      *
      * @return Loaded layout
      *
      * @throws ClassNotFoundException Class not found
      * @throws IOException            Could not read the file
      *
-     * @see #save(String filename)
+     * @see #save(String fileName)
      */
     public static Layout load(String fileName) throws ClassNotFoundException, IOException
     {
@@ -107,11 +107,11 @@ public class Layout implements Cloneable, Serializable
     /**
      * Saves the layout in a file.
      *
-     * @param filename File in which the layout is saved
+     * @param fileName File in which the layout is saved
      *
      * @throws IOException Could not write to the file
      *
-     * @see #load(String filename)
+     * @see #load(String fileName)
      */
     public void save(String fileName) throws IOException
     {

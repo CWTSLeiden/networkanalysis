@@ -200,9 +200,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Returns the maximum number of iterations.
-     *
-     * @return Maximum number of iterations
+     * Sets the maximum number of iterations.
+     * 
+     * @param maxNIterations Maximum number of iterations
      */
     public void setMaxNIterations(int maxNIterations)
     {
@@ -210,9 +210,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Returns the initial step size.
-     *
-     * @return Initial step size
+     * Sets the initial step size.
+     * 
+     * @param initialStepSize Initial step size
      */
     public void setInitialStepSize(double initialStepSize)
     {
@@ -220,9 +220,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Returns the minimum step size.
-     *
-     * @return Minimum step size
+     * Sets the minimum step size.
+     * 
+     * @param minStepSize Minimum step size
      */
     public void setMinStepSize(double minStepSize)
     {
@@ -230,9 +230,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Returns the step size reduction.
-     *
-     * @return Step size reduction
+     * Sets the step size reduction.
+     * 
+     * @param stepSizeReduction Step size reduction
      */
     public void setStepSizeReduction(double stepSizeReduction)
     {
@@ -240,9 +240,10 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Returns the required number of quality value improvements.
-     *
-     * @return Required number of quality value improvements
+     * Sets the required number of quality value improvements.
+     * 
+     * @param requiredNQualityValueImprovements Required number of quality value
+     *            improvements
      */
     public void setRequiredNQualityValueImprovements(int requiredNQualityValueImprovements)
     {
