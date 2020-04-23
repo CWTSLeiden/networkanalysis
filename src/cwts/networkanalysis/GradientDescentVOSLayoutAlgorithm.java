@@ -66,6 +66,56 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
         return gradientDescentVOSLayoutAlgorithm;
     }
 
+    public int getMaxNIterations()
+    {
+        return maxNIterations;
+    }
+
+    public double getInitialStepLength()
+    {
+        return initialStepLength;
+    }
+
+    public double getMinStepLength()
+    {
+        return minStepLength;
+    }
+
+    public double getStepLengthReduction()
+    {
+        return stepLengthReduction;
+    }
+
+    public int getRequiredNQualityFunctionImprovements()
+    {
+        return requiredNQualityFunctionImprovements;
+    }
+
+    public void setMaxNIterations(int maxNIterations)
+    {
+        this.maxNIterations = maxNIterations;
+    }
+
+    public void setInitialStepLength(double initialStepLength)
+    {
+        this.initialStepLength = initialStepLength;
+    }
+
+    public void setMinStepLength(double minStepLength)
+    {
+        this.minStepLength = minStepLength;
+    }
+
+    public void setStepLengthReduction(double stepLengthReduction)
+    {
+        this.stepLengthReduction = stepLengthReduction;
+    }
+
+    public void setRequiredNQualityFunctionImprovements(int requiredNQualityFunctionImprovements)
+    {
+        this.requiredNQualityFunctionImprovements = requiredNQualityFunctionImprovements;
+    }
+
     public Layout findLayout(Network network)
     {
         Layout layout;

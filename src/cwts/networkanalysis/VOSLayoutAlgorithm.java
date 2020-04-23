@@ -42,6 +42,36 @@ public abstract class VOSLayoutAlgorithm implements Cloneable, QualityLayoutAlgo
         }
     }
 
+    public int getAttraction()
+    {
+        return attraction;
+    }
+
+    public int getRepulsion()
+    {
+        return repulsion;
+    }
+
+    public double getEdgeWeightIncrement()
+    {
+        return edgeWeightIncrement;
+    }
+
+    public void setAttraction(int attraction)
+    {
+        this.attraction = attraction;
+    }
+
+    public void setRepulsion(int repulsion)
+    {
+        this.repulsion = repulsion;
+    }
+
+    public void setEdgeWeightIncrement(double edgeWeightIncrement)
+    {
+        this.edgeWeightIncrement = edgeWeightIncrement;
+    }
+
     public double calcQuality(Network network, Layout layout)
     {
         double distance, distance1, distance2, qualityFunction;
