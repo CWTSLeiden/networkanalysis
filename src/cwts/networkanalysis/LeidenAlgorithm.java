@@ -198,9 +198,8 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
     protected boolean improveClusteringOneIteration(Network network, Clustering clustering)
     {
         boolean update;
-        Clustering clusteringReducedNetwork, clusteringSubnetwork;
+        Clustering clusteringReducedNetwork, clusteringSubnetwork, refinement;
         int i, j;
-        int[] clustersReducedNetwork, nNodesPerClusterReducedNetwork;
         int[][] nodesPerCluster;
         LocalMergingAlgorithm localMergingAlgorithm;
         Network reducedNetwork;
@@ -223,37 +222,50 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
             localMergingAlgorithm = new LocalMergingAlgorithm(resolution, randomness, random);
             subnetworks = network.createSubnetworks(clustering);
             nodesPerCluster = clustering.getNodesPerCluster();
-            clustering.nClusters = 0;
-            nNodesPerClusterReducedNetwork = new int[subnetworks.length];
+            refinement = new Clustering(network.nNodes);
+            refinement.nClusters = 0;
             for (i = 0; i < subnetworks.length; i++)
             {
                 clusteringSubnetwork = localMergingAlgorithm.findClustering(subnetworks[i]);
 
                 for (j = 0; j < subnetworks[i].nNodes; j++)
-                    clustering.clusters[nodesPerCluster[i][j]] = clustering.nClusters + clusteringSubnetwork.clusters[j];
-                clustering.nClusters += clusteringSubnetwork.nClusters;
-                nNodesPerClusterReducedNetwork[i] = clusteringSubnetwork.nClusters;
+                    refinement.clusters[nodesPerCluster[i][j]] = refinement.nClusters + clusteringSubnetwork.clusters[j];
+
+                refinement.nClusters += clusteringSubnetwork.nClusters;
             }
 
             /*
              * Create an aggregate network based on the refined clustering of
              * the non-aggregate network.
              */
-            reducedNetwork = network.createReducedNetwork(clustering);
-
-            /*
-             * Create an initial clustering for the aggregate network based on
-             * the non-refined clustering of the non-aggregate network.
-             */
-            clustersReducedNetwork = new int[clustering.nClusters];
-            i = 0;
-            for (j = 0; j < nNodesPerClusterReducedNetwork.length; j++)
+            if (refinement.nClusters < network.nNodes)
             {
-                Arrays.fill(clustersReducedNetwork, i, i + nNodesPerClusterReducedNetwork[j], j);
-                i += nNodesPerClusterReducedNetwork[j];
-            }
-            clusteringReducedNetwork = new Clustering(clustersReducedNetwork);
+                reducedNetwork = network.createReducedNetwork(refinement);
+                /*
+                 * Create an initial clustering for the aggregate network based
+                 * on the non-refined clustering of the non-aggregate network.
+                 */
+                clusteringReducedNetwork = new Clustering(refinement.nClusters);
+                clusteringReducedNetwork.nClusters = clustering.nClusters;
+                for (i = 0; i < network.nNodes; i++)
+                    clusteringReducedNetwork.clusters[refinement.clusters[i]] = clustering.clusters[i];
 
+                /*
+                 * Set the original clustering to the refined clustering, so
+                 * that the results are correctly merged back after applying the
+                 * algorithm to the aggregated network.
+                 */
+                clustering.clusters = refinement.clusters;
+            }
+            else
+            {
+                /*
+                 * No aggregation took place, so we now aggregate on the basis
+                 * of the original clustering.
+                 */
+                reducedNetwork = network.createReducedNetwork(clustering);
+                clusteringReducedNetwork = new Clustering(reducedNetwork.nNodes);
+            }
             /*
              * Recursively apply the algorithm to the aggregate network,
              * starting from the initial clustering created for this network.
