@@ -1,7 +1,7 @@
 package cwts.networkanalysis;
 
 /**
- * Layout
+ * Layout of the nodes in a network.
  *
  * @author Ludo Waltman
  * @author Nees Jan van Eck
@@ -21,9 +21,28 @@ public class Layout implements Cloneable, Serializable
 {
     private static final long serialVersionUID = 1;
 
+    /**
+     * Number of nodes.
+     */
     protected int nNodes;
+
+    /**
+     * Coordinates of each node.
+     */
     protected double[][] coordinates;
 
+    /**
+     * Loads a layout from a file.
+     *
+     * @param filename File from which a layout is loaded
+     *
+     * @return Loaded layout
+     *
+     * @throws ClassNotFoundException Class not found
+     * @throws IOException            Could not read the file
+     *
+     * @see #save(String filename)
+     */
     public static Layout load(String fileName) throws ClassNotFoundException, IOException
     {
         Layout layout;
@@ -38,12 +57,22 @@ public class Layout implements Cloneable, Serializable
         return layout;
     }
 
+    /**
+     * Constructs a layout for a specified number of nodes.
+     *
+     * @param nNodes Number of nodes
+     */
     public Layout(int nNodes)
     {
         this.nNodes = nNodes;
         coordinates = new double[2][nNodes];
     }
 
+    /**
+     * Constructs a layout using specified coordinates for each node.
+     *
+     * @param coordinates Coordinates of each node
+     */
     public Layout(double[][] coordinates)
     {
         nNodes = coordinates[0].length;
@@ -52,6 +81,11 @@ public class Layout implements Cloneable, Serializable
         this.coordinates[1] = coordinates[1].clone();
     }
 
+    /**
+     * Clones the layout.
+     *
+     * @return Cloned layout
+     */
     public Layout clone()
     {
         Layout clonedLayout;
@@ -70,6 +104,15 @@ public class Layout implements Cloneable, Serializable
         }
     }
 
+    /**
+     * Saves the layout in a file.
+     *
+     * @param filename File in which the layout is saved
+     *
+     * @throws IOException Could not write to the file
+     *
+     * @see #load(String filename)
+     */
     public void save(String fileName) throws IOException
     {
         ObjectOutputStream objectOutputStream;
@@ -81,11 +124,21 @@ public class Layout implements Cloneable, Serializable
         objectOutputStream.close();
     }
 
+    /**
+     * Returns the number of nodes.
+     *
+     * @return Number of nodes
+     */
     public int getNNodes()
     {
         return nNodes;
     }
 
+    /**
+     * Returns the coordinates of each node.
+     *
+     * @return Coordinates of each node
+     */
     public double[][] getCoordinates()
     {
         double[][] clonedCoordinates;
@@ -96,6 +149,13 @@ public class Layout implements Cloneable, Serializable
         return clonedCoordinates;
     }
 
+    /**
+     * Returns the coordinates of a node.
+     *
+     * @param node Node
+     *
+     * @return Coordinates
+     */
     public double[] getCoordinates(int node)
     {
         double[] coordinates;
@@ -106,6 +166,11 @@ public class Layout implements Cloneable, Serializable
         return coordinates;
     }
 
+    /**
+     * Returns the minimum of the coordinates of all node.
+     *
+     * @return Minimum coordinates
+     */
     public double[] getMinCoordinates()
     {
         double[] minCoordinates;
@@ -116,6 +181,11 @@ public class Layout implements Cloneable, Serializable
         return minCoordinates;
     }
 
+    /**
+     * Returns the maximum of the coordinates of all node.
+     *
+     * @return Maximum coordinates
+     */
     public double[] getMaxCoordinates()
     {
         double[] maxCoordinates;
@@ -126,6 +196,11 @@ public class Layout implements Cloneable, Serializable
         return maxCoordinates;
     }
 
+    /**
+     * Returns the average distance between all pairs of nodes.
+     *
+     * @return Average distance
+     */
     public double getAverageDistance()
     {
         double averageDistance, distance1, distance2;
@@ -143,17 +218,39 @@ public class Layout implements Cloneable, Serializable
         return averageDistance;
     }
 
+    /**
+     * Positions a node on coordinates.
+     *
+     * @param node        Node
+     * @param coordinates Coordinates
+     */
     public void setCoordinates(int node, double[] coordinates)
     {
         this.coordinates[0][node] = coordinates[0];
         this.coordinates[1][node] = coordinates[1];
     }
 
+    /**
+     * Initializes a random layout.
+     *
+     * <p>
+     * Each node is positioned at random coordinates.
+     * </p>
+     */
     public void initRandomCoordinates()
     {
         initRandomCoordinates(new Random());
     }
 
+    /**
+     * Initializes a random layout.
+     *
+     * <p>
+     * Each node is positioned at random coordinates.
+     * </p>
+     * 
+     * @param random Random number generator
+     */
     public void initRandomCoordinates(Random random)
     {
         int i;
@@ -165,9 +262,16 @@ public class Layout implements Cloneable, Serializable
         }
     }
 
+    /**
+     * Standardize a layout.
+     * 
+     * @param standardizeDistances Standardize distances
+     */
     public void standardizeCoordinates(boolean standardizeDistances)
     {
-        double averageCoordinate1, averageCoordinate2, averageDistance, coordinateOld1, coordinateOld2, covariance, discriminant, eigenvalue1, eigenvalue2, normalizedEigenvector11, normalizedEigenvector12, normalizedEigenvector21, normalizedEigenvector22, variance1, variance2, vectorLength;
+        double averageCoordinate1, averageCoordinate2, averageDistance, coordinateOld1, coordinateOld2, covariance,
+                discriminant, eigenvalue1, eigenvalue2, normalizedEigenvector11, normalizedEigenvector12,
+                normalizedEigenvector21, normalizedEigenvector22, variance1, variance2, vectorLength;
         int i, j;
 
         averageCoordinate1 = Arrays.calcAverage(coordinates[0]);
@@ -190,17 +294,20 @@ public class Layout implements Cloneable, Serializable
         variance1 /= nNodes;
         variance2 /= nNodes;
         covariance /= nNodes;
-        discriminant = variance1 * variance1 + variance2 * variance2 - 2 * variance1 * variance2 + 4 * covariance * covariance;
+        discriminant = variance1 * variance1 + variance2 * variance2 - 2 * variance1 * variance2
+                + 4 * covariance * covariance;
         eigenvalue1 = (variance1 + variance2 - Math.sqrt(discriminant)) / 2;
         eigenvalue2 = (variance1 + variance2 + Math.sqrt(discriminant)) / 2;
         normalizedEigenvector11 = variance1 + covariance - eigenvalue1;
         normalizedEigenvector12 = variance2 + covariance - eigenvalue1;
-        vectorLength = Math.sqrt(normalizedEigenvector11 * normalizedEigenvector11 + normalizedEigenvector12 * normalizedEigenvector12);
+        vectorLength = Math.sqrt(
+                normalizedEigenvector11 * normalizedEigenvector11 + normalizedEigenvector12 * normalizedEigenvector12);
         normalizedEigenvector11 /= vectorLength;
         normalizedEigenvector12 /= vectorLength;
         normalizedEigenvector21 = variance1 + covariance - eigenvalue2;
         normalizedEigenvector22 = variance2 + covariance - eigenvalue2;
-        vectorLength = Math.sqrt(normalizedEigenvector21 * normalizedEigenvector21 + normalizedEigenvector22 * normalizedEigenvector22);
+        vectorLength = Math.sqrt(
+                normalizedEigenvector21 * normalizedEigenvector21 + normalizedEigenvector22 * normalizedEigenvector22);
         normalizedEigenvector21 /= vectorLength;
         normalizedEigenvector22 /= vectorLength;
         for (i = 0; i < nNodes; i++)
@@ -227,6 +334,11 @@ public class Layout implements Cloneable, Serializable
         }
     }
 
+    /**
+     * Rotate a layout.
+     * 
+     * @param angle Angle
+     */
     public void rotate(double angle)
     {
         double coordinateOld1, coordinateOld2, cos, sin;
@@ -243,6 +355,11 @@ public class Layout implements Cloneable, Serializable
         }
     }
 
+    /**
+     * Flip a layout.
+     * 
+     * @param dimension Dimension
+     */
     public void flip(int dimension)
     {
         int i;

@@ -6,36 +6,96 @@ import java.util.Random;
 import cwts.util.FastMath;
 
 /**
- * GradientDescentVOSLayoutAlgorithm
+ * Gradient descend VOS layout algorithm.
  *
  * @author Ludo Waltman
  * @author Nees Jan van Eck
  */
 public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implements LayoutAlgorithm
 {
+    /**
+     * Default maximum number of iterations.
+     */
     public static final int DEFAULT_MAX_N_ITERATIONS = 1000;
+
+    /**
+     * Default initial step size.
+     */
     public static final double DEFAULT_INITIAL_STEP_SIZE = 1;
+
+    /**
+     * Default minimum step size.
+     */
     public static final double DEFAULT_MIN_STEP_SIZE = 0.001;
+
+    /**
+     * Default step size reduction.
+     */
     public static final double DEFAULT_STEP_SIZE_REDUCTION = 0.75;
+
+    /**
+     * Default required number of quality function improvements.
+     */
     public static final int DEFAULT_REQUIRED_N_QUALITY_FUNTION_IMPROVEMENTS = 5;
 
+    /**
+     * Maximum number of iterations.
+     */
     protected int maxNIterations;
+
+    /**
+     * Initial step size.
+     */
     protected double initialStepLength;
+
+    /**
+     * Minimum step size.
+     */
     protected double minStepLength;
+
+    /**
+     * Step size reduction.
+     */
     protected double stepLengthReduction;
+
+    /**
+     * Required number of quality function improvements.
+     */
     protected int requiredNQualityFunctionImprovements;
+
+    /**
+     * Random number generator.
+     */
     protected Random random;
 
+    /**
+     * Constructs a VOS algorithm.
+     */
     public GradientDescentVOSLayoutAlgorithm()
     {
         this(new Random());
     }
 
+    /**
+     * Constructs a gradient descend VOS layout algorithm.
+     *
+     * @param random Random number generator
+     */
     public GradientDescentVOSLayoutAlgorithm(Random random)
     {
         this(DEFAULT_ATTRACTION, DEFAULT_REPULSION, DEFAULT_EDGE_WEIGHT_INCREMENT, random);
     }
 
+    /**
+     * Constructs a gradient descend VOS layout algorithm for a specified
+     * attraction parameter, repulsion parameter, and edge weight increment
+     * parameter.
+     *
+     * @param attraction          Attraction parameter
+     * @param repulsion           Repulsion parameter
+     * @param edgeWeightIncrement Edge weight increment parameter
+     * @param random              Random number generator
+     */
     public GradientDescentVOSLayoutAlgorithm(int attraction, int repulsion, double edgeWeightIncrement, Random random)
     {
         this(attraction, repulsion, edgeWeightIncrement, DEFAULT_MAX_N_ITERATIONS, DEFAULT_INITIAL_STEP_SIZE,
@@ -43,6 +103,22 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
                 random);
     }
 
+    /**
+     * Constructs a gradient descend VOS layout algorithm for a specified
+     * attraction parameter, repulsion parameter, and edge weight increment
+     * parameter.
+     *
+     * @param attraction                           Attraction parameter
+     * @param repulsion                            Repulsion parameter
+     * @param edgeWeightIncrement                  Edge weight increment parameter
+     * @param maxNIterations                       Maximum number of iterations
+     * @param initialStepLength                    Initial step length
+     * @param minStepLength                        Minimum step length
+     * @param stepLengthReduction                  Step length reduction
+     * @param requiredNQualityFunctionImprovements Required number of quality
+     *            function improvements
+     * @param random                               Random number generator
+     */
     public GradientDescentVOSLayoutAlgorithm(int attraction, int repulsion, double edgeWeightIncrement,
             int maxNIterations, double initialStepLength, double minStepLength, double stepLengthReduction,
             int requiredNQualityFunctionImprovements, Random random)
@@ -57,6 +133,11 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
         this.random = random;
     }
 
+    /**
+     * Clones the algorithm.
+     *
+     * @return Cloned algorithm
+     */
     public GradientDescentVOSLayoutAlgorithm clone()
     {
         GradientDescentVOSLayoutAlgorithm gradientDescentVOSLayoutAlgorithm;
@@ -66,56 +147,119 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
         return gradientDescentVOSLayoutAlgorithm;
     }
 
+    /**
+     * Returns the maximum number of iterations.
+     *
+     * @return Maximum number of iterations
+     */
     public int getMaxNIterations()
     {
         return maxNIterations;
     }
 
+    /**
+     * Returns the initial step size.
+     *
+     * @return Initial step size
+     */
     public double getInitialStepLength()
     {
         return initialStepLength;
     }
 
+    /**
+     * Returns the minimum step size.
+     *
+     * @return Minimum step size
+     */
     public double getMinStepLength()
     {
         return minStepLength;
     }
 
+    /**
+     * Returns the step size reduction.
+     *
+     * @return Step size reduction
+     */
     public double getStepLengthReduction()
     {
         return stepLengthReduction;
     }
 
+    /**
+     * Returns the required number of quality function improvements.
+     *
+     * @return Required number of quality function improvements
+     */
     public int getRequiredNQualityFunctionImprovements()
     {
         return requiredNQualityFunctionImprovements;
     }
 
+    /**
+     * Returns the maximum number of iterations.
+     *
+     * @return Maximum number of iterations
+     */
     public void setMaxNIterations(int maxNIterations)
     {
         this.maxNIterations = maxNIterations;
     }
 
+    /**
+     * Returns the initial step size.
+     *
+     * @return Initial step size
+     */
     public void setInitialStepLength(double initialStepLength)
     {
         this.initialStepLength = initialStepLength;
     }
 
+    /**
+     * Returns the minimum step size.
+     *
+     * @return Minimum step size
+     */
     public void setMinStepLength(double minStepLength)
     {
         this.minStepLength = minStepLength;
     }
 
+    /**
+     * Returns the step size reduction.
+     *
+     * @return Step size reduction
+     */
     public void setStepLengthReduction(double stepLengthReduction)
     {
         this.stepLengthReduction = stepLengthReduction;
     }
 
+    /**
+     * Returns the required number of quality function improvements.
+     *
+     * @return Required number of quality function improvements
+     */
     public void setRequiredNQualityFunctionImprovements(int requiredNQualityFunctionImprovements)
     {
         this.requiredNQualityFunctionImprovements = requiredNQualityFunctionImprovements;
     }
 
+    /**
+     * Finds a layout of the nodes in a network.
+     *
+     * <p>
+     * The layout is obtained by calling
+     * {@link #improveLayout(Network network, Layout layout)} and by providing a
+     * random layout as input to this method.
+     * </p>
+     *
+     * @param network Network
+     *
+     * @return Layout
+     */
     public Layout findLayout(Network network)
     {
         Layout layout;
@@ -126,6 +270,13 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
         return layout;
     }
 
+    /**
+     * Improves a layout by performing the gradient descend VOS layout
+     * algorithm.
+     *
+     * @param network Network
+     * @param layout  Layout
+     */
     public void improveLayout(Network network, Layout layout)
     {
         boolean[] nodeVisited;
