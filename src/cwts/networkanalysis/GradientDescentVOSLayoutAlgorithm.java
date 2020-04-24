@@ -6,12 +6,12 @@ import java.util.Random;
 import cwts.util.FastMath;
 
 /**
- * Gradient descend VOS layout algorithm.
+ * Gradient descent VOS layout algorithm.
  *
  * @author Ludo Waltman
  * @author Nees Jan van Eck
  */
-public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implements LayoutAlgorithm
+public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm
 {
     /**
      * Default maximum number of iterations.
@@ -69,7 +69,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     protected Random random;
 
     /**
-     * Constructs a VOS algorithm.
+     * Constructs a gradient descent VOS layout algorithm.
      */
     public GradientDescentVOSLayoutAlgorithm()
     {
@@ -77,7 +77,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Constructs a gradient descend VOS layout algorithm.
+     * Constructs a gradient descent VOS layout algorithm.
      *
      * @param random Random number generator
      */
@@ -87,7 +87,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Constructs a gradient descend VOS layout algorithm for a specified
+     * Constructs a gradient descent VOS layout algorithm for a specified
      * attraction parameter, repulsion parameter, and edge weight increment
      * parameter.
      *
@@ -104,10 +104,10 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Constructs a gradient descend VOS layout algorithm for a specified
+     * Constructs a gradient descent VOS layout algorithm for a specified
      * attraction parameter, repulsion parameter, edge weight increment
      * parameter, maximum number of iterations, initial step size, minimum step
-     * size, Step size reduction, and required number of quality value
+     * size, step size reduction, and required number of quality value
      * improvements.
      *
      * @param attraction                        Attraction parameter
@@ -251,13 +251,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Finds a layout of the nodes in a network.
-     *
-     * <p>
-     * The layout is obtained by calling
-     * {@link #improveLayout(Network network, Layout layout)} and by providing a
-     * random layout as input to this method.
-     * </p>
+     * Finds a layout using the gradient descent VOS layout algorithm.
      *
      * @param network Network
      *
@@ -274,8 +268,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm implem
     }
 
     /**
-     * Improves a layout by performing the gradient descend VOS layout
-     * algorithm.
+     * Improves a layout using the gradient descent VOS layout algorithm.
      *
      * @param network Network
      * @param layout  Layout

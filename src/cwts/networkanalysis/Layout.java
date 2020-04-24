@@ -219,7 +219,7 @@ public class Layout implements Cloneable, Serializable
     }
 
     /**
-     * Positions a node on coordinates.
+     * Positions a node at coordinates.
      *
      * @param node        Node
      * @param coordinates Coordinates
@@ -263,7 +263,7 @@ public class Layout implements Cloneable, Serializable
     }
 
     /**
-     * Standardize a layout.
+     * Standardizes a layout.
      * 
      * @param standardizeDistances Standardize distances
      */
@@ -335,7 +335,7 @@ public class Layout implements Cloneable, Serializable
     }
 
     /**
-     * Rotate a layout.
+     * Rotates a layout.
      * 
      * @param angle Angle
      */
@@ -356,7 +356,7 @@ public class Layout implements Cloneable, Serializable
     }
 
     /**
-     * Flip a layout.
+     * Flips a layout.
      * 
      * @param dimension Dimension
      */

@@ -49,7 +49,8 @@ public abstract class VOSLayoutAlgorithm implements Cloneable, QualityLayoutAlgo
     }
 
     /**
-     * Constructs a VOS layout algorithm with a specified attraction parameter.
+     * Constructs a VOS layout algorithm with a specified attraction parameter,
+     * repulsion parameter, and edge weight increment parameter.
      *
      * @param attraction          Attraction parameter
      * @param repulsion           Repulsion parameter
@@ -146,17 +147,18 @@ public abstract class VOSLayoutAlgorithm implements Cloneable, QualityLayoutAlgo
      * The VOS quality function is given by
      * </p>
      *
-     * <blockquote> 1 / attraction * sum(a[i][j] * dist(x[i], x[j]) ^
-     * attraction) - 1 / repulsion * sum(dist(x[i], x[j]) ^
-     * repulsion) </blockquote>
+     * <blockquote> {@code 1 / attraction * sum(a[i][j] * d(x[i], x[j]) ^
+     * attraction) - 1 / repulsion * sum(d(x[i], x[j]) ^
+     * repulsion)}, </blockquote>
      *
      * <p>
      * where {@code a[i][j]} is the weight of the edge between nodes {@code i}
      * and {@code j} and {@code x[i] = (x[i][1], x[i][2])} are the coordinates
-     * of node {@code i}. The function {@code dist(x[i], x[j])} is the Euclidean
+     * of node {@code i}. The function {@code d(x[i], x[j])} is the Euclidean
      * distance between nodes {@code i} and {@code j}. The sum is taken over all
      * pairs of nodes {@code i} and {@code j}. The attraction parameter must be
-     * higher than the repulsion parameter.
+     * greater than the repulsion parameter. The lower the value of the VOS
+     * quality function, the higher the quality of the layout.
      * </p>
      *
      * @param network Network
