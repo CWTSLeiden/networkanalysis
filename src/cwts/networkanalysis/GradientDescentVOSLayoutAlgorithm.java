@@ -261,8 +261,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm
     {
         Layout layout;
 
-        layout = new Layout(network.getNNodes());
-        layout.initRandomCoordinates(random);
+        layout = new Layout(network.getNNodes(), random);
         improveLayout(network, layout);
         return layout;
     }

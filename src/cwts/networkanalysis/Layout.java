@@ -58,14 +58,26 @@ public class Layout implements Cloneable, Serializable
     }
 
     /**
-     * Constructs a layout for a specified number of nodes.
+     * Constructs a random layout for a specified number of nodes.
      *
      * @param nNodes Number of nodes
      */
     public Layout(int nNodes)
     {
+        this(nNodes, new Random());
+    }
+
+    /**
+     * Constructs a random layout for a specified number of nodes.
+     *
+     * @param nNodes Number of nodes
+     * @param random Random number generator
+     */
+    public Layout(int nNodes, Random random)
+    {
         this.nNodes = nNodes;
         coordinates = new double[2][nNodes];
+        initRandomCoordinatesHelper(random);
     }
 
     /**
@@ -253,13 +265,7 @@ public class Layout implements Cloneable, Serializable
      */
     public void initRandomCoordinates(Random random)
     {
-        int i;
-
-        for (i = 0; i < nNodes; i++)
-        {
-            coordinates[0][i] = 2 * random.nextDouble() - 1;
-            coordinates[1][i] = 2 * random.nextDouble() - 1;
-        }
+        initRandomCoordinatesHelper(random);
     }
 
     /**
@@ -366,5 +372,16 @@ public class Layout implements Cloneable, Serializable
 
         for (i = 0; i < nNodes; i++)
             coordinates[dimension][i] *= -1;
+    }
+
+    private void initRandomCoordinatesHelper(Random random)
+    {
+        int i;
+
+        for (i = 0; i < nNodes; i++)
+        {
+            coordinates[0][i] = 2 * random.nextDouble() - 1;
+            coordinates[1][i] = 2 * random.nextDouble() - 1;
+        }
     }
 }
