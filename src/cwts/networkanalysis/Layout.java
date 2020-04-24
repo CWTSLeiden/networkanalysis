@@ -271,6 +271,16 @@ public class Layout implements Cloneable, Serializable
     /**
      * Standardizes a layout.
      * 
+     * <p>
+     * Standardization involves translation, rotation, reflection, and
+     * optionally dilation. The layout is translated so that it is centered at
+     * the origin. The layout is rotated so that the variance in the horizontal
+     * dimension is maximized. The layout is reflected so that in both the
+     * horizontal and the vertical dimension the median of the coordinates is
+     * non-positive. If {@code standardizeDistances = true}, the layout is
+     * dilated so that the average distance between nodes equals one.
+     * </p>
+     * 
      * @param standardizeDistances Standardize distances
      */
     public void standardizeCoordinates(boolean standardizeDistances)
