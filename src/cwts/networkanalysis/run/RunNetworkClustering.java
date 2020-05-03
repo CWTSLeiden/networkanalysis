@@ -62,9 +62,22 @@ public final class RunNetworkClustering
      */
     public static final double DEFAULT_RANDOMNESS = LeidenAlgorithm.DEFAULT_RANDOMNESS;
 
+    /**
+     * No normalization method.
+     */
     public static final String NONE_NORMALIZATION_METHOD = "None";
+    /**
+     * Association strenght normalization method.
+     */
     public static final String ASS_NORMALIZATION_METHOD = "AssociationStrength";
+    /**
+     * Fractionalization normalization method.
+     */
     public static final String FRAC_NORMALIZATION_METHOD = "Fractionalization";
+    /**
+     * LinLog/modularity normalization method.
+     * Work with modularity quality function.
+     */
     public static final String LINLOG_NORMALIZATION_METHOD = "LinLog/modularity";
 
     /**
