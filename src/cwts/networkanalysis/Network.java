@@ -1389,6 +1389,10 @@ public class Network implements Serializable
             checkIntegrity();
     }
 
+    public void setNodeWeightsToTotalEdgeWeights(){
+        this.nodeWeights = this.getTotalEdgeWeightPerNodeHelper();
+    }
+
     private double[] getTotalEdgeWeightPerNodeHelper()
     {
         double[] totalEdgeWeightPerNode;

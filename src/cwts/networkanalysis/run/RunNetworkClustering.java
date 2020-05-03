@@ -62,6 +62,11 @@ public final class RunNetworkClustering
      */
     public static final double DEFAULT_RANDOMNESS = LeidenAlgorithm.DEFAULT_RANDOMNESS;
 
+    public static final String NONE_NORMALIZATION_METHOD = "None";
+    public static final String ASS_NORMALIZATION_METHOD = "AssociationStrength";
+    public static final String FRAC_NORMALIZATION_METHOD = "Fractionalization";
+    public static final String LINLOG_NORMALIZATION_METHOD = "LinLog/modularity";
+
     /**
      * Description text.
      */
@@ -104,6 +109,8 @@ public final class RunNetworkClustering
           + "-w --weighted-edges\n"
           + "    Indicates that the edge list file has a third column containing edge\n"
           + "    weights.\n"
+          + "-n --normalization <None|AssociationStrength|Fractionalization|LinLog/modularity> (default: None)\n"
+          + "    Indicates that the edge list will be normalized with the selected normalization method.\n"
           + "--sorted-edge-list\n"
           + "    Indicates that the edge list file is sorted. The file should be sorted based\n"
           + "    on the nodes in the first column, followed by the nodes in the second\n"
@@ -150,6 +157,7 @@ public final class RunNetworkClustering
         long seed = 0;
         boolean useSeed = false;
         boolean weightedEdges = false;
+        String normalizationMethod = null;
         boolean sortedEdgeList = false;
         String initialClusteringFilename = null;
         String finalClusteringFilename = null;
@@ -259,6 +267,21 @@ public final class RunNetworkClustering
                     weightedEdges = true;
                     argIndex++;
                 }
+                else if (arg.equals("-n") || arg.equals("--normalization"))
+                {
+                    if (    ((argIndex + 1) >= args.length) ||
+                            (   !args[argIndex + 1].equals(NONE_NORMALIZATION_METHOD) &&
+                                !args[argIndex + 1].equals(ASS_NORMALIZATION_METHOD) &&
+                                !args[argIndex + 1].equals(FRAC_NORMALIZATION_METHOD) &&
+                                !args[argIndex + 1].equals(LINLOG_NORMALIZATION_METHOD))) {
+
+                        throw new IllegalArgumentException("Invalid normalization method. Value must be 'None', 'AssociationStrength',  'Fractionalization' or 'LinLog'.");
+                    }
+
+                    normalizationMethod = args[argIndex + 1];
+                    argIndex += 2;
+
+                }
                 else if (arg.equals("--sorted-edge-list"))
                 {
                     sortedEdgeList = true;
@@ -298,6 +321,8 @@ public final class RunNetworkClustering
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
         long startTimeEdgeListFile = System.currentTimeMillis();
         Network network = readEdgeList(edgeListFilename, useModularity, weightedEdges, sortedEdgeList);
+        if(normalizationMethod != null)
+            network = normalizeNetwork(network, normalizationMethod);
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
         System.err.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
 
@@ -467,6 +492,35 @@ public final class RunNetworkClustering
             System.exit(-1);
         }
         return network;
+    }
+
+    /**
+     * Normalize a network with a specified normalization method
+     * For association strenght and fractionalization, node weights are calculated before normalization.
+     * @param network Network to normalize.
+     * @param normalizationMethod Indicates the normalization method.
+     * @return Normalized network.
+     */
+    public static Network normalizeNetwork(Network network, String normalizationMethod) {
+
+        Network normalisedNetwork = null;
+
+        if (normalizationMethod.equals(NONE_NORMALIZATION_METHOD) || normalizationMethod.equals(LINLOG_NORMALIZATION_METHOD)){
+            // No change for these two normalisation method
+            // In the Network constructor, setNodeWeightsToTotalEdgeWeights is set to false by default (useModularity).
+            // LinLog need modularity quality function and not CPM quality function.
+            normalisedNetwork = network;
+
+        }else if(normalizationMethod.equals(ASS_NORMALIZATION_METHOD)) {
+            network.setNodeWeightsToTotalEdgeWeights();
+            normalisedNetwork = network.createNormalizedNetworkUsingAssociationStrength();
+
+        }else if(normalizationMethod.equals(FRAC_NORMALIZATION_METHOD)){
+            network.setNodeWeightsToTotalEdgeWeights();
+            normalisedNetwork = network.createNormalizedNetworkUsingFractionalization();
+        }
+
+        return normalisedNetwork;
     }
 
     /**
