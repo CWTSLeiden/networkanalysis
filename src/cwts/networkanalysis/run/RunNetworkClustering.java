@@ -41,24 +41,35 @@ public final class RunNetworkClustering
     public static final int MODULARITY = 3;
 
     /**
+     * Clustering algorithm IDs.
+     */
+    public static final int LEIDEN = 0;
+    public static final int LOUVAIN = 1;
+    
+    /**
      * Normalization method names.
      */
     public static final String[] NORMALIZATION_NAMES = { "none", "AssociationStrength", "Fractionalization", "Modularity" };
 
     /**
+     * Clustering algorithm names.
+     */
+    public static final String[] ALGORITHM_NAMES = { "Leiden", "Louvain" };
+
+    /**
      * Default normalization method.
      */
     public static final int DEFAULT_NORMALIZATION = NO_NORMALIZATION;
+    
+    /**
+     * Default clustering algorithm.
+     */
+    public static final int DEFAULT_ALGORITHM = LEIDEN;
 
     /**
      * Default resolution parameter.
      */
     public static final double DEFAULT_RESOLUTION = CPMClusteringAlgorithm.DEFAULT_RESOLUTION;
-
-    /**
-     * Default clustering algorithm.
-     */
-    public static final boolean DEFAULT_USE_LOUVAIN = false;
 
     /**
      * Default number of random starts.
@@ -102,7 +113,7 @@ public final class RunNetworkClustering
           + "    Method for normalizing the edge weights.\n"
           + "-r --resolution <resolution> (default: " + DEFAULT_RESOLUTION + ")\n"
           + "    Resolution parameter of the quality function.\n"
-          + "-a --algorithm {Leiden|Louvain} (default: Leiden)\n"
+          + "-a --algorithm {" + ALGORITHM_NAMES[LEIDEN] + "|" + ALGORITHM_NAMES[LOUVAIN] + "} (default: " + ALGORITHM_NAMES[DEFAULT_ALGORITHM] + ")\n"
           + "    Algorithm for optimizing the quality function. Either the Leiden or the\n"
           + "    Louvain algorithm can be used.\n"
           + "-s --random-starts <random starts> (default: " + DEFAULT_N_RANDOM_STARTS + ")\n"
@@ -154,7 +165,7 @@ public final class RunNetworkClustering
 
         int normalization = DEFAULT_NORMALIZATION;
         double resolution = DEFAULT_RESOLUTION;
-        boolean useLouvain = DEFAULT_USE_LOUVAIN;
+        boolean useLouvain = (DEFAULT_ALGORITHM == LOUVAIN);
         int nRandomStarts = DEFAULT_N_RANDOM_STARTS;
         int nIterations = DEFAULT_N_ITERATIONS;
         double randomness = DEFAULT_RANDOMNESS;
@@ -205,9 +216,9 @@ public final class RunNetworkClustering
                 }
                 else if (arg.equals("-a") || arg.equals("--algorithm"))
                 {
-                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals("Leiden") && !args[argIndex + 1].equals("Louvain")))
-                        throw new IllegalArgumentException("Value must be 'Leiden' or 'Louvain'.");
-                    useLouvain = args[argIndex + 1].equals("Louvain");
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(ALGORITHM_NAMES[LEIDEN]) && !args[argIndex + 1].equals(ALGORITHM_NAMES[LOUVAIN])))
+                        throw new IllegalArgumentException("Value must be '" + ALGORITHM_NAMES[LEIDEN] + "' or '" + ALGORITHM_NAMES[LOUVAIN] + "'.");
+                    useLouvain = args[argIndex + 1].equals(ALGORITHM_NAMES[LOUVAIN]);
                     argIndex += 2;
                 }
                 else if (arg.equals("-s") || arg.equals("--random-starts"))
@@ -322,20 +333,20 @@ public final class RunNetworkClustering
 
         // Read initial clustering from file.
         Clustering initialClustering = null;
-        if (initialClusteringFilename == null)
-        {
-            System.err.println("Using singleton initial clustering.");
-            initialClustering = new Clustering(network.getNNodes());
-        }
-        else
+        if (initialClusteringFilename != null)
         {
             System.err.println("Reading initial clustering from '" + initialClusteringFilename + "'.");
             initialClustering = readClustering(initialClusteringFilename, network.getNNodes());
             System.err.println("Initial clustering consists of " + initialClustering.getNClusters() + " clusters.");
         }
+        else
+        {
+            System.err.println("Using singleton initial clustering.");
+            initialClustering = new Clustering(network.getNNodes());
+        }
 
         // Run algorithm for network clustering.
-        System.err.println("Running " + (useLouvain ? "Louvain" : "Leiden") + " algorithm.");
+        System.err.println("Running " + (useLouvain ? ALGORITHM_NAMES[LOUVAIN] : ALGORITHM_NAMES[LEIDEN]) + " algorithm.");
         System.err.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
         System.err.println("Resolution parameter:         " + resolution);
         if ((!weightedEdges) && (normalization != MODULARITY) && (resolution >= 1))
