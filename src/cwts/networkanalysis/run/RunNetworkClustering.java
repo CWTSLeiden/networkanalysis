@@ -367,6 +367,7 @@ public final class RunNetworkClustering
                 maxQuality = quality;
             }
         }
+        finalClustering.orderClustersByNNodes();
         System.err.println("Running algorithm took " + (System.currentTimeMillis() - startTimeAlgorithm) / 1000 + "s.");
         if (nRandomStarts > 1)
             System.err.println("Maximum value of quality function in " + nRandomStarts + " random starts equals " + maxQuality + ".");
