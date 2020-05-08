@@ -33,9 +33,22 @@ import java.util.Random;
 public final class RunNetworkClustering
 {
     /**
-     * Default quality function.
+     * Normalization method IDs.
      */
-    public static final boolean DEFAULT_USE_MODULARITY = false;
+    public static final int NO_NORMALIZATION = 0;
+    public static final int ASSOCIATION_STRENGTH = 1;
+    public static final int FRACTIONALIZATION = 2;
+    public static final int MODULARITY = 3;
+
+    /**
+     * Normalization method names.
+     */
+    public static final String[] NORMALIZATION_NAMES = { "none", "AssociationStrength", "Fractionalization", "Modularity" };
+
+    /**
+     * Default normalization method.
+     */
+    public static final int DEFAULT_NORMALIZATION = NO_NORMALIZATION;
 
     /**
      * Default resolution parameter.
@@ -85,9 +98,8 @@ public final class RunNetworkClustering
           + "in the file.\n"
           + "\n"
           + "Options:\n"
-          + "-q --quality-function {CPM|modularity} (default: CPM)\n"
-          + "    Quality function to be optimized. Either the CPM (constant Potts model) or\n"
-          + "    the modularity quality function can be used.\n"
+          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "|" + NORMALIZATION_NAMES[MODULARITY] + "} (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
+          + "    Method for normalizing the edge weights.\n"
           + "-r --resolution <resolution> (default: " + DEFAULT_RESOLUTION + ")\n"
           + "    Resolution parameter of the quality function.\n"
           + "-a --algorithm {Leiden|Louvain} (default: Leiden)\n"
@@ -140,7 +152,7 @@ public final class RunNetworkClustering
             System.exit(-1);
         }
 
-        boolean useModularity = DEFAULT_USE_MODULARITY;
+        int normalization = DEFAULT_NORMALIZATION;
         double resolution = DEFAULT_RESOLUTION;
         boolean useLouvain = DEFAULT_USE_LOUVAIN;
         int nRandomStarts = DEFAULT_N_RANDOM_STARTS;
@@ -161,11 +173,18 @@ public final class RunNetworkClustering
             String arg = args[argIndex];
             try
             {
-                if (arg.equals("-q") || arg.equals("--quality-function"))
+                if (arg.equals("-n") || arg.equals("--normalization"))
                 {
-                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals("CPM") && !args[argIndex + 1].equals("modularity")))
-                        throw new IllegalArgumentException("Value must be 'CPM' or 'modularity'.");
-                    useModularity = args[argIndex + 1].equals("modularity");
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[MODULARITY])))
+                        throw new IllegalArgumentException("Value must be '" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "', '" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "', '" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "', or '" + NORMALIZATION_NAMES[MODULARITY] + "'.");
+                    if (args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]))
+                        normalization = NO_NORMALIZATION;
+                    else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]))
+                        normalization = ASSOCIATION_STRENGTH;
+                    else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION]))
+                        normalization = FRACTIONALIZATION;
+                    else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[MODULARITY]))
+                        normalization = MODULARITY;
                     argIndex += 2;
                 }
                 else if (arg.equals("-r") || arg.equals("--resolution"))
@@ -297,7 +316,7 @@ public final class RunNetworkClustering
         // Read edge list from file.
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
         long startTimeEdgeListFile = System.currentTimeMillis();
-        Network network = readEdgeList(edgeListFilename, useModularity, weightedEdges, sortedEdgeList);
+        Network network = readEdgeList(edgeListFilename, weightedEdges, sortedEdgeList);
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
         System.err.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
 
@@ -317,9 +336,9 @@ public final class RunNetworkClustering
 
         // Run algorithm for network clustering.
         System.err.println("Running " + (useLouvain ? "Louvain" : "Leiden") + " algorithm.");
-        System.err.println("Quality function:             " + (useModularity ? "modularity" : "CPM"));
+        System.err.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
         System.err.println("Resolution parameter:         " + resolution);
-        if ((!weightedEdges) && (!useModularity) && (resolution >= 1))
+        if ((!weightedEdges) && (normalization != MODULARITY) && (resolution >= 1))
             System.err.println("Warning: When applying the CPM quality function in an unweighted network, the resolution parameter should have a value below 1.");
         System.err.println("Number of random starts:      " + nRandomStarts);
         System.err.println("Number of iterations:         " + nIterations);
@@ -328,7 +347,13 @@ public final class RunNetworkClustering
         System.err.println("Random number generator seed: " + (useSeed ? seed : "random"));
 
         long startTimeAlgorithm = System.currentTimeMillis();
-        double resolution2 = useModularity ? (resolution / (2 * network.getTotalEdgeWeight() + network.getTotalEdgeWeightSelfLinks())) : resolution;
+        if (normalization == NO_NORMALIZATION)
+            network = network.createNetworkWithoutNodeWeights();
+        else if (normalization == ASSOCIATION_STRENGTH)
+            network = network.createNormalizedNetworkUsingAssociationStrength();
+        else if (normalization == FRACTIONALIZATION)
+            network = network.createNormalizedNetworkUsingFractionalization();
+        double resolution2 = (normalization == MODULARITY) ? (resolution / (2 * network.getTotalEdgeWeight() + network.getTotalEdgeWeightSelfLinks())) : resolution;
         Random random = useSeed ? new Random(seed) : new Random();
         IterativeCPMClusteringAlgorithm algorithm = useLouvain ? new LouvainAlgorithm(resolution2, nIterations, random) : new LeidenAlgorithm(resolution2, nIterations, randomness, random);
         Clustering finalClustering = null;
@@ -362,14 +387,12 @@ public final class RunNetworkClustering
      * Reads an edge list from a file and creates a network.
      *
      * @param filename       Filename
-     * @param useModularity  Indicates whether to use the modularity or the CPM
-     *                       quality function
      * @param weightedEdges  Indicates whether edges have weights
      * @param sortedEdgeList Indicates whether the edge list is sorted
      *
      * @return Network
      */
-    public static Network readEdgeList(String filename, boolean useModularity, boolean weightedEdges, boolean sortedEdgeList)
+    public static Network readEdgeList(String filename, boolean weightedEdges, boolean sortedEdgeList)
     {
         // Read edge list.
         DynamicIntArray[] edges = new DynamicIntArray[2];
@@ -457,9 +480,9 @@ public final class RunNetworkClustering
         try
         {
             if (weightedEdges)
-                network = new Network(nNodes, useModularity, edges2, edgeWeights.toArray(), sortedEdgeList, true);
+                network = new Network(nNodes, true, edges2, edgeWeights.toArray(), sortedEdgeList, true);
             else
-                network = new Network(nNodes, useModularity, edges2, sortedEdgeList, true);
+                network = new Network(nNodes, true, edges2, sortedEdgeList, true);
         }
         catch (IllegalArgumentException e)
         {
