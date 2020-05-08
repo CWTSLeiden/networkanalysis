@@ -334,8 +334,6 @@ public final class RunNetworkClustering
         System.err.println("Running " + (useLouvain ? ALGORITHM_NAMES[LOUVAIN] : ALGORITHM_NAMES[LEIDEN]) + " algorithm.");
         System.err.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
         System.err.println("Resolution parameter:         " + resolution);
-        if ((!weightedEdges) && (normalization != MODULARITY) && (resolution >= 1))
-            System.err.println("Warning: When applying the CPM quality function in an unweighted network, the resolution parameter should have a value below 1.");
         System.err.println("Number of random starts:      " + nRandomStarts);
         System.err.println("Number of iterations:         " + nIterations);
         if (!useLouvain)
