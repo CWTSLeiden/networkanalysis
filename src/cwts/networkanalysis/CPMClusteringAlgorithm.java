@@ -1,5 +1,7 @@
 package cwts.networkanalysis;
 
+import cwts.util.Arrays;
+
 /**
  * Abstract base class for clustering algorithms that use the CPM quality
  * function.
@@ -134,5 +136,155 @@ public abstract class CPMClusteringAlgorithm implements Cloneable, QualityCluste
         quality /= 2 * network.getTotalEdgeWeight() + network.totalEdgeWeightSelfLinks;
 
         return quality;
+    }
+
+    /**
+     * Removes a cluster from a clustering by merging the cluster with another
+     * cluster.
+     * 
+     * @param network    Network
+     * @param clustering Clustering
+     * @param cluster    Cluster to be removed
+     * 
+     * @return Cluster with which the cluster to be removed has been merged, or
+     *         -1 if the cluster could not be removed
+     */
+    public int removeCluster(Network network, Clustering clustering, int cluster)
+    {
+        double maxQualityFunction, qualityFunction;
+        double[] clusterWeights, totalEdgeWeightPerCluster;
+        int i, j;
+
+        clusterWeights = new double[clustering.nClusters];
+        totalEdgeWeightPerCluster = new double[clustering.nClusters];
+        for (i = 0; i < network.nNodes; i++)
+        {
+            clusterWeights[clustering.clusters[i]] += network.nodeWeights[i];
+            if (clustering.clusters[i] == cluster)
+                for (j = network.firstNeighborIndices[i]; j < network.firstNeighborIndices[i + 1]; j++)
+                    totalEdgeWeightPerCluster[clustering.clusters[network.neighbors[j]]] += network.edgeWeights[j];
+        }
+
+        i = -1;
+        maxQualityFunction = 0;
+        for (j = 0; j < clustering.nClusters; j++)
+            if ((j != cluster) && (clusterWeights[j] > 0))
+            {
+                qualityFunction = totalEdgeWeightPerCluster[j] / clusterWeights[j];
+                if (qualityFunction > maxQualityFunction)
+                {
+                    i = j;
+                    maxQualityFunction = qualityFunction;
+                }
+            }
+
+        if (i >= 0)
+        {
+            for (j = 0; j < network.nNodes; j++)
+                if (clustering.clusters[j] == cluster)
+                    clustering.clusters[j] = i;
+            if (cluster == clustering.nClusters - 1)
+                clustering.nClusters = Arrays.calcMaximum(clustering.clusters) + 1;
+        }
+
+        return i;
+    }
+
+    /**
+     * Removes small clusters from a clustering. Clusters are merged until each
+     * cluster contains at least a certain minimum number of nodes.
+     * 
+     * @param network             Network
+     * @param clustering          Clustering
+     * @param minNNodesPerCluster Minimum number of nodes per cluster
+     * 
+     * @return Boolean indicating whether any clusters have been removed
+     */
+    public boolean removeSmallClustersBasedOnNNodes(Network network, Clustering clustering, int minNNodesPerCluster)
+    {
+        int i, j, nNodesSmallestCluster;
+        int[] nNodesPerCluster;
+
+        Network reducedNetwork = network.createReducedNetwork(clustering);
+        Clustering clusteringReducedNetwork = new Clustering(reducedNetwork.nNodes);
+
+        nNodesPerCluster = clustering.getNNodesPerCluster();
+
+        do
+        {
+            i = -1;
+            nNodesSmallestCluster = minNNodesPerCluster;
+            for (j = 0; j < clustering.nClusters; j++)
+                if ((nNodesPerCluster[j] > 0) && (nNodesPerCluster[j] < nNodesSmallestCluster))
+                {
+                    i = j;
+                    nNodesSmallestCluster = nNodesPerCluster[j];
+                }
+
+            if (i >= 0)
+            {
+                j = removeCluster(reducedNetwork, clusteringReducedNetwork, i);
+                if (j >= 0)
+                    nNodesPerCluster[j] += nNodesPerCluster[i];
+                nNodesPerCluster[i] = 0;
+            }
+        }
+        while (i >= 0);
+
+        clustering.mergeClusters(clusteringReducedNetwork);
+
+        return clusteringReducedNetwork.nClusters < reducedNetwork.nNodes;
+    }
+    
+    /**
+     * Removes small clusters from a clustering. Clusters are merged until each
+     * cluster has at least a certain minimum total node weight.
+     * 
+     * <p>
+     * The total node weight of a cluster equals the sum of the weights of the
+     * nodes belonging to the cluster.
+     * </p>
+     * 
+     * @param network          Network
+     * @param clustering       Clustering
+     * @param minClusterWeight Minimum total node weight of a cluster
+     * 
+     * @return Boolean indicating whether any clusters have been removed
+     */
+    public boolean removeSmallClustersBasedOnWeight(Network network, Clustering clustering, double minClusterWeight)
+    {
+        double weightSmallestCluster;
+        double[] clusterWeights;
+        int i, j;
+
+        Network reducedNetwork = network.createReducedNetwork(clustering);
+        Clustering clusteringReducedNetwork = new Clustering(reducedNetwork.nNodes);
+
+        clusterWeights = reducedNetwork.nodeWeights.clone();
+
+        do
+        {
+            i = -1;
+            weightSmallestCluster = minClusterWeight;
+            for (j = 0; j < clusteringReducedNetwork.nClusters; j++)
+                if ((clusterWeights[j] > 0) && (clusterWeights[j] < weightSmallestCluster))
+                {
+                    i = j;
+                    weightSmallestCluster = clusterWeights[j];
+                }
+
+            if (i >= 0)
+            {
+                j = removeCluster(reducedNetwork, clusteringReducedNetwork, i);
+                if (j >= 0)
+                    clusterWeights[j] += clusterWeights[i];
+                clusterWeights[i] = 0;
+            }
+        }
+        while (i >= 0);
+
+        clustering.mergeClusters(clusteringReducedNetwork);
+
+        return clusteringReducedNetwork.nClusters < reducedNetwork.nNodes;
     }
 }
