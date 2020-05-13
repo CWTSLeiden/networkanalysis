@@ -35,7 +35,7 @@ public final class RunNetworkClustering
      */
     public static final int LEIDEN = 0;
     public static final int LOUVAIN = 1;
-    
+
     /**
      * Normalization method names.
      */
@@ -50,7 +50,7 @@ public final class RunNetworkClustering
      * Default normalization method.
      */
     public static final int DEFAULT_NORMALIZATION = NO_NORMALIZATION;
-    
+
     /**
      * Default clustering algorithm.
      */
@@ -80,7 +80,7 @@ public final class RunNetworkClustering
      * Description text.
      */
     public static final String DESCRIPTION
-        = "RunNetworkClustering version 1.0.0\n"
+        = "RunNetworkClustering version 1.1.0\n"
           + "By Vincent Traag, Ludo Waltman, and Nees Jan van Eck\n"
           + "Centre for Science and Technology Studies (CWTS), Leiden University\n";
 
@@ -90,7 +90,7 @@ public final class RunNetworkClustering
     public static final String USAGE
         = "Usage: RunNetworkClustering [options] <filename>\n"
           + "\n"
-          + "Identify clusters (also known as communities) in a network, using either the\n"
+          + "Identify clusters (also known as communities) in a network using either the\n"
           + "Leiden or the Louvain algorithm.\n"
           + "\n"
           + "The file in <filename> is expected to contain a tab-separated edge list\n"
@@ -99,7 +99,8 @@ public final class RunNetworkClustering
           + "in the file.\n"
           + "\n"
           + "Options:\n"
-          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "|" + NORMALIZATION_NAMES[MODULARITY] + "} (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
+          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "|" + NORMALIZATION_NAMES[MODULARITY] + "}\n"
+          + "        (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
           + "    Method for normalizing the edge weights.\n"
           + "-r --resolution <resolution> (default: " + DEFAULT_RESOLUTION + ")\n"
           + "    Resolution parameter of the quality function.\n"

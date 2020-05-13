@@ -85,7 +85,7 @@ public class RunNetworkLayout
      * Description text.
      */
     public static final String DESCRIPTION
-        = "RunNetworkLayout version 1.0.0\n"
+        = "RunNetworkLayout version 1.1.0\n"
           + "By Nees Jan van Eck and Ludo Waltman\n"
           + "Centre for Science and Technology Studies (CWTS), Leiden University\n";
 
@@ -95,7 +95,8 @@ public class RunNetworkLayout
     public static final String USAGE
         = "Usage: RunNetworkLayout [options] <filename>\n"
           + "\n"
-          + "Finds a layout using the gradient descent VOS layout algorithm.\n"
+          + "Determine a layout for a network using the gradient descent VOS layout\n"
+          + "algorithm.\n"
           + "\n"
           + "The file in <filename> is expected to contain a tab-separated edge list\n"
           + "(without a header line). Nodes are represented by zero-index integer numbers.\n"
@@ -103,7 +104,8 @@ public class RunNetworkLayout
           + "in the file.\n"
           + "\n"
           + "Options:\n"
-          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "|" + NORMALIZATION_NAMES[LINLOG] + "} (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
+          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "|" + NORMALIZATION_NAMES[LINLOG] + "}\n"
+          + "        (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
           + "    Method for normalizing the edge weights.\n"
           + "-a --attraction <attraction> (Default: " + DEFAULT_ATTRACTION + ")\n"
           + "    Attraction parameter of the VOS quality function.\n"
@@ -119,8 +121,10 @@ public class RunNetworkLayout
           + "    Minimum step size of the gradient descent algorithm.\n"
           + "--step-size-reduction <step size reduction> (default: " + DEFAULT_STEP_SIZE_REDUCTION + ")\n"
           + "    Step size reduction of the gradient descent algorithm.\n"
-          + "--required-quality-value-improvements <required quality value improvements> (default: " + DEFAULT_REQUIRED_N_QUALITY_VALUE_IMPROVEMENTS + ")\n"
-          + "    Required number of quality value improvements of the gradient descent algorithm.\n"
+          + "--required-quality-value-improvements <required quality value improvements>\n"
+          + "        (default: " + DEFAULT_REQUIRED_N_QUALITY_VALUE_IMPROVEMENTS + ")\n"
+          + "    Required number of quality value improvements of the gradient descent\n"
+          + "    algorithm.\n"
           + "--seed <seed> (default: random)\n"
           + "    Seed of the random number generator.\n"
           + "-w --weighted-edges\n"
@@ -133,8 +137,8 @@ public class RunNetworkLayout
           + "--input-layout <filename> (default: random layout)\n"
           + "    Read the initial layout from the specified file. The file is expected to\n"
           + "    contain three tab-separated columns (without a header line), first a column\n"
-          + "    of nodes, then a column of x-coordinates, and finally a column of\n"
-          + "    y-coordinates. Nodes are represented by zero-index integer numbers. If no\n"
+          + "    of nodes, then a column of x coordinates, and finally a column of\n"
+          + "    y coordinates. Nodes are represented by zero-index integer numbers. If no\n"
           + "    file is specified, a random layout (in which each node is positioned at\n"
           + "    random coordinates) is used as the initial layout.\n"
           + "-o --output-layout <filename> (default: standard output)\n"
