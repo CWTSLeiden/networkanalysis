@@ -1,30 +1,35 @@
 ## Introduction
 
 This package provides data structures and algorithms for network analysis in `java`.
-Currently, the focus of the package is restricted to clustering (or community detection) in networks.
-In particular, the package contains an implementation of the [Leiden algorithm](https://arxiv.org/abs/xxx.xxxx) and the [Louvain algorithm](https://arxiv.org/abs/0803.0476).
+Currently, the focus of the package is restricted to clustering (or community detection) and layout of networks.
+In particular, the package contains an implementation of the [Leiden algorithm](https://arxiv.org/abs/1810.08473) and the [Louvain algorithm](https://arxiv.org/abs/0803.0476) for network clustering and the [VOS technique](https://arxiv.org/abs/1003.2551) for network layout.
 Only undirected networks are supported.
 
 [![DOI](https://zenodo.org/badge/153760626.svg)](https://zenodo.org/badge/latestdoi/153760626)
 
 ## Usage
 
-To run the clustering algorithms, the command-line tool `RunNetworkClustering` is provided.
-The latest version of the tool is available as a pre-compiled `jar` file in the GitHub [release](https://github.com/CWTSLeiden/networkanalysis/releases/latest).
+The latest version of this package is available as a pre-compiled `jar` file in the GitHub [release](https://github.com/CWTSLeiden/networkanalysis/releases/latest).
 The source code is also available in this repository.
 You can use it to [compile](#compilation) the code yourself.
-The `.jar` file can be executed as follows:
+
+To run the clustering algorithms, the command-line tool `RunNetworkClustering` is provided.
+The tool can be run as follows:
 
 ```
-java -jar RunNetworkClustering.jar
+java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkClustering
 ```
 
 If no further arguments are provided, the following usage notice will be displayed:
 
 ```
+RunNetworkClustering version 1.1.0
+By Vincent Traag, Ludo Waltman, and Nees Jan van Eck
+Centre for Science and Technology Studies (CWTS), Leiden University
+
 Usage: RunNetworkClustering [options] <filename>
 
-Identify clusters (also known as communities) in a network, using either the
+Identify clusters (also known as communities) in a network using either the
 Leiden or the Louvain algorithm.
 
 The file in <filename> is expected to contain a tab-separated edge list
@@ -33,9 +38,9 @@ Only undirected networks are supported. Each edge should be included only once
 in the file.
 
 Options:
--q --quality-function {CPM|modularity} (default: CPM)
-    Quality function to be optimized. Either the CPM (constant Potts model) or
-    the modularity quality function can be used.
+-n --normalization {none|AssociationStrength|Fractionalization|Modularity}
+        (Default: none)
+    Method for normalizing the edge weights.
 -r --resolution <resolution> (default: 1.0)
     Resolution parameter of the quality function.
 -a --algorithm {Leiden|Louvain} (default: Leiden)
@@ -68,11 +73,78 @@ Options:
     the standard output is used.
 ```
 
-To run the clustering algorithms, you need `java 1.8.0` or higher.
+To run the layout algorithm, the command-line tool `RunNetworkLayout` is provided.
+The tool can be run as follows:
+
+```
+java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkLayout
+```
+
+If no further arguments are provided, the following usage notice will be displayed:
+
+```
+RunNetworkLayout version 1.1.0
+By Nees Jan van Eck and Ludo Waltman
+Centre for Science and Technology Studies (CWTS), Leiden University
+
+Usage: RunNetworkLayout [options] <filename>
+
+Determine a layout for a network using the gradient descent VOS layout
+algorithm.
+
+The file in <filename> is expected to contain a tab-separated edge list
+(without a header line). Nodes are represented by zero-index integer numbers.
+Only undirected networks are supported. Each edge should be included only once
+in the file.
+
+Options:
+-n --normalization {none|AssociationStrength|Fractionalization|LinLog}
+        (Default: none)
+    Method for normalizing the edge weights.
+-a --attraction <attraction> (Default: 2)
+    Attraction parameter of the VOS quality function.
+-r --repulsion <repulsion> (Default: 1)
+    Repulsion parameter of the VOS quality function.
+-s --random-starts <random starts> (default: 1)
+    Number of random starts of the gradient descent algorithm.
+-i --max-iterations <max. iterations> (default: 1000)
+    Maximum number of iterations of the gradient descent algorithm.
+--initial-step-size <initial step size> (default: 1.0)
+    Initial step size of the gradient descent algorithm.
+--min-step-size <min. step size> (default: 0.001)
+    Minimum step size of the gradient descent algorithm.
+--step-size-reduction <step size reduction> (default: 0.75)
+    Step size reduction of the gradient descent algorithm.
+--required-quality-value-improvements <required quality value improvements>
+        (default: 5)
+    Required number of quality value improvements of the gradient descent
+    algorithm.
+--seed <seed> (default: random)
+    Seed of the random number generator.
+-w --weighted-edges
+    Indicates that the edge list file has a third column containing edge
+    weights.
+--sorted-edge-list
+    Indicates that the edge list file is sorted. The file should be sorted based
+    on the nodes in the first column, followed by the nodes in the second
+    column. Each edge should be included in both directions in the file.
+--input-layout <filename> (default: random layout)
+    Read the initial layout from the specified file. The file is expected to
+    contain three tab-separated columns (without a header line), first a column
+    of nodes, then a column of x coordinates, and finally a column of
+    y coordinates. Nodes are represented by zero-index integer numbers. If no
+    file is specified, a random layout (in which each node is positioned at
+    random coordinates) is used as the initial layout.
+-o --output-layout <filename> (default: standard output)
+    Write the final layout to the specified file. If no file is specified,
+    the standard output is used.
+```
+
+To run the command-line tools, you need `java 1.8.0` or higher.
 
 ### Example
 
-The following example illustrates the use of the `RunNetworkClustering` tool.
+The following example illustrates the use of the `RunNetworkClustering` and `RunNetworkLayout` tools.
 Consider this network:
 
 ```text
@@ -100,13 +172,16 @@ The network is encoded as an edge list that is saved in a tab-separated text fil
 ```
 
 Nodes must be represented by integer numbers starting from 0.
+
 Assuming that the edge list has been saved in the file `network.txt`, the `RunNetworkClustering` tool can be run as follows:
 
 ```
-java -jar RunNetworkClustering.jar -r 0.2 -o clusters.txt network.txt
+java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkClustering -r 0.2 -o clusters.txt network.txt
 ```
 
-In this case, clusters are identified using the Leiden algorithm based on the CPM quality function with a value of `0.2` for the resolution parameter.
+In this case, clusters are identified using the Leiden algorithm.
+The CPM (constant Potts model) quality function is used without normalizing the edge weights.
+A value of `0.2` is used for the resolution parameter.
 The resulting clustering is saved in the text file `clusters.txt`:
 
 ```text
@@ -119,9 +194,30 @@ The resulting clustering is saved in the text file `clusters.txt`:
 ```
 
 The file `clusters.txt` shows that two clusters have been identified.
-The first column in `clusters.txt` indicates the node, and the second column indicates the cluster to which the node belongs.
+The first column in `clusters.txt` indicates a node, and the second column indicates the cluster to which the node belongs.
 Cluster 0 includes nodes 0, 1, and 2.
 Cluster 1 includes nodes 3, 4, and 5.
+
+The `RunNetworkLayout` tool can be run as follows:
+
+```
+java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkLayout -o layout.txt network.txt
+```
+
+In this case, the default parameter values are used for the VOS layout technique.
+The resulting layout is saved in the text file `layout.txt`:
+
+```text
+0	-0.8690519467788094	-0.04001496992603245
+1	-0.8690620214452673	0.040038034108640194
+2	-0.4603890908313338	-2.5793522310420543E-5
+3	0.46031975105512185	-1.6403462331212636E-5
+4	0.8690853506388282	0.04007029704233864
+5	0.86909795736146	-0.04005116424030402
+```
+
+The first column in `layout.txt` indicates a node, and the second and third column indicate the x and y coordinates of the node.
+
 In the above example, the edges in the file `network.txt` have not been sorted.
 To provide a sorted edge list as input, include the edges in both directions and use the option ``--sorted-edge-list``.
 Furthermore, edge weights can be provided by adding a third column to the file `network.txt` and by using the option ``--weighted-edges``.
@@ -136,11 +232,17 @@ javac -d build src/cwts/networkanalysis/*.java src/cwts/networkanalysis/run/*.ja
 
 The compiled `class` files will be output to the directory `build`.
 There are no external dependencies.
-The `main` method is provided in the class `cwts.networkanalysis.run.RunNetworkClustering`.
+There are two `main` methods, one in the class `cwts.networkanalysis.run.RunNetworkClustering` and one in the class `cwts.networkanalysis.run.RunNetworkLayout`.
 After the code has been compiled, the `RunNetworkClustering` tool can be run as follows:
 
 ```
 java -cp build cwts.networkanalysis.run.RunNetworkClustering
+```
+
+The `RunNetworkLayout` tool can be run as follows:
+
+```
+java -cp build cwts.networkanalysis.run.RunNetworkLayout
 ```
 
 The latest stable version of the code is available from the [`master`](https://github.com/CWTSLeiden/networkanalysis/tree/master) branch on GitHub.
