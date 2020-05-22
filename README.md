@@ -128,19 +128,25 @@ Furthermore, edge weights can be provided by adding a third column to the file `
 
 ## Compilation
 
-The source code can be compiled as follows:
+You must have JDK 1.8+ installed to compile. The source code can be compiled as follows on Mac OS and Linux:
 
 ```
-javac -d build src/cwts/networkanalysis/*.java src/cwts/networkanalysis/run/*.java src/cwts/util/*.java
+./mvnw package
 ```
 
-The compiled `class` files will be output to the directory `build`.
+On Windows, use the following command:
+
+```
+./mvnw.cmd package
+```
+
+The compiled `class` files will be output to the directory `target/classes`.
 There are no external dependencies.
-The `main` method is provided in the class `cwts.networkanalysis.run.RunNetworkClustering`.
+The `main` method is provided in the class `nl.cwts.networkanalysis.run.RunNetworkClustering`.
 After the code has been compiled, the `RunNetworkClustering` tool can be run as follows:
 
 ```
-java -cp build cwts.networkanalysis.run.RunNetworkClustering
+java -cp target/classes nl.cwts.networkanalysis.run.RunNetworkClustering
 ```
 
 The latest stable version of the code is available from the [`master`](https://github.com/CWTSLeiden/networkanalysis/tree/master) branch on GitHub.

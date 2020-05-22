@@ -6,12 +6,30 @@
 
     <groupId>nl.cwts</groupId>
     <artifactId>networkanalysis</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>networkanalysis</name>
     <description>Java package that provides data structures and algorithms for network analysis.</description>
     <url>https://github.com/CWTSLeiden/networkanalysis</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Ludo Waltman</name>
+        </developer>
+        <developer>
+            <name>Nees Jan van Eck</name>
+        </developer>
+        <developer>
+            <name>Vincent Traag</name>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
