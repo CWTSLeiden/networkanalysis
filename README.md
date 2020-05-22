@@ -137,7 +137,7 @@ You must have JDK 1.8+ installed to compile. The source code can be compiled as 
 On Windows, use the following command:
 
 ```
-./mvnw.cmd package
+mvnw.cmd package
 ```
 
 The compiled `class` files will be output to the directory `target/classes`.
