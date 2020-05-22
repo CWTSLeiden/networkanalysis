@@ -160,7 +160,14 @@ Before submitting, please examine whether issues have not yet been reported befo
 ## Documentation
 
 Documentation of the source code is provided in the code in `javadoc` format.
-The documentation is also available in a [compiled format](https://CWTSLeiden.github.io/networkanalysis).
+
+You can browse a local copy of the documentation by running:
+
+```
+./mvnw site:run
+```
+
+This will start a local webserver, and the documentation will be available at [http://localhost:8080/apidocs/index.html](http://localhost:8080/apidocs/index.html)
 
 ## Contribution
 
