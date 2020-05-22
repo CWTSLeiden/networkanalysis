@@ -8,10 +8,10 @@
  * </p>
  *
  * <p>
- * The classes {@link cwts.networkanalysis.Network} and {@link
- * cwts.networkanalysis.Clustering} represent the core data structures. The
- * classes {@link cwts.networkanalysis.LeidenAlgorithm} and {@link
- * cwts.networkanalysis.LouvainAlgorithm} represent the core clustering
+ * The classes {@link nl.cwts.networkanalysis.Network} and {@link
+ * nl.cwts.networkanalysis.Clustering} represent the core data structures. The
+ * classes {@link nl.cwts.networkanalysis.LeidenAlgorithm} and {@link
+ * nl.cwts.networkanalysis.LouvainAlgorithm} represent the core clustering
  * algorithms. These two classes are embedded in a hierarchy of classes and
  * interfaces for representing clustering algorithms.
  * </p>

@@ -8,7 +8,7 @@
  *
  * <p>
  * The network analysis algorithms are provided by the package {@link
- * cwts.networkanalysis}.
+ * nl.cwts.networkanalysis}.
  * </p>
  *
  * @author Ludo Waltman
