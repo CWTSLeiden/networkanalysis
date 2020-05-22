@@ -1,4 +1,4 @@
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
 
 import java.util.Random;
 

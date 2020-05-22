@@ -1,4 +1,4 @@
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
 
 /**
  * Abstract base class for iterative clustering algorithms that use the CPM

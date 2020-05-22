@@ -5,4 +5,4 @@
  * @author Nees Jan van Eck
  * @author Vincent Traag
  */
-package cwts.util;
+package nl.cwts.util;

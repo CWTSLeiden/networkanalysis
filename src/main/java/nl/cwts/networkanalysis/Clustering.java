@@ -1,4 +1,4 @@
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -87,7 +87,7 @@ public class Clustering implements Cloneable, Serializable
     {
         nNodes = clusters.length;
         this.clusters = clusters.clone();
-        nClusters = cwts.util.Arrays.calcMaximum(clusters) + 1;
+        nClusters = nl.cwts.util.Arrays.calcMaximum(clusters) + 1;
     }
 
     /**
@@ -277,7 +277,7 @@ public class Clustering implements Cloneable, Serializable
      */
     public void orderClustersByNNodes()
     {
-        orderClustersByWeight(cwts.util.Arrays.createDoubleArrayOfOnes(nNodes));
+        orderClustersByWeight(nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes));
     }
 
     /**

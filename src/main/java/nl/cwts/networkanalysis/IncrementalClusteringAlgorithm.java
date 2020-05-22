@@ -1,4 +1,4 @@
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
 
 /**
  * Interface for clustering algorithms that are able to improve an existing

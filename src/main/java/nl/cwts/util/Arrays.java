@@ -1,4 +1,4 @@
-package cwts.util;
+package nl.cwts.util;
 
 import java.util.Random;
 

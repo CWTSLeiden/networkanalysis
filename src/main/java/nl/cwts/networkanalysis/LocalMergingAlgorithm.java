@@ -1,7 +1,7 @@
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
 
-import cwts.util.Arrays;
-import cwts.util.FastMath;
+import nl.cwts.util.Arrays;
+import nl.cwts.util.FastMath;
 import java.util.Random;
 
 /**

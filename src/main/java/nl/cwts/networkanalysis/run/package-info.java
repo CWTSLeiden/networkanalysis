@@ -15,4 +15,4 @@
  * @author Nees Jan van Eck
  * @author Vincent Traag
  */
-package cwts.networkanalysis.run;
+package nl.cwts.networkanalysis.run;

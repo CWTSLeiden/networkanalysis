@@ -1,13 +1,13 @@
-package cwts.networkanalysis.run;
+package nl.cwts.networkanalysis.run;
 
-import cwts.networkanalysis.Clustering;
-import cwts.networkanalysis.CPMClusteringAlgorithm;
-import cwts.networkanalysis.IterativeCPMClusteringAlgorithm;
-import cwts.networkanalysis.LeidenAlgorithm;
-import cwts.networkanalysis.LouvainAlgorithm;
-import cwts.networkanalysis.Network;
-import cwts.util.DynamicDoubleArray;
-import cwts.util.DynamicIntArray;
+import nl.cwts.networkanalysis.Clustering;
+import nl.cwts.networkanalysis.CPMClusteringAlgorithm;
+import nl.cwts.networkanalysis.IterativeCPMClusteringAlgorithm;
+import nl.cwts.networkanalysis.LeidenAlgorithm;
+import nl.cwts.networkanalysis.LouvainAlgorithm;
+import nl.cwts.networkanalysis.Network;
+import nl.cwts.util.DynamicDoubleArray;
+import nl.cwts.util.DynamicIntArray;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

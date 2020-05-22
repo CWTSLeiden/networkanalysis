@@ -1,4 +1,4 @@
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -384,7 +384,7 @@ public class Network implements Serializable
      */
     public double getTotalNodeWeight()
     {
-        return cwts.util.Arrays.calcSum(nodeWeights);
+        return nl.cwts.util.Arrays.calcSum(nodeWeights);
     }
 
     /**
@@ -530,7 +530,7 @@ public class Network implements Serializable
      */
     public double getTotalEdgeWeight()
     {
-        return cwts.util.Arrays.calcSum(edgeWeights) / 2;
+        return nl.cwts.util.Arrays.calcSum(edgeWeights) / 2;
     }
 
     /**
@@ -556,7 +556,7 @@ public class Network implements Serializable
      */
     public double getTotalEdgeWeight(int node)
     {
-        return cwts.util.Arrays.calcSum(edgeWeights, firstNeighborIndices[node], firstNeighborIndices[node + 1]);
+        return nl.cwts.util.Arrays.calcSum(edgeWeights, firstNeighborIndices[node], firstNeighborIndices[node + 1]);
     }
 
     /**
@@ -631,7 +631,7 @@ public class Network implements Serializable
         networkWithoutNodeWeights = new Network();
         networkWithoutNodeWeights.nNodes = nNodes;
         networkWithoutNodeWeights.nEdges = nEdges;
-        networkWithoutNodeWeights.nodeWeights = cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
+        networkWithoutNodeWeights.nodeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
         networkWithoutNodeWeights.firstNeighborIndices = firstNeighborIndices;
         networkWithoutNodeWeights.neighbors = neighbors;
         networkWithoutNodeWeights.edgeWeights = edgeWeights;
@@ -658,7 +658,7 @@ public class Network implements Serializable
         networkWithoutEdgeWeights.nodeWeights = nodeWeights;
         networkWithoutEdgeWeights.firstNeighborIndices = firstNeighborIndices;
         networkWithoutEdgeWeights.neighbors = neighbors;
-        networkWithoutEdgeWeights.edgeWeights = cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
+        networkWithoutEdgeWeights.edgeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
         networkWithoutEdgeWeights.totalEdgeWeightSelfLinks = 0;
         return networkWithoutEdgeWeights;
     }
@@ -680,10 +680,10 @@ public class Network implements Serializable
         networkWithoutNodeAndEdgeWeights = new Network();
         networkWithoutNodeAndEdgeWeights.nNodes = nNodes;
         networkWithoutNodeAndEdgeWeights.nEdges = nEdges;
-        networkWithoutNodeAndEdgeWeights.nodeWeights = cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
+        networkWithoutNodeAndEdgeWeights.nodeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
         networkWithoutNodeAndEdgeWeights.firstNeighborIndices = firstNeighborIndices;
         networkWithoutNodeAndEdgeWeights.neighbors = neighbors;
-        networkWithoutNodeAndEdgeWeights.edgeWeights = cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
+        networkWithoutNodeAndEdgeWeights.edgeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
         networkWithoutNodeAndEdgeWeights.totalEdgeWeightSelfLinks = 0;
         return networkWithoutNodeAndEdgeWeights;
     }
@@ -729,7 +729,7 @@ public class Network implements Serializable
 
         normalizedNetwork.nNodes = nNodes;
         normalizedNetwork.nEdges = nEdges;
-        normalizedNetwork.nodeWeights = cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
+        normalizedNetwork.nodeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
         normalizedNetwork.firstNeighborIndices = firstNeighborIndices;
         normalizedNetwork.neighbors = neighbors;
 
@@ -778,7 +778,7 @@ public class Network implements Serializable
 
         normalizedNetwork.nNodes = nNodes;
         normalizedNetwork.nEdges = nEdges;
-        normalizedNetwork.nodeWeights = cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
+        normalizedNetwork.nodeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
         normalizedNetwork.firstNeighborIndices = firstNeighborIndices;
         normalizedNetwork.neighbors = neighbors;
 
@@ -860,7 +860,7 @@ public class Network implements Serializable
         while ((nEdgesAboveThreshold + nEdgesAtThreshold < nEdges / 2) && (edgeWeights[nEdges / 2 - nEdgesAboveThreshold - nEdgesAtThreshold - 1] == edgeWeightThreshold))
             nEdgesAtThreshold++;
 
-        randomNumbers = cwts.util.Arrays.createDoubleArrayOfRandomNumbers(nNodes * nNodes, random);
+        randomNumbers = nl.cwts.util.Arrays.createDoubleArrayOfRandomNumbers(nNodes * nNodes, random);
 
         randomNumbersEdgesAtThreshold = new double[nEdgesAtThreshold];
         i = 0;
@@ -1368,7 +1368,7 @@ public class Network implements Serializable
         neighbors = Arrays.copyOfRange(neighbors, 0, nEdges);
         this.edgeWeights = Arrays.copyOfRange(this.edgeWeights, 0, nEdges);
 
-        this.nodeWeights = (nodeWeights != null) ? nodeWeights.clone() : (setNodeWeightsToTotalEdgeWeights ? getTotalEdgeWeightPerNodeHelper() : cwts.util.Arrays.createDoubleArrayOfOnes(nNodes));
+        this.nodeWeights = (nodeWeights != null) ? nodeWeights.clone() : (setNodeWeightsToTotalEdgeWeights ? getTotalEdgeWeightPerNodeHelper() : nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes));
 
         if (checkIntegrity)
             checkIntegrity();
@@ -1380,10 +1380,10 @@ public class Network implements Serializable
         nEdges = neighbors.length;
         this.firstNeighborIndices = firstNeighborIndices.clone();
         this.neighbors = neighbors.clone();
-        this.edgeWeights = (edgeWeights != null) ? edgeWeights.clone() : cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
+        this.edgeWeights = (edgeWeights != null) ? edgeWeights.clone() : nl.cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
         totalEdgeWeightSelfLinks = 0;
 
-        this.nodeWeights = (nodeWeights != null) ? nodeWeights.clone() : (setNodeWeightsToTotalEdgeWeights ? getTotalEdgeWeightPerNodeHelper() : cwts.util.Arrays.createDoubleArrayOfOnes(nNodes));
+        this.nodeWeights = (nodeWeights != null) ? nodeWeights.clone() : (setNodeWeightsToTotalEdgeWeights ? getTotalEdgeWeightPerNodeHelper() : nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes));
 
         if (checkIntegrity)
             checkIntegrity();
@@ -1396,7 +1396,7 @@ public class Network implements Serializable
 
         totalEdgeWeightPerNode = new double[nNodes];
         for (i = 0; i < nNodes; i++)
-            totalEdgeWeightPerNode[i] = cwts.util.Arrays.calcSum(edgeWeights, firstNeighborIndices[i], firstNeighborIndices[i + 1]);
+            totalEdgeWeightPerNode[i] = nl.cwts.util.Arrays.calcSum(edgeWeights, firstNeighborIndices[i], firstNeighborIndices[i + 1]);
         return totalEdgeWeightPerNode;
     }
 

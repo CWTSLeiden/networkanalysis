@@ -1,6 +1,6 @@
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
 
-import cwts.util.Arrays;
+import nl.cwts.util.Arrays;
 import java.util.Random;
 
 /**

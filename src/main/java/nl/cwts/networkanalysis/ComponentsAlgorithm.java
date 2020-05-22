@@ -1,4 +1,4 @@
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
 
 /**
  * Algorithm for finding the connected components of a network.

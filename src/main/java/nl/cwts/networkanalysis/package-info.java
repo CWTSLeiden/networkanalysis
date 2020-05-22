@@ -20,4 +20,4 @@
  * @author Nees Jan van Eck
  * @author Vincent Traag
  */
-package cwts.networkanalysis;
+package nl.cwts.networkanalysis;
