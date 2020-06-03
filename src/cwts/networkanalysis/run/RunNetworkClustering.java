@@ -77,6 +77,11 @@ public final class RunNetworkClustering
     public static final double DEFAULT_RESOLUTION = CPMClusteringAlgorithm.DEFAULT_RESOLUTION;
 
     /**
+     * Default minimum cluster size.
+     */
+    public static final int DEFAULT_MIN_CLUSTER_SIZE = 1;
+
+    /**
      * Default number of random starts.
      */
     public static final int DEFAULT_N_RANDOM_STARTS = 1;
@@ -121,6 +126,8 @@ public final class RunNetworkClustering
           + "    Method for normalizing edge weights in the CPM quality function.\n"
           + "-r --resolution <resolution> (default: " + DEFAULT_RESOLUTION + ")\n"
           + "    Resolution parameter of the quality function.\n"
+          + "-m --min-cluster-size <min. cluster size> (default: " + DEFAULT_MIN_CLUSTER_SIZE + ")"
+          + "    Minimum number of nodes per cluster."
           + "-a --algorithm {" + ALGORITHM_NAMES[LEIDEN] + "|" + ALGORITHM_NAMES[LOUVAIN] + "} (default: " + ALGORITHM_NAMES[DEFAULT_ALGORITHM] + ")\n"
           + "    Algorithm for optimizing the quality function. Either the Leiden or the\n"
           + "    Louvain algorithm can be used.\n"
@@ -169,6 +176,7 @@ public final class RunNetworkClustering
         boolean useModularity = (DEFAULT_QUALITY_FUNCTION == MODULARITY);
         int normalization = DEFAULT_NORMALIZATION;
         double resolution = DEFAULT_RESOLUTION;
+        int minClusterSize = DEFAULT_MIN_CLUSTER_SIZE;
         boolean useLouvain = (DEFAULT_ALGORITHM == LOUVAIN);
         int nRandomStarts = DEFAULT_N_RANDOM_STARTS;
         int nIterations = DEFAULT_N_ITERATIONS;
@@ -220,6 +228,22 @@ public final class RunNetworkClustering
                     catch (NumberFormatException e)
                     {
                         throw new IllegalArgumentException("Value must be a non-negative number.");
+                    }
+                    argIndex += 2;
+                }
+                else if (arg.equals("-m") || arg.equals("--min-cluster-size"))
+                {
+                    try
+                    {
+                        if ((argIndex + 1) >= args.length)
+                            throw new NumberFormatException();
+                        minClusterSize = Integer.parseInt(args[argIndex + 1]);
+                        if (minClusterSize <= 0)
+                            throw new NumberFormatException();
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        throw new IllegalArgumentException("Value must be a positive integer number.");
                     }
                     argIndex += 2;
                 }
@@ -357,8 +381,10 @@ public final class RunNetworkClustering
         // Run algorithm for network clustering.
         System.err.println("Running " + (useLouvain ? ALGORITHM_NAMES[LOUVAIN] : ALGORITHM_NAMES[LEIDEN]) + " algorithm.");
         System.err.println("Quality function:             " + (useModularity ? QUALITY_FUNCTION_NAMES[MODULARITY] : QUALITY_FUNCTION_NAMES[CPM]));
-        System.err.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
+        if (!useModularity)
+            System.err.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
         System.err.println("Resolution parameter:         " + resolution);
+        System.err.println("Minimum cluster size:         " + minClusterSize);
         System.err.println("Number of random starts:      " + nRandomStarts);
         System.err.println("Number of iterations:         " + nIterations);
         if (!useLouvain)
@@ -399,6 +425,12 @@ public final class RunNetworkClustering
             System.err.println("Maximum value of quality function in " + nRandomStarts + " random starts equals " + maxQuality + ".");
         else
             System.err.println("Quality function equals " + maxQuality + ".");
+        if (minClusterSize > 1)
+        {
+            System.err.println("Clustering consists of " + finalClustering.getNClusters() + " clusters.");
+            System.err.println("Removing clusters consisting of fewer than " + minClusterSize + " nodes.");
+            algorithm.removeSmallClustersBasedOnNNodes(network, finalClustering, minClusterSize);
+        }
         System.err.println("Final clustering consists of " + finalClustering.getNClusters() + " clusters.");
 
         // Write final clustering to file (or to standard output).

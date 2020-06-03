@@ -424,7 +424,8 @@ public class RunNetworkLayout
         // Run algorithm for network layout.
         System.err.println("Running gradient descent VOS layout algorithm.");
         System.err.println("Quality function:                              " + (useLinLog ? QUALITY_FUNCTION_NAMES[LINLOG] : QUALITY_FUNCTION_NAMES[VOS]));
-        System.err.println("Normalization method:                          " + NORMALIZATION_NAMES[normalization]);
+        if (!useLinLog)
+            System.err.println("Normalization method:                          " + NORMALIZATION_NAMES[normalization]);
         System.err.println("Attraction parameter:                          " + attraction);
         System.err.println("Repulsion parameter:                           " + repulsion);
         System.err.println("Number of random starts:                       " + nRandomStarts);
