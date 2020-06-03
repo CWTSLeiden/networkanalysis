@@ -393,4 +393,8 @@ public class FileIO
                 }
         }
     }
+
+    private FileIO()
+    {
+    }
 }
