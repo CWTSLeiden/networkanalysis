@@ -140,7 +140,8 @@ public abstract class CPMClusteringAlgorithm implements Cloneable, QualityCluste
 
     /**
      * Removes a cluster from a clustering by merging the cluster with another
-     * cluster.
+     * cluster. If a cluster has no connections with other clusters, it cannot
+     * be removed.
      * 
      * @param network    Network
      * @param clustering Clustering
