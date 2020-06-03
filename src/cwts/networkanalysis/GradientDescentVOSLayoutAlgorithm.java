@@ -329,6 +329,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm
                         distance2 = layout.coordinates[1][k] - layout.coordinates[1][l];
                         squaredDistance = distance1 * distance1 + distance2 * distance2;
                         distance = Math.sqrt(squaredDistance);
+
                         a = FastMath.fastPow(distance, repulsion);
 
                         if (squaredDistance > 0)
@@ -343,16 +344,9 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm
                                 qualityValue -= network.nodeWeights[k] * network.nodeWeights[l] * a / repulsion;
                             else
                                 qualityValue -= network.nodeWeights[k] * network.nodeWeights[l] * Math.log(distance);
-                    }
 
-                if (edgeWeightIncrement > 0)
-                    for (l = 0; l < network.nNodes; l++)
-                        if (l != k)
+                        if (edgeWeightIncrement > 0)
                         {
-                            distance1 = layout.coordinates[0][k] - layout.coordinates[0][l];
-                            distance2 = layout.coordinates[1][k] - layout.coordinates[1][l];
-                            squaredDistance = distance1 * distance1 + distance2 * distance2;
-                            distance = Math.sqrt(squaredDistance);
                             a = FastMath.fastPow(distance, attraction);
 
                             if (squaredDistance > 0)
@@ -368,6 +362,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm
                                 else
                                     qualityValue += edgeWeightIncrement * Math.log(distance);
                         }
+                    }
 
                 gradientLength = Math.sqrt(gradient1 * gradient1 + gradient2 * gradient2);
                 layout.coordinates[0][k] -= stepSize * gradient1 / gradientLength;

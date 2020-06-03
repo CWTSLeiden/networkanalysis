@@ -156,9 +156,9 @@ public abstract class VOSLayoutAlgorithm implements Cloneable, QualityLayoutAlgo
      * and {@code j} and {@code x[i] = (x[i][1], x[i][2])} are the coordinates
      * of node {@code i}. The function {@code d(x[i], x[j])} is the Euclidean
      * distance between nodes {@code i} and {@code j}. The sum is taken over all
-     * pairs of nodes {@code i} and {@code j}. The attraction parameter must be
-     * greater than the repulsion parameter. The lower the value of the VOS
-     * quality function, the higher the quality of the layout.
+     * pairs of nodes {@code i} and {@code j} with {@code j < i}. The attraction
+     * parameter must be greater than the repulsion parameter. The lower the
+     * value of the VOS quality function, the higher the quality of the layout.
      * </p>
      *
      * @param network Network
@@ -192,25 +192,19 @@ public abstract class VOSLayoutAlgorithm implements Cloneable, QualityLayoutAlgo
                 distance1 = layout.coordinates[0][i] - layout.coordinates[0][j];
                 distance2 = layout.coordinates[1][i] - layout.coordinates[1][j];
                 distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
+
                 if (repulsion != 0)
                     quality -= network.nodeWeights[i] * network.nodeWeights[j]
                             * FastMath.fastPow(distance, repulsion) / repulsion;
                 else
                     quality -= network.nodeWeights[i] * network.nodeWeights[j] * Math.log(distance);
-            }
 
-        if (edgeWeightIncrement > 0)
-            for (i = 0; i < network.nNodes; i++)
-                for (j = 0; j < i; j++)
-                {
-                    distance1 = layout.coordinates[0][i] - layout.coordinates[0][j];
-                    distance2 = layout.coordinates[1][i] - layout.coordinates[1][j];
-                    distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
+                if (edgeWeightIncrement > 0)
                     if (attraction != 0)
                         quality += edgeWeightIncrement * FastMath.fastPow(distance, attraction) / attraction;
                     else
                         quality += edgeWeightIncrement * Math.log(distance);
-                }
+            }
 
         return quality;
     }
