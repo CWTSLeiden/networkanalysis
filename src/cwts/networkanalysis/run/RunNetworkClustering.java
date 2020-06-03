@@ -23,12 +23,17 @@ import java.util.Random;
 public final class RunNetworkClustering
 {
     /**
+     * Quality function IDs.  
+     */
+    public static final int CPM = 0;
+    public static final int MODULARITY = 1;
+
+    /**
      * Normalization method IDs.
      */
     public static final int NO_NORMALIZATION = 0;
     public static final int ASSOCIATION_STRENGTH = 1;
     public static final int FRACTIONALIZATION = 2;
-    public static final int MODULARITY = 3;
 
     /**
      * Clustering algorithm IDs.
@@ -37,14 +42,24 @@ public final class RunNetworkClustering
     public static final int LOUVAIN = 1;
 
     /**
+     * Quality function names.
+     */
+    public static final String[] QUALITY_FUNCTION_NAMES = { "CPM", "Modularity" };
+
+    /**
      * Normalization method names.
      */
-    public static final String[] NORMALIZATION_NAMES = { "none", "AssociationStrength", "Fractionalization", "Modularity" };
+    public static final String[] NORMALIZATION_NAMES = { "none", "AssociationStrength", "Fractionalization" };
 
     /**
      * Clustering algorithm names.
      */
     public static final String[] ALGORITHM_NAMES = { "Leiden", "Louvain" };
+
+    /**
+     * Default quality function.
+     */
+    public static final int DEFAULT_QUALITY_FUNCTION = CPM;
 
     /**
      * Default normalization method.
@@ -99,9 +114,11 @@ public final class RunNetworkClustering
           + "in the file.\n"
           + "\n"
           + "Options:\n"
-          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "|" + NORMALIZATION_NAMES[MODULARITY] + "}\n"
-          + "        (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
-          + "    Method for normalizing the edge weights.\n"
+          + "-q --quality-function {" + QUALITY_FUNCTION_NAMES[CPM] + "|" + QUALITY_FUNCTION_NAMES[MODULARITY] + "} (default: " + QUALITY_FUNCTION_NAMES[DEFAULT_QUALITY_FUNCTION] + ")\n"
+          + "    Quality function to be optimized. Either the CPM (constant Potts model) or\n"
+          + "    the modularity quality function can be used.\n"
+          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + " (Default: " + NORMALIZATION_NAMES[DEFAULT_NORMALIZATION] + ")\n"
+          + "    Method for normalizing edge weights in the CPM quality function.\n"
           + "-r --resolution <resolution> (default: " + DEFAULT_RESOLUTION + ")\n"
           + "    Resolution parameter of the quality function.\n"
           + "-a --algorithm {" + ALGORITHM_NAMES[LEIDEN] + "|" + ALGORITHM_NAMES[LOUVAIN] + "} (default: " + ALGORITHM_NAMES[DEFAULT_ALGORITHM] + ")\n"
@@ -149,6 +166,7 @@ public final class RunNetworkClustering
             System.exit(-1);
         }
 
+        boolean useModularity = (DEFAULT_QUALITY_FUNCTION == MODULARITY);
         int normalization = DEFAULT_NORMALIZATION;
         double resolution = DEFAULT_RESOLUTION;
         boolean useLouvain = (DEFAULT_ALGORITHM == LOUVAIN);
@@ -170,18 +188,23 @@ public final class RunNetworkClustering
             String arg = args[argIndex];
             try
             {
-                if (arg.equals("-n") || arg.equals("--normalization"))
+                if (arg.equals("-q") || arg.equals("--quality-function"))
                 {
-                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[MODULARITY])))
-                        throw new IllegalArgumentException("Value must be '" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "', '" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "', '" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "', or '" + NORMALIZATION_NAMES[MODULARITY] + "'.");
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[CPM]) && !args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[MODULARITY])))
+                        throw new IllegalArgumentException("Value must be '" + QUALITY_FUNCTION_NAMES[CPM] + "' or '" + QUALITY_FUNCTION_NAMES[MODULARITY] + "'.");
+                    useModularity = args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[MODULARITY]);
+                    argIndex += 2;
+                }
+                else if (arg.equals("-n") || arg.equals("--normalization"))
+                {
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION])))
+                        throw new IllegalArgumentException("Value must be '" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "', '" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "', or '" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "'.");
                     if (args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]))
                         normalization = NO_NORMALIZATION;
                     else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]))
                         normalization = ASSOCIATION_STRENGTH;
                     else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION]))
                         normalization = FRACTIONALIZATION;
-                    else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[MODULARITY]))
-                        normalization = MODULARITY;
                     argIndex += 2;
                 }
                 else if (arg.equals("-r") || arg.equals("--resolution"))
@@ -333,6 +356,7 @@ public final class RunNetworkClustering
 
         // Run algorithm for network clustering.
         System.err.println("Running " + (useLouvain ? ALGORITHM_NAMES[LOUVAIN] : ALGORITHM_NAMES[LEIDEN]) + " algorithm.");
+        System.err.println("Quality function:             " + (useModularity ? QUALITY_FUNCTION_NAMES[MODULARITY] : QUALITY_FUNCTION_NAMES[CPM]));
         System.err.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
         System.err.println("Resolution parameter:         " + resolution);
         System.err.println("Number of random starts:      " + nRandomStarts);
@@ -342,13 +366,16 @@ public final class RunNetworkClustering
         System.err.println("Random number generator seed: " + (useSeed ? seed : "random"));
 
         long startTimeAlgorithm = System.currentTimeMillis();
-        if (normalization == NO_NORMALIZATION)
-            network = network.createNetworkWithoutNodeWeights();
-        else if (normalization == ASSOCIATION_STRENGTH)
-            network = network.createNormalizedNetworkUsingAssociationStrength();
-        else if (normalization == FRACTIONALIZATION)
-            network = network.createNormalizedNetworkUsingFractionalization();
-        double resolution2 = (normalization == MODULARITY) ? (resolution / (2 * network.getTotalEdgeWeight() + network.getTotalEdgeWeightSelfLinks())) : resolution;
+        if (!useModularity)
+        {
+            if (normalization == NO_NORMALIZATION)
+                network = network.createNetworkWithoutNodeWeights();
+            else if (normalization == ASSOCIATION_STRENGTH)
+                network = network.createNormalizedNetworkUsingAssociationStrength();
+            else if (normalization == FRACTIONALIZATION)
+                network = network.createNormalizedNetworkUsingFractionalization();
+        }
+        double resolution2 = useModularity ? (resolution / (2 * network.getTotalEdgeWeight() + network.getTotalEdgeWeightSelfLinks())) : resolution;
         Random random = useSeed ? new Random(seed) : new Random();
         IterativeCPMClusteringAlgorithm algorithm = useLouvain ? new LouvainAlgorithm(resolution2, nIterations, random) : new LeidenAlgorithm(resolution2, nIterations, randomness, random);
         Clustering finalClustering = null;
