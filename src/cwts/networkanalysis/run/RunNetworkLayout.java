@@ -19,22 +19,37 @@ import java.util.Random;
 public class RunNetworkLayout
 {
     /**
+     * Quality function IDs.  
+     */
+    public static final int VOS = 0;
+    public static final int LINLOG = 1;
+
+    /**
      * Normalization method IDs.
      */
     public static final int NO_NORMALIZATION = 0;
     public static final int ASSOCIATION_STRENGTH = 1;
     public static final int FRACTIONALIZATION = 2;
-    public static final int LINLOG = 3;
+
+    /**
+     * Quality function names.
+     */
+    public static final String[] QUALITY_FUNCTION_NAMES = { "VOS", "LinLog" };
 
     /**
      * Normalization method names.
      */
-    public static final String[] NORMALIZATION_NAMES = { "none", "AssociationStrength", "Fractionalization", "LinLog" };
+    public static final String[] NORMALIZATION_NAMES = { "none", "AssociationStrength", "Fractionalization" };
 
     /**
      * Edge weight increment unconnected nodes.
      */
     public static final double EDGE_WEIGHT_INCREMENT_UNCONNECTED_NODES = 0.01;
+
+    /**
+     * Default quality function.
+     */
+    public static final int DEFAULT_QUALITY_FUNCTION = VOS;
 
     /**
      * Default normalization method.
@@ -104,9 +119,11 @@ public class RunNetworkLayout
           + "in the file.\n"
           + "\n"
           + "Options:\n"
-          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "|" + NORMALIZATION_NAMES[LINLOG] + "}\n"
-          + "        (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
-          + "    Method for normalizing the edge weights.\n"
+          + "-q --quality-function {" + QUALITY_FUNCTION_NAMES[VOS] + "|" + QUALITY_FUNCTION_NAMES[LINLOG] + "} (default: " + QUALITY_FUNCTION_NAMES[DEFAULT_QUALITY_FUNCTION] + ")\n"
+          + "    Quality function to be optimized. Either the VOS (visualization of\n"
+          + "    similarities) or the LinLog quality function can be used.\n"
+          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + " (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
+          + "    Method for normalizing edge weights in the VOS quality function.\n"
           + "-a --attraction <attraction> (Default: " + DEFAULT_ATTRACTION + ")\n"
           + "    Attraction parameter of the VOS quality function.\n"
           + "-r --repulsion <repulsion> (Default: " + DEFAULT_REPULSION + ")\n"
@@ -161,6 +178,7 @@ public class RunNetworkLayout
             System.exit(-1);
         }
 
+        boolean useLinLog = (DEFAULT_QUALITY_FUNCTION == LINLOG);
         int normalization = DEFAULT_NORMALIZATION;
         int attraction = DEFAULT_ATTRACTION;
         int repulsion = DEFAULT_REPULSION;
@@ -185,18 +203,23 @@ public class RunNetworkLayout
             String arg = args[argIndex];
             try
             {
-                if (arg.equals("-n") || arg.equals("--normalization"))
+                if (arg.equals("-q") || arg.equals("--quality-function"))
                 {
-                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[LINLOG])))
-                        throw new IllegalArgumentException("Value must be '" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "', '" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "', '" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "', or '" + NORMALIZATION_NAMES[LINLOG] + "'.");
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[VOS]) && !args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[LINLOG])))
+                        throw new IllegalArgumentException("Value must be '" + QUALITY_FUNCTION_NAMES[VOS] + "' or '" + QUALITY_FUNCTION_NAMES[LINLOG] + "'.");
+                    useLinLog = args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[LINLOG]);
+                    argIndex += 2;
+                }
+                else if (arg.equals("-n") || arg.equals("--normalization"))
+                {
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION])))
+                        throw new IllegalArgumentException("Value must be '" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "', '" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "', or '" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "'.");
                     if (args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]))
                         normalization = NO_NORMALIZATION;
                     else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]))
                         normalization = ASSOCIATION_STRENGTH;
                     else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION]))
                         normalization = FRACTIONALIZATION;
-                    else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[LINLOG]))
-                        normalization = LINLOG;
                     argIndex += 2;
                 }
                 else if (arg.equals("-a") || arg.equals("--attraction"))
@@ -400,6 +423,7 @@ public class RunNetworkLayout
 
         // Run algorithm for network layout.
         System.err.println("Running gradient descent VOS layout algorithm.");
+        System.err.println("Quality function:                              " + (useLinLog ? QUALITY_FUNCTION_NAMES[LINLOG] : QUALITY_FUNCTION_NAMES[VOS]));
         System.err.println("Normalization method:                          " + NORMALIZATION_NAMES[normalization]);
         System.err.println("Attraction parameter:                          " + attraction);
         System.err.println("Repulsion parameter:                           " + repulsion);
@@ -412,12 +436,15 @@ public class RunNetworkLayout
         System.err.println("Random number generator seed:                  " + (useSeed ? seed : "random"));
 
         long startTimeAlgorithm = System.currentTimeMillis();
-        if (normalization == NO_NORMALIZATION)
-            network = network.createNetworkWithoutNodeWeights();
-        else if (normalization == ASSOCIATION_STRENGTH)
-            network = network.createNormalizedNetworkUsingAssociationStrength();
-        else if (normalization == FRACTIONALIZATION)
-            network = network.createNormalizedNetworkUsingFractionalization();
+        if (!useLinLog)
+        {
+            if (normalization == NO_NORMALIZATION)
+                network = network.createNetworkWithoutNodeWeights();
+            else if (normalization == ASSOCIATION_STRENGTH)
+                network = network.createNormalizedNetworkUsingAssociationStrength();
+            else if (normalization == FRACTIONALIZATION)
+                network = network.createNormalizedNetworkUsingFractionalization();
+        }
         double edgeWeightIncrement = (network.identifyComponents().getNClusters() > 1) ? EDGE_WEIGHT_INCREMENT_UNCONNECTED_NODES : 0;
         Random random = useSeed ? new Random(seed) : new Random();
         GradientDescentVOSLayoutAlgorithm algorithm = new GradientDescentVOSLayoutAlgorithm(attraction, repulsion, edgeWeightIncrement, random);
