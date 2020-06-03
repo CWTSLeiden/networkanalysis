@@ -283,12 +283,12 @@ public class Layout implements Cloneable, Serializable
      * 
      * @param standardizeDistances Standardize distances
      */
-    public void standardizeCoordinates(boolean standardizeDistances)
+    public void standardize(boolean standardizeDistances)
     {
         double averageCoordinate1, averageCoordinate2, averageDistance, coordinateOld1, coordinateOld2, covariance,
                 discriminant, eigenvalue1, eigenvalue2, normalizedEigenvector11, normalizedEigenvector12,
                 normalizedEigenvector21, normalizedEigenvector22, variance1, variance2, vectorLength;
-        int i, j;
+        int i;
 
         averageCoordinate1 = Arrays.calcAverage(coordinates[0]);
         averageCoordinate2 = Arrays.calcAverage(coordinates[1]);
@@ -336,8 +336,7 @@ public class Layout implements Cloneable, Serializable
 
         for (i = 0; i < 2; i++)
             if (Arrays.calcMedian(coordinates[i]) > 0)
-                for (j = 0; j < nNodes; j++)
-                    coordinates[i][j] *= -1;
+                flip(i);
 
         if (standardizeDistances)
         {

@@ -464,7 +464,7 @@ public class RunNetworkLayout
                 minQuality = quality;
             }
         }
-        finalLayout.standardizeCoordinates(true);
+        finalLayout.standardize(true);
         System.err.println("Running algorithm took " + (System.currentTimeMillis() - startTimeAlgorithm) / 1000 + "s.");
         if (nRandomStarts > 1)
             System.err.println("Minimum value of quality function in " + nRandomStarts + " random starts equals " + minQuality + ".");
