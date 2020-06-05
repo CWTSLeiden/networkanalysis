@@ -1,9 +1,11 @@
 ## Introduction
 
-This package provides data structures and algorithms for network analysis in `java`.
-Currently, the focus of the package is restricted to clustering (or community detection) and layout of networks.
+This package provides algorithms and data structures for network analysis in `java`.
+Currently, the package focuses on clustering (or community detection) and layout (or mapping) of networks.
 In particular, the package contains an implementation of the [Leiden algorithm](https://arxiv.org/abs/1810.08473) and the [Louvain algorithm](https://arxiv.org/abs/0803.0476) for network clustering and the [VOS technique](https://arxiv.org/abs/1003.2551) for network layout.
 Only undirected networks are supported.
+
+This package requires `java 1.8.0` or higher.
 
 [![DOI](https://zenodo.org/badge/153760626.svg)](https://zenodo.org/badge/latestdoi/153760626)
 
@@ -38,12 +40,14 @@ Only undirected networks are supported. Each edge should be included only once
 in the file.
 
 Options:
--n --normalization {none|AssociationStrength|Fractionalization|Modularity}
-        (Default: none)
-    Method for normalizing the edge weights.
+-q --quality-function {CPM|Modularity} (default: CPM)
+    Quality function to be optimized. Either the CPM (constant Potts model) or
+    the modularity quality function can be used.
+-n --normalization {none|AssociationStrength|Fractionalization (Default: none)
+    Method for normalizing edge weights in the CPM quality function.
 -r --resolution <resolution> (default: 1.0)
     Resolution parameter of the quality function.
--a --algorithm {Leiden|Louvain} (default: Leiden)
+-m --min-cluster-size <min. cluster size> (default: 1)    Minimum number of nodes per cluster.-a --algorithm {Leiden|Louvain} (default: Leiden)
     Algorithm for optimizing the quality function. Either the Leiden or the
     Louvain algorithm can be used.
 -s --random-starts <random starts> (default: 1)
@@ -98,9 +102,11 @@ Only undirected networks are supported. Each edge should be included only once
 in the file.
 
 Options:
--n --normalization {none|AssociationStrength|Fractionalization|LinLog}
-        (Default: none)
-    Method for normalizing the edge weights.
+-q --quality-function {VOS|LinLog} (default: VOS)
+    Quality function to be optimized. Either the VOS (visualization of
+    similarities) or the LinLog quality function can be used.
+-n --normalization {none|AssociationStrength|Fractionalization (Default: none)
+    Method for normalizing edge weights in the VOS quality function.
 -a --attraction <attraction> (Default: 2)
     Attraction parameter of the VOS quality function.
 -r --repulsion <repulsion> (Default: 1)
@@ -140,8 +146,6 @@ Options:
     the standard output is used.
 ```
 
-To run the command-line tools, you need `java 1.8.0` or higher.
-
 ### Example
 
 The following example illustrates the use of the `RunNetworkClustering` and `RunNetworkLayout` tools.
@@ -159,7 +163,7 @@ Consider this network:
     4-----5
 ```
 
-The network is encoded as an edge list that is saved in a tab-separated text file:
+The network is encoded as an edge list that is saved in a text file containing two tab-separated columns:
 
 ```text
 0	1
@@ -180,9 +184,9 @@ java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkClustering -r 0.
 ```
 
 In this case, clusters are identified using the Leiden algorithm.
-The CPM (constant Potts model) quality function is used without normalizing the edge weights.
+The CPM (constant Potts model) quality function is used without normalizing edge weights.
 A value of `0.2` is used for the resolution parameter.
-The resulting clustering is saved in the text file `clusters.txt`:
+The resulting clustering is saved in the text file `clusters.txt` that contains two tab-separated columns:
 
 ```text
 0	0
@@ -194,7 +198,7 @@ The resulting clustering is saved in the text file `clusters.txt`:
 ```
 
 The file `clusters.txt` shows that two clusters have been identified.
-The first column in `clusters.txt` indicates a node, and the second column indicates the cluster to which the node belongs.
+The first column in the file represents a node, and the second column represents the cluster to which the node belongs.
 Cluster 0 includes nodes 0, 1, and 2.
 Cluster 1 includes nodes 3, 4, and 5.
 
@@ -205,7 +209,7 @@ java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkLayout -o layout
 ```
 
 In this case, the default parameter values are used for the VOS layout technique.
-The resulting layout is saved in the text file `layout.txt`:
+The resulting layout is saved in the text file `layout.txt` containing three tab-separated columns:
 
 ```text
 0	-0.8690519467788094	-0.04001496992603245
@@ -216,7 +220,7 @@ The resulting layout is saved in the text file `layout.txt`:
 5	0.86909795736146	-0.04005116424030402
 ```
 
-The first column in `layout.txt` indicates a node, and the second and third column indicate the x and y coordinates of the node.
+The first column in the file `layout.txt` represents a node, and the second and third column represent the x and y coordinates of the node.
 
 In the above example, the edges in the file `network.txt` have not been sorted.
 To provide a sorted edge list as input, include the edges in both directions and use the option ``--sorted-edge-list``.
@@ -251,7 +255,6 @@ The most recent code, which may be under development, is available from the [`de
 ## Issues
 
 If you encounter any issues, please report them using the [issue tracker](https://github.com/CWTSLeiden/networkanalysis/issues).
-Before submitting, please examine whether issues have not yet been reported before.
 
 ## Documentation
 
