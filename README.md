@@ -47,7 +47,9 @@ Options:
     Method for normalizing edge weights in the CPM quality function.
 -r --resolution <resolution> (default: 1.0)
     Resolution parameter of the quality function.
--m --min-cluster-size <min. cluster size> (default: 1)    Minimum number of nodes per cluster.-a --algorithm {Leiden|Louvain} (default: Leiden)
+-m --min-cluster-size <min. cluster size> (default: 1)
+    Minimum number of nodes per cluster.
+-a --algorithm {Leiden|Louvain} (default: Leiden)
     Algorithm for optimizing the quality function. Either the Leiden or the
     Louvain algorithm can be used.
 -s --random-starts <random starts> (default: 1)
