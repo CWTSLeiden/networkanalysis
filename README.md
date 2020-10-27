@@ -43,7 +43,7 @@ Options:
 -q --quality-function {CPM|Modularity} (default: CPM)
     Quality function to be optimized. Either the CPM (constant Potts model) or
     the modularity quality function can be used.
--n --normalization {none|AssociationStrength|Fractionalization (Default: none)
+-n --normalization {none|AssociationStrength|Fractionalization} (Default: none)
     Method for normalizing edge weights in the CPM quality function.
 -r --resolution <resolution> (default: 1.0)
     Resolution parameter of the quality function.
@@ -107,7 +107,7 @@ Options:
 -q --quality-function {VOS|LinLog} (default: VOS)
     Quality function to be optimized. Either the VOS (visualization of
     similarities) or the LinLog quality function can be used.
--n --normalization {none|AssociationStrength|Fractionalization (Default: none)
+-n --normalization {none|AssociationStrength|Fractionalization} (Default: none)
     Method for normalizing edge weights in the VOS quality function.
 -a --attraction <attraction> (Default: 2)
     Attraction parameter of the VOS quality function.

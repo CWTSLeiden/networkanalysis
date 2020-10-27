@@ -122,7 +122,7 @@ public final class RunNetworkClustering
           + "-q --quality-function {" + QUALITY_FUNCTION_NAMES[CPM] + "|" + QUALITY_FUNCTION_NAMES[MODULARITY] + "} (default: " + QUALITY_FUNCTION_NAMES[DEFAULT_QUALITY_FUNCTION] + ")\n"
           + "    Quality function to be optimized. Either the CPM (constant Potts model) or\n"
           + "    the modularity quality function can be used.\n"
-          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + " (Default: " + NORMALIZATION_NAMES[DEFAULT_NORMALIZATION] + ")\n"
+          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "} (Default: " + NORMALIZATION_NAMES[DEFAULT_NORMALIZATION] + ")\n"
           + "    Method for normalizing edge weights in the CPM quality function.\n"
           + "-r --resolution <resolution> (default: " + DEFAULT_RESOLUTION + ")\n"
           + "    Resolution parameter of the quality function.\n"

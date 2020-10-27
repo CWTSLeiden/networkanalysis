@@ -122,7 +122,7 @@ public class RunNetworkLayout
           + "-q --quality-function {" + QUALITY_FUNCTION_NAMES[VOS] + "|" + QUALITY_FUNCTION_NAMES[LINLOG] + "} (default: " + QUALITY_FUNCTION_NAMES[DEFAULT_QUALITY_FUNCTION] + ")\n"
           + "    Quality function to be optimized. Either the VOS (visualization of\n"
           + "    similarities) or the LinLog quality function can be used.\n"
-          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + " (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
+          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "} (Default: " + NORMALIZATION_NAMES[NO_NORMALIZATION] + ")\n"
           + "    Method for normalizing edge weights in the VOS quality function.\n"
           + "-a --attraction <attraction> (Default: " + DEFAULT_ATTRACTION + ")\n"
           + "    Attraction parameter of the VOS quality function.\n"
