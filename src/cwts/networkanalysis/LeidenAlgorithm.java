@@ -234,12 +234,12 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
                 refinement.nClusters += clusteringSubnetwork.nClusters;
             }
 
-            /*
-             * Create an aggregate network based on the refined clustering of
-             * the non-aggregate network.
-             */
             if (refinement.nClusters < network.nNodes)
             {
+                /*
+                 * Create an aggregate network based on the refined clustering of
+                 * the non-aggregate network.
+                 */
                 reducedNetwork = network.createReducedNetwork(refinement);
                 /*
                  * Create an initial clustering for the aggregate network based
@@ -251,17 +251,18 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
                     clusteringReducedNetwork.clusters[refinement.clusters[i]] = clustering.clusters[i];
 
                 /*
-                 * Set the original clustering to the refined clustering, so
-                 * that the results are correctly merged back after applying the
-                 * algorithm to the aggregated network.
+                 * Set the non-refined clustering to the refined clustering, so that the results correctly
+                 * merged back after recursively applying the algorithm to the aggregate network.
                  */
                 clustering.clusters = refinement.clusters;
+                clustering.nClusters = refinement.nClusters;
             }
             else
             {
                 /*
-                 * No aggregation took place, so we now aggregate on the basis
-                 * of the original clustering.
+                 * The refinement is a singleton clustering, so we now
+                 * aggregate on the basis of the non-refined clustering
+                 * of the non-aggregate network.
                  */
                 reducedNetwork = network.createReducedNetwork(clustering);
                 clusteringReducedNetwork = new Clustering(reducedNetwork.nNodes);
