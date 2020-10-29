@@ -1,0 +1,89 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    withJavadocJar()
+    withSourcesJar()
+}
+
+jar {
+   manifest {
+        attributes('Implementation-Title': project.name,
+            'Implementation-Version': project.version)
+   }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/neesjanvaneck/networkanalysis-gradle"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+        maven {
+            name = "OSSRH"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("OSSRH_USERNAME")
+                password = System.getenv("OSSRH_PASSWORD")
+            }
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = "networkanalysis"
+                description = "Java package that provides data structures and algorithms for network analysis."
+                url = "https://github.com/CWTSLeiden/networkanalysis"
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "http://www.opensource.org/licenses/mit-license.php"
+                    }
+                }
+                developers {
+                    developer {
+                        name = "Nees Jan van Eck"
+                        email = "ecknjpvan@cwts.leidenuniv.nl"
+                        url = "https://github.com/neesjanvaneck"
+                        id = "neesjanvaneck"
+                    }
+                    developer {
+                        name = "Vincent Traag"
+                        email = "v.a.traag@cwts.leidenuniv.nl"
+                        url = "https://github.com/vtraag"
+                        id = "vtraag"
+                    }
+                    developer {
+                        name = "Ludo Waltman"
+                        email = "waltmanlr@cwts.leidenuniv.nl"
+                        url = "https://github.com/ludowaltman"
+                        id = "ludowaltman"
+                    }
+                }
+                scm {
+                    connection = "scm:git@github.com:CWTSLeiden/networkanalysis.git"
+                    developerConnection = "scm:git@github.com:CWTSLeiden/networkanalysis.git"
+                    url = "https://github.com/CWTSLeiden/networkanalysis"
+                }
+            }
+        }
+    }
+}
+
+signing {
+    required { gradle.taskGraph.hasTask("publish") }
+    def signingKey = System.getenv("GPG_SIGNING_KEY")
+    def signingPassword = System.getenv("GPG_SIGNING_PASSWORD")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications.mavenJava
+}
