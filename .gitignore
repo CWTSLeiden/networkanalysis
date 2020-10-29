@@ -12,3 +12,7 @@ src/PublicationClustering.java
 test_network.ser
 test*
 *.txt
+bin/
+.classpath
+.project
+.settings

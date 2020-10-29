@@ -6,16 +6,6 @@ import cwts.networkanalysis.IterativeCPMClusteringAlgorithm;
 import cwts.networkanalysis.LeidenAlgorithm;
 import cwts.networkanalysis.LouvainAlgorithm;
 import cwts.networkanalysis.Network;
-import cwts.util.DynamicDoubleArray;
-import cwts.util.DynamicIntArray;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -33,9 +23,53 @@ import java.util.Random;
 public final class RunNetworkClustering
 {
     /**
+     * Quality function IDs.  
+     */
+    public static final int CPM = 0;
+    public static final int MODULARITY = 1;
+
+    /**
+     * Normalization method IDs.
+     */
+    public static final int NO_NORMALIZATION = 0;
+    public static final int ASSOCIATION_STRENGTH = 1;
+    public static final int FRACTIONALIZATION = 2;
+
+    /**
+     * Clustering algorithm IDs.
+     */
+    public static final int LEIDEN = 0;
+    public static final int LOUVAIN = 1;
+
+    /**
+     * Quality function names.
+     */
+    public static final String[] QUALITY_FUNCTION_NAMES = { "CPM", "Modularity" };
+
+    /**
+     * Normalization method names.
+     */
+    public static final String[] NORMALIZATION_NAMES = { "none", "AssociationStrength", "Fractionalization" };
+
+    /**
+     * Clustering algorithm names.
+     */
+    public static final String[] ALGORITHM_NAMES = { "Leiden", "Louvain" };
+
+    /**
      * Default quality function.
      */
-    public static final boolean DEFAULT_USE_MODULARITY = false;
+    public static final int DEFAULT_QUALITY_FUNCTION = CPM;
+
+    /**
+     * Default normalization method.
+     */
+    public static final int DEFAULT_NORMALIZATION = NO_NORMALIZATION;
+
+    /**
+     * Default clustering algorithm.
+     */
+    public static final int DEFAULT_ALGORITHM = LEIDEN;
 
     /**
      * Default resolution parameter.
@@ -43,9 +77,9 @@ public final class RunNetworkClustering
     public static final double DEFAULT_RESOLUTION = CPMClusteringAlgorithm.DEFAULT_RESOLUTION;
 
     /**
-     * Default clustering algorithm.
+     * Default minimum cluster size.
      */
-    public static final boolean DEFAULT_USE_LOUVAIN = false;
+    public static final int DEFAULT_MIN_CLUSTER_SIZE = 1;
 
     /**
      * Default number of random starts.
@@ -66,7 +100,7 @@ public final class RunNetworkClustering
      * Description text.
      */
     public static final String DESCRIPTION
-        = "RunNetworkClustering version 1.0.0\n"
+        = "RunNetworkClustering version 1.1.0\n"
           + "By Vincent Traag, Ludo Waltman, and Nees Jan van Eck\n"
           + "Centre for Science and Technology Studies (CWTS), Leiden University\n";
 
@@ -76,7 +110,7 @@ public final class RunNetworkClustering
     public static final String USAGE
         = "Usage: RunNetworkClustering [options] <filename>\n"
           + "\n"
-          + "Identify clusters (also known as communities) in a network, using either the\n"
+          + "Identify clusters (also known as communities) in a network using either the\n"
           + "Leiden or the Louvain algorithm.\n"
           + "\n"
           + "The file in <filename> is expected to contain a tab-separated edge list\n"
@@ -85,12 +119,16 @@ public final class RunNetworkClustering
           + "in the file.\n"
           + "\n"
           + "Options:\n"
-          + "-q --quality-function {CPM|modularity} (default: CPM)\n"
+          + "-q --quality-function {" + QUALITY_FUNCTION_NAMES[CPM] + "|" + QUALITY_FUNCTION_NAMES[MODULARITY] + "} (default: " + QUALITY_FUNCTION_NAMES[DEFAULT_QUALITY_FUNCTION] + ")\n"
           + "    Quality function to be optimized. Either the CPM (constant Potts model) or\n"
           + "    the modularity quality function can be used.\n"
+          + "-n --normalization {" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "|" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "|" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "} (Default: " + NORMALIZATION_NAMES[DEFAULT_NORMALIZATION] + ")\n"
+          + "    Method for normalizing edge weights in the CPM quality function.\n"
           + "-r --resolution <resolution> (default: " + DEFAULT_RESOLUTION + ")\n"
           + "    Resolution parameter of the quality function.\n"
-          + "-a --algorithm {Leiden|Louvain} (default: Leiden)\n"
+          + "-m --min-cluster-size <min. cluster size> (default: " + DEFAULT_MIN_CLUSTER_SIZE + ")\n"
+          + "    Minimum number of nodes per cluster.\n"
+          + "-a --algorithm {" + ALGORITHM_NAMES[LEIDEN] + "|" + ALGORITHM_NAMES[LOUVAIN] + "} (default: " + ALGORITHM_NAMES[DEFAULT_ALGORITHM] + ")\n"
           + "    Algorithm for optimizing the quality function. Either the Leiden or the\n"
           + "    Louvain algorithm can be used.\n"
           + "-s --random-starts <random starts> (default: " + DEFAULT_N_RANDOM_STARTS + ")\n"
@@ -120,11 +158,6 @@ public final class RunNetworkClustering
           + "    the standard output is used.\n";
 
     /**
-     * Column separator for edge list and clustering files.
-     */
-    public static final String COLUMN_SEPARATOR = "\t";
-
-    /**
      * This method is called when the tool is started.
      *
      * @param args Command line arguments
@@ -140,9 +173,11 @@ public final class RunNetworkClustering
             System.exit(-1);
         }
 
-        boolean useModularity = DEFAULT_USE_MODULARITY;
+        boolean useModularity = (DEFAULT_QUALITY_FUNCTION == MODULARITY);
+        int normalization = DEFAULT_NORMALIZATION;
         double resolution = DEFAULT_RESOLUTION;
-        boolean useLouvain = DEFAULT_USE_LOUVAIN;
+        int minClusterSize = DEFAULT_MIN_CLUSTER_SIZE;
+        boolean useLouvain = (DEFAULT_ALGORITHM == LOUVAIN);
         int nRandomStarts = DEFAULT_N_RANDOM_STARTS;
         int nIterations = DEFAULT_N_ITERATIONS;
         double randomness = DEFAULT_RANDOMNESS;
@@ -163,9 +198,21 @@ public final class RunNetworkClustering
             {
                 if (arg.equals("-q") || arg.equals("--quality-function"))
                 {
-                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals("CPM") && !args[argIndex + 1].equals("modularity")))
-                        throw new IllegalArgumentException("Value must be 'CPM' or 'modularity'.");
-                    useModularity = args[argIndex + 1].equals("modularity");
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[CPM]) && !args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[MODULARITY])))
+                        throw new IllegalArgumentException("Value must be '" + QUALITY_FUNCTION_NAMES[CPM] + "' or '" + QUALITY_FUNCTION_NAMES[MODULARITY] + "'.");
+                    useModularity = args[argIndex + 1].equals(QUALITY_FUNCTION_NAMES[MODULARITY]);
+                    argIndex += 2;
+                }
+                else if (arg.equals("-n") || arg.equals("--normalization"))
+                {
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]) && !args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION])))
+                        throw new IllegalArgumentException("Value must be '" + NORMALIZATION_NAMES[NO_NORMALIZATION] + "', '" + NORMALIZATION_NAMES[ASSOCIATION_STRENGTH] + "', or '" + NORMALIZATION_NAMES[FRACTIONALIZATION] + "'.");
+                    if (args[argIndex + 1].equals(NORMALIZATION_NAMES[NO_NORMALIZATION]))
+                        normalization = NO_NORMALIZATION;
+                    else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[ASSOCIATION_STRENGTH]))
+                        normalization = ASSOCIATION_STRENGTH;
+                    else if (args[argIndex + 1].equals(NORMALIZATION_NAMES[FRACTIONALIZATION]))
+                        normalization = FRACTIONALIZATION;
                     argIndex += 2;
                 }
                 else if (arg.equals("-r") || arg.equals("--resolution"))
@@ -184,11 +231,27 @@ public final class RunNetworkClustering
                     }
                     argIndex += 2;
                 }
+                else if (arg.equals("-m") || arg.equals("--min-cluster-size"))
+                {
+                    try
+                    {
+                        if ((argIndex + 1) >= args.length)
+                            throw new NumberFormatException();
+                        minClusterSize = Integer.parseInt(args[argIndex + 1]);
+                        if (minClusterSize <= 0)
+                            throw new NumberFormatException();
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        throw new IllegalArgumentException("Value must be a positive integer number.");
+                    }
+                    argIndex += 2;
+                }
                 else if (arg.equals("-a") || arg.equals("--algorithm"))
                 {
-                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals("Leiden") && !args[argIndex + 1].equals("Louvain")))
-                        throw new IllegalArgumentException("Value must be 'Leiden' or 'Louvain'.");
-                    useLouvain = args[argIndex + 1].equals("Louvain");
+                    if (((argIndex + 1) >= args.length) || (!args[argIndex + 1].equals(ALGORITHM_NAMES[LEIDEN]) && !args[argIndex + 1].equals(ALGORITHM_NAMES[LOUVAIN])))
+                        throw new IllegalArgumentException("Value must be '" + ALGORITHM_NAMES[LEIDEN] + "' or '" + ALGORITHM_NAMES[LOUVAIN] + "'.");
+                    useLouvain = args[argIndex + 1].equals(ALGORITHM_NAMES[LOUVAIN]);
                     argIndex += 2;
                 }
                 else if (arg.equals("-s") || arg.equals("--random-starts"))
@@ -297,30 +360,31 @@ public final class RunNetworkClustering
         // Read edge list from file.
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
         long startTimeEdgeListFile = System.currentTimeMillis();
-        Network network = readEdgeList(edgeListFilename, useModularity, weightedEdges, sortedEdgeList);
+        Network network = FileIO.readEdgeList(edgeListFilename, weightedEdges, sortedEdgeList);
         System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
         System.err.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
 
         // Read initial clustering from file.
         Clustering initialClustering = null;
-        if (initialClusteringFilename == null)
+        if (initialClusteringFilename != null)
+        {
+            System.err.println("Reading initial clustering from '" + initialClusteringFilename + "'.");
+            initialClustering = FileIO.readClustering(initialClusteringFilename, network.getNNodes());
+            System.err.println("Initial clustering consists of " + initialClustering.getNClusters() + " clusters.");
+        }
+        else
         {
             System.err.println("Using singleton initial clustering.");
             initialClustering = new Clustering(network.getNNodes());
         }
-        else
-        {
-            System.err.println("Reading initial clustering from '" + initialClusteringFilename + "'.");
-            initialClustering = readClustering(initialClusteringFilename, network.getNNodes());
-            System.err.println("Initial clustering consists of " + initialClustering.getNClusters() + " clusters.");
-        }
 
         // Run algorithm for network clustering.
-        System.err.println("Running " + (useLouvain ? "Louvain" : "Leiden") + " algorithm.");
-        System.err.println("Quality function:             " + (useModularity ? "modularity" : "CPM"));
+        System.err.println("Running " + (useLouvain ? ALGORITHM_NAMES[LOUVAIN] : ALGORITHM_NAMES[LEIDEN]) + " algorithm.");
+        System.err.println("Quality function:             " + (useModularity ? QUALITY_FUNCTION_NAMES[MODULARITY] : QUALITY_FUNCTION_NAMES[CPM]));
+        if (!useModularity)
+            System.err.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
         System.err.println("Resolution parameter:         " + resolution);
-        if ((!weightedEdges) && (!useModularity) && (resolution >= 1))
-            System.err.println("Warning: When applying the CPM quality function in an unweighted network, the resolution parameter should have a value below 1.");
+        System.err.println("Minimum cluster size:         " + minClusterSize);
         System.err.println("Number of random starts:      " + nRandomStarts);
         System.err.println("Number of iterations:         " + nIterations);
         if (!useLouvain)
@@ -328,6 +392,15 @@ public final class RunNetworkClustering
         System.err.println("Random number generator seed: " + (useSeed ? seed : "random"));
 
         long startTimeAlgorithm = System.currentTimeMillis();
+        if (!useModularity)
+        {
+            if (normalization == NO_NORMALIZATION)
+                network = network.createNetworkWithoutNodeWeights();
+            else if (normalization == ASSOCIATION_STRENGTH)
+                network = network.createNormalizedNetworkUsingAssociationStrength();
+            else if (normalization == FRACTIONALIZATION)
+                network = network.createNormalizedNetworkUsingFractionalization();
+        }
         double resolution2 = useModularity ? (resolution / (2 * network.getTotalEdgeWeight() + network.getTotalEdgeWeightSelfLinks())) : resolution;
         Random random = useSeed ? new Random(seed) : new Random();
         IterativeCPMClusteringAlgorithm algorithm = useLouvain ? new LouvainAlgorithm(resolution2, nIterations, random) : new LeidenAlgorithm(resolution2, nIterations, randomness, random);
@@ -346,251 +419,23 @@ public final class RunNetworkClustering
                 maxQuality = quality;
             }
         }
+        finalClustering.orderClustersByNNodes();
         System.err.println("Running algorithm took " + (System.currentTimeMillis() - startTimeAlgorithm) / 1000 + "s.");
         if (nRandomStarts > 1)
             System.err.println("Maximum value of quality function in " + nRandomStarts + " random starts equals " + maxQuality + ".");
         else
             System.err.println("Quality function equals " + maxQuality + ".");
+        if (minClusterSize > 1)
+        {
+            System.err.println("Clustering consists of " + finalClustering.getNClusters() + " clusters.");
+            System.err.println("Removing clusters consisting of fewer than " + minClusterSize + " nodes.");
+            algorithm.removeSmallClustersBasedOnNNodes(network, finalClustering, minClusterSize);
+        }
         System.err.println("Final clustering consists of " + finalClustering.getNClusters() + " clusters.");
 
         // Write final clustering to file (or to standard output).
         System.err.println("Writing final clustering to " + ((finalClusteringFilename == null) ? "standard output." : "'" + finalClusteringFilename + "'."));
-        writeClustering(finalClusteringFilename, finalClustering);
-    }
-
-    /**
-     * Reads an edge list from a file and creates a network.
-     *
-     * @param filename       Filename
-     * @param useModularity  Indicates whether to use the modularity or the CPM
-     *                       quality function
-     * @param weightedEdges  Indicates whether edges have weights
-     * @param sortedEdgeList Indicates whether the edge list is sorted
-     *
-     * @return Network
-     */
-    public static Network readEdgeList(String filename, boolean useModularity, boolean weightedEdges, boolean sortedEdgeList)
-    {
-        // Read edge list.
-        DynamicIntArray[] edges = new DynamicIntArray[2];
-        edges[0] = new DynamicIntArray(100);
-        edges[1] = new DynamicIntArray(100);
-        DynamicDoubleArray edgeWeights = weightedEdges ? new DynamicDoubleArray(100) : null;
-        int nNodes = 0;
-        BufferedReader reader = null;
-        try
-        {
-            reader = new BufferedReader(new FileReader(filename));
-            String line = reader.readLine();
-            int lineNo = 0;
-            while (line != null)
-            {
-                lineNo++;
-                String[] columns = line.split(COLUMN_SEPARATOR);
-                if ((!weightedEdges && ((columns.length < 2) || (columns.length > 3))) || (weightedEdges && (columns.length != 3)))
-                    throw new IOException("Incorrect number of columns (line " + lineNo + ").");
-
-                int node1;
-                int node2;
-                try
-                {
-                    node1 = Integer.parseUnsignedInt(columns[0]);
-                    node2 = Integer.parseUnsignedInt(columns[1]);
-                }
-                catch (NumberFormatException e)
-                {
-                    throw new IOException("Node must be represented by a zero-index integer number (line " + lineNo + ").");
-                }
-                edges[0].append(node1);
-                edges[1].append(node2);
-                if (node1 >= nNodes)
-                    nNodes = node1 + 1;
-                if (node2 >= nNodes)
-                    nNodes = node2 + 1;
-
-                if (weightedEdges)
-                {
-                    double weight;
-                    try
-                    {
-                        weight = Double.parseDouble(columns[2]);
-                    }
-                    catch (NumberFormatException e)
-                    {
-                        throw new IOException("Edge weight must be a number (line " + lineNo + ").");
-                    }
-                    edgeWeights.append(weight);
-                }
-
-                line = reader.readLine();
-            }
-        }
-        catch (FileNotFoundException e)
-        {
-            System.err.println("Error while reading edge list from file: File not found.");
-            System.exit(-1);
-        }
-        catch (IOException e)
-        {
-            System.err.println("Error while reading edge list from file: " + e.getMessage());
-            System.exit(-1);
-        }
-        finally
-        {
-            if (reader != null)
-                try
-                {
-                    reader.close();
-                }
-                catch (IOException e)
-                {
-                    System.err.println("Error while reading edge list from file: " + e.getMessage());
-                    System.exit(-1);
-                }
-        }
-
-        // Create network.
-        Network network = null;
-        int[][] edges2 = new int[2][];
-        edges2[0] = edges[0].toArray();
-        edges2[1] = edges[1].toArray();
-        try
-        {
-            if (weightedEdges)
-                network = new Network(nNodes, useModularity, edges2, edgeWeights.toArray(), sortedEdgeList, true);
-            else
-                network = new Network(nNodes, useModularity, edges2, sortedEdgeList, true);
-        }
-        catch (IllegalArgumentException e)
-        {
-            System.err.println("Error while creating network: " + e.getMessage());
-            System.exit(-1);
-        }
-        return network;
-    }
-
-    /**
-     * Reads a clustering from a file.
-     *
-     * @param filename Filename
-     * @param nNodes   Number of nodes
-     *
-     * @return Clustering
-     */
-    public static Clustering readClustering(String filename, int nNodes)
-    {
-        int[] clusters = new int[nNodes];
-        Arrays.fill(clusters, -1);
-        BufferedReader reader = null;
-        try
-        {
-            reader = new BufferedReader(new FileReader(filename));
-            String line = reader.readLine();
-            int lineNo = 0;
-            while (line != null)
-            {
-                lineNo++;
-                String[] columns = line.split(COLUMN_SEPARATOR);
-                if (columns.length != 2)
-                    throw new IOException("Incorrect number of columns (line " + lineNo + ").");
-
-                int node;
-                try
-                {
-                    node = Integer.parseUnsignedInt(columns[0]);
-                }
-                catch (NumberFormatException e)
-                {
-                    throw new IOException("Node must be represented by a zero-index integer number (line " + lineNo + ").");
-                }
-                if (node >= nNodes)
-                    throw new IOException("Invalid node (line " + lineNo + ").");
-                int cluster;
-                try
-                {
-                    cluster = Integer.parseUnsignedInt(columns[1]);
-                }
-                catch (NumberFormatException e)
-                {
-                    throw new IOException("Cluster must be represented by a zero-index integer number (line " + lineNo + ").");
-                }
-                if (clusters[node] >= 0)
-                    throw new IOException("Duplicate node (line " + lineNo + ").");
-                clusters[node] = cluster;
-
-                line = reader.readLine();
-            }
-            if (lineNo < nNodes)
-                throw new IOException("Missing nodes.");
-        }
-        catch (FileNotFoundException e)
-        {
-            System.err.println("Error while reading clustering from file: File not found.");
-            System.exit(-1);
-        }
-        catch (IOException e)
-        {
-            System.err.println("Error while reading clustering from file: " + e.getMessage());
-            System.exit(-1);
-        }
-        finally
-        {
-            if (reader != null)
-                try
-                {
-                    reader.close();
-                }
-                catch (IOException e)
-                {
-                    System.err.println("Error while reading clustering from file: " + e.getMessage());
-                    System.exit(-1);
-                }
-        }
-
-        return new Clustering(clusters);
-    }
-
-    /**
-     * Writes a clustering to a file.
-     *
-     * @param filename   Filename
-     * @param clustering Clustering
-     */
-    public static void writeClustering(String filename, Clustering clustering)
-    {
-        BufferedWriter writer = null;
-        try
-        {
-            writer = new BufferedWriter((filename == null) ? new OutputStreamWriter(System.out) : new FileWriter(filename));
-            for (int i = 0; i < clustering.getNNodes(); i++)
-            {
-                writer.write(i + COLUMN_SEPARATOR + clustering.getCluster(i));
-                writer.newLine();
-            }
-        }
-        catch (FileNotFoundException e)
-        {
-            System.err.println("Error while writing clustering to file: File not found.");
-            System.exit(-1);
-        }
-        catch (IOException e)
-        {
-            System.err.println("Error while writing clustering to file: " + e.getMessage());
-            System.exit(-1);
-        }
-        finally
-        {
-            if (writer != null)
-                try
-                {
-                    writer.close();
-                }
-                catch (IOException e)
-                {
-                    System.err.println("Error while writing clustering to file: " + e.getMessage());
-                    System.exit(-1);
-                }
-        }
+        FileIO.writeClustering(finalClusteringFilename, finalClustering);
     }
 
     private RunNetworkClustering()
