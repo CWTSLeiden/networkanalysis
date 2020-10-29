@@ -1,5 +1,10 @@
 package nl.cwts.networkanalysis;
 
+import nl.cwts.util.LargeBooleanArray;
+import nl.cwts.util.LargeDoubleArray;
+import nl.cwts.util.LargeIntArray;
+import nl.cwts.util.LargeLongArray;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,7 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.PrimitiveIterator;
 import java.util.Random;
 
 /**
@@ -34,6 +39,8 @@ public class Network implements Serializable
 {
     private static final long serialVersionUID = 1;
 
+    public static final long MAX_N_EDGES = LargeDoubleArray.MAX_SIZE / 2;
+
     /**
      * Number of nodes.
      */
@@ -46,7 +53,7 @@ public class Network implements Serializable
      * Each edge is counted twice, once in each direction.
      * </p>
      */
-    protected int nEdges;
+    protected long nEdges;
 
     /**
      * Node weights.
@@ -62,17 +69,17 @@ public class Network implements Serializable
      * neighbors[firstNeighborIndices[i + 1] - 1]}.
      * </p>
      */
-    protected int[] firstNeighborIndices;
+    protected long[] firstNeighborIndices;
 
     /**
      * Neighbors of each node.
      */
-    protected int[] neighbors;
+    protected LargeIntArray neighbors;
 
     /**
      * Edge weights.
      */
-    protected double[] edgeWeights;
+    protected LargeDoubleArray edgeWeights;
 
     /**
      * Total edge weight of self links.
@@ -110,8 +117,8 @@ public class Network implements Serializable
      *
      * <p>
      * The list of edges is provided in the two-dimensional array {@code
-     * edges}. Edge {@code i} connects nodes {@code edges[0][i]} and {@code
-     * edges[1][i]}. Edges do not have weights. If {@code sortedEdges} is
+     * edges}. Edge {@code i} connects nodes {@code edges[0].get(i)} and {@code
+     * edges[1].get(i)}. Edges do not have weights. If {@code sortedEdges} is
      * false, the list of edges does not need to be sorted and each edge must
      * be included only once. If {@code sortedEdges}is true, the list of edges
      * must be sorted and each edge must be included twice, once in each
@@ -124,7 +131,7 @@ public class Network implements Serializable
      * @param checkIntegrity Indicates whether to check the integrity of the
      *                       network
      */
-    public Network(double[] nodeWeights, int[][] edges, boolean sortedEdges, boolean checkIntegrity)
+    public Network(double[] nodeWeights, LargeIntArray[] edges, boolean sortedEdges, boolean checkIntegrity)
     {
         this(nodeWeights.length, nodeWeights, false, edges, null, sortedEdges, checkIntegrity);
     }
@@ -134,8 +141,8 @@ public class Network implements Serializable
      *
      * <p>
      * The list of edges is provided in the two-dimensional array {@code
-     * edges}. Edge {@code i} connects nodes {@code edges[0][i]} and {@code
-     * edges[1][i]} and has weight {@code edgeWeights[i]}. If {@code
+     * edges}. Edge {@code i} connects nodes {@code edges[0].get(i)} and {@code
+     * edges[1].get(i)} and has weight {@code edgeWeights.get(i)}. If {@code
      * sortedEdges} is false, the list of edges does not need to be sorted and
      * each edge must be included only once. If {@code sortedEdges} is true,
      * the list of edges must be sorted and each edge must be included twice,
@@ -149,7 +156,7 @@ public class Network implements Serializable
      * @param checkIntegrity Indicates whether to check the integrity of the
      *                       network
      */
-    public Network(double[] nodeWeights, int[][] edges, double[] edgeWeights, boolean sortedEdges, boolean checkIntegrity)
+    public Network(double[] nodeWeights, LargeIntArray[] edges, LargeDoubleArray edgeWeights, boolean sortedEdges, boolean checkIntegrity)
     {
         this(nodeWeights.length, nodeWeights, false, edges, edgeWeights, sortedEdges, checkIntegrity);
     }
@@ -173,7 +180,7 @@ public class Network implements Serializable
      * @param checkIntegrity       Indicates whether to check the integrity of
      *                             the network
      */
-    public Network(double[] nodeWeights, int[] firstNeighborIndices, int[] neighbors, boolean checkIntegrity)
+    public Network(double[] nodeWeights, long[] firstNeighborIndices, LargeIntArray neighbors, boolean checkIntegrity)
     {
         this(nodeWeights.length, nodeWeights, false, firstNeighborIndices, neighbors, null, checkIntegrity);
     }
@@ -199,7 +206,7 @@ public class Network implements Serializable
      * @param checkIntegrity       Indicates whether to check the integrity of
      *                             the network
      */
-    public Network(double[] nodeWeights, int[] firstNeighborIndices, int[] neighbors, double[] edgeWeights, boolean checkIntegrity)
+    public Network(double[] nodeWeights, long[] firstNeighborIndices, LargeIntArray neighbors, LargeDoubleArray edgeWeights, boolean checkIntegrity)
     {
         this(nodeWeights.length, nodeWeights, false, firstNeighborIndices, neighbors, edgeWeights, checkIntegrity);
     }
@@ -209,8 +216,8 @@ public class Network implements Serializable
      *
      * <p>
      * The list of edges is provided in the two-dimensional array {@code
-     * edges}. Edge {@code i} connects nodes {@code edges[0][i]} and {@code
-     * edges[1][i]}. Edges do not have weights. If {@code sortedEdges} is
+     * edges}. Edge {@code i} connects nodes {@code edges[0].get(i)} and {@code
+     * edges[1].get(i)}. Edges do not have weights. If {@code sortedEdges} is
      * false, the list of edges does not need to be sorted and each edge must
      * be included only once. If {@code sortedEdges}is true, the list of edges
      * must be sorted and each edge must be included twice, once in each
@@ -234,7 +241,7 @@ public class Network implements Serializable
      * @param checkIntegrity                   Indicates whether to check the
      *                                         integrity of the network
      */
-    public Network(int nNodes, boolean setNodeWeightsToTotalEdgeWeights, int[][] edges, boolean sortedEdges, boolean checkIntegrity)
+    public Network(int nNodes, boolean setNodeWeightsToTotalEdgeWeights, LargeIntArray[] edges, boolean sortedEdges, boolean checkIntegrity)
     {
         this(nNodes, null, setNodeWeightsToTotalEdgeWeights, edges, null, sortedEdges, checkIntegrity);
     }
@@ -244,8 +251,8 @@ public class Network implements Serializable
      *
      * <p>
      * The list of edges is provided in the two-dimensional array {@code
-     * edges}. Edge {@code i} connects nodes {@code edges[0][i]} and {@code
-     * edges[1][i]} and has weight {@code edgeWeights[i]}. If {@code
+     * edges}. Edge {@code i} connects nodes {@code edges[0].get(i)} and {@code
+     * edges[1].get(i)} and has weight {@code edgeWeights.get(i)}. If {@code
      * sortedEdges} is false, the list of edges does not need to be sorted and
      * each edge must be included only once. If {@code sortedEdges} is true,
      * the list of edges must be sorted and each edge must be included twice,
@@ -270,7 +277,7 @@ public class Network implements Serializable
      * @param checkIntegrity                   Indicates whether to check the
      *                                         integrity of the network
      */
-    public Network(int nNodes, boolean setNodeWeightsToTotalEdgeWeights, int[][] edges, double[] edgeWeights, boolean sortedEdges, boolean checkIntegrity)
+    public Network(int nNodes, boolean setNodeWeightsToTotalEdgeWeights, LargeIntArray[] edges, LargeDoubleArray edgeWeights, boolean sortedEdges, boolean checkIntegrity)
     {
         this(nNodes, null, setNodeWeightsToTotalEdgeWeights, edges, edgeWeights, sortedEdges, checkIntegrity);
     }
@@ -305,7 +312,7 @@ public class Network implements Serializable
      * @param checkIntegrity                   Indicates whether to check the
      *                                         integrity of the network
      */
-    public Network(int nNodes, boolean setNodeWeightsToTotalEdgeWeights, int[] firstNeighborIndices, int[] neighbors, boolean checkIntegrity)
+    public Network(int nNodes, boolean setNodeWeightsToTotalEdgeWeights, long[] firstNeighborIndices, LargeIntArray neighbors, boolean checkIntegrity)
     {
         this(nNodes, null, setNodeWeightsToTotalEdgeWeights, firstNeighborIndices, neighbors, null, checkIntegrity);
     }
@@ -342,7 +349,7 @@ public class Network implements Serializable
      * @param checkIntegrity                   Indicates whether to check the
      *                                         integrity of the network
      */
-    public Network(int nNodes, boolean setNodeWeightsToTotalEdgeWeights, int[] firstNeighborIndices, int[] neighbors, double[] edgeWeights, boolean checkIntegrity)
+    public Network(int nNodes, boolean setNodeWeightsToTotalEdgeWeights, long[] firstNeighborIndices, LargeIntArray neighbors, LargeDoubleArray edgeWeights, boolean checkIntegrity)
     {
         this(nNodes, null, setNodeWeightsToTotalEdgeWeights, firstNeighborIndices, neighbors, edgeWeights, checkIntegrity);
     }
@@ -421,7 +428,7 @@ public class Network implements Serializable
      *
      * @return Number of edges
      */
-    public int getNEdges()
+    public long getNEdges()
     {
         return nEdges / 2;
     }
@@ -438,7 +445,7 @@ public class Network implements Serializable
 
         nNeighborsPerNode = new int[nNodes];
         for (i = 0; i < nNodes; i++)
-            nNeighborsPerNode[i] = firstNeighborIndices[i + 1] - firstNeighborIndices[i];
+            nNeighborsPerNode[i] = (int)(firstNeighborIndices[i + 1] - firstNeighborIndices[i]);
         return nNeighborsPerNode;
     }
 
@@ -451,7 +458,7 @@ public class Network implements Serializable
      */
     public int getNNeighbors(int node)
     {
-        return firstNeighborIndices[node + 1] - firstNeighborIndices[node];
+        return (int)(firstNeighborIndices[node + 1] - firstNeighborIndices[node]);
     }
 
     /**
@@ -465,21 +472,20 @@ public class Network implements Serializable
      *
      * <p>
      * The list of edges is returned in a two-dimensional array {@code edges}.
-     * Edge {@code i} connects nodes {@code edges[0][i]} and {@code
-     * edges[1][i]}.
+     * Edge {@code i} connects nodes {@code edges[0].get(i)} and {@code
+     * edges[1].get(i)}.
      * </p>
      *
      * @return List of edges
      */
-    public int[][] getEdges()
+    public LargeIntArray[] getEdges()
     {
         int i;
-        int[][] edges;
-
-        edges = new int[2][];
-        edges[0] = new int[nEdges];
+        LargeIntArray[] edges;
+        edges = new LargeIntArray[2];
+        edges[0] = new LargeIntArray(nEdges);
         for (i = 0; i < nNodes; i++)
-            Arrays.fill(edges[0], firstNeighborIndices[i], firstNeighborIndices[i + 1], i);
+            edges[0].fill(firstNeighborIndices[i], firstNeighborIndices[i + 1], i);
         edges[1] = neighbors.clone();
         return edges;
     }
@@ -496,7 +502,7 @@ public class Network implements Serializable
 
         neighborsPerNode = new int[nNodes][];
         for (i = 0; i < nNodes; i++)
-            neighborsPerNode[i] = Arrays.copyOfRange(neighbors, firstNeighborIndices[i], firstNeighborIndices[i + 1]);
+            neighborsPerNode[i] = neighbors.toArray(firstNeighborIndices[i], firstNeighborIndices[i + 1]);
         return neighborsPerNode;
     }
 
@@ -509,7 +515,29 @@ public class Network implements Serializable
      */
     public int[] getNeighbors(int node)
     {
-        return Arrays.copyOfRange(neighbors, firstNeighborIndices[node], firstNeighborIndices[node + 1]);
+        return neighbors.toArray(firstNeighborIndices[node], firstNeighborIndices[node + 1]);
+    }
+
+    /**
+     * Returns an iterable over all the neighbors of a node.
+     *
+     * @param node Node
+     * @return Iterable over neighbors
+     */
+    public LargeIntArray.FromToIterable neighbors(int node)
+    {
+        return neighbors.fromTo(firstNeighborIndices[node], firstNeighborIndices[node + 1]);
+    }
+
+    /**
+     * Returns an iterable over all the incident edges of a node.
+     *
+     * @param node Node
+     * @return Iterable over incident edges.
+     */
+    public RangeIterable incidentEdges(int node)
+    {
+        return new RangeIterable(firstNeighborIndices[node], firstNeighborIndices[node + 1]);
     }
 
     /**
@@ -530,7 +558,7 @@ public class Network implements Serializable
      */
     public double getTotalEdgeWeight()
     {
-        return nl.cwts.util.Arrays.calcSum(edgeWeights) / 2;
+        return edgeWeights.calcSum() / 2;
     }
 
     /**
@@ -556,7 +584,7 @@ public class Network implements Serializable
      */
     public double getTotalEdgeWeight(int node)
     {
-        return nl.cwts.util.Arrays.calcSum(edgeWeights, firstNeighborIndices[node], firstNeighborIndices[node + 1]);
+        return edgeWeights.calcSum(firstNeighborIndices[node], firstNeighborIndices[node + 1]);
     }
 
     /**
@@ -570,7 +598,7 @@ public class Network implements Serializable
      *
      * @return Edge weights
      */
-    public double[] getEdgeWeights()
+    public LargeDoubleArray getEdgeWeights()
     {
         return edgeWeights.clone();
     }
@@ -588,7 +616,7 @@ public class Network implements Serializable
 
         edgeWeightsPerNode = new double[nNodes][];
         for (i = 0; i < nNodes; i++)
-            edgeWeightsPerNode[i] = Arrays.copyOfRange(edgeWeights, firstNeighborIndices[i], firstNeighborIndices[i + 1]);
+            edgeWeightsPerNode[i] = edgeWeights.toArray(firstNeighborIndices[i], firstNeighborIndices[i + 1]);
         return edgeWeightsPerNode;
     }
 
@@ -602,7 +630,19 @@ public class Network implements Serializable
      */
     public double[] getEdgeWeights(int node)
     {
-        return Arrays.copyOfRange(edgeWeights, firstNeighborIndices[node], firstNeighborIndices[node + 1]);
+        return edgeWeights.toArray(firstNeighborIndices[node], firstNeighborIndices[node + 1]);
+    }
+
+    /**
+     * Returns an iterable over all the edge weights of all incident edges of a
+     * node.
+     *
+     * @param node Node
+     * @return Iterable over edge weights of a node.
+     */
+    public LargeDoubleArray.FromToIterable edgeWeights(int node)
+    {
+        return edgeWeights.fromTo(firstNeighborIndices[node], firstNeighborIndices[node + 1]);
     }
 
     /**
@@ -658,7 +698,7 @@ public class Network implements Serializable
         networkWithoutEdgeWeights.nodeWeights = nodeWeights;
         networkWithoutEdgeWeights.firstNeighborIndices = firstNeighborIndices;
         networkWithoutEdgeWeights.neighbors = neighbors;
-        networkWithoutEdgeWeights.edgeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
+        networkWithoutEdgeWeights.edgeWeights = new LargeDoubleArray(nEdges, 1);
         networkWithoutEdgeWeights.totalEdgeWeightSelfLinks = 0;
         return networkWithoutEdgeWeights;
     }
@@ -683,7 +723,7 @@ public class Network implements Serializable
         networkWithoutNodeAndEdgeWeights.nodeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes);
         networkWithoutNodeAndEdgeWeights.firstNeighborIndices = firstNeighborIndices;
         networkWithoutNodeAndEdgeWeights.neighbors = neighbors;
-        networkWithoutNodeAndEdgeWeights.edgeWeights = nl.cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
+        networkWithoutNodeAndEdgeWeights.edgeWeights = new LargeDoubleArray(nEdges, 1);
         networkWithoutNodeAndEdgeWeights.totalEdgeWeightSelfLinks = 0;
         return networkWithoutNodeAndEdgeWeights;
     }
@@ -722,7 +762,8 @@ public class Network implements Serializable
     public Network createNormalizedNetworkUsingAssociationStrength()
     {
         double totalNodeWeight;
-        int i, j;
+        int i;
+        long j;
         Network normalizedNetwork;
 
         normalizedNetwork = new Network();
@@ -733,11 +774,11 @@ public class Network implements Serializable
         normalizedNetwork.firstNeighborIndices = firstNeighborIndices;
         normalizedNetwork.neighbors = neighbors;
 
-        normalizedNetwork.edgeWeights = new double[nEdges];
+        normalizedNetwork.edgeWeights = new LargeDoubleArray(nEdges);
         totalNodeWeight = getTotalNodeWeight();
         for (i = 0; i < nNodes; i++)
             for (j = firstNeighborIndices[i]; j < firstNeighborIndices[i + 1]; j++)
-                normalizedNetwork.edgeWeights[j] = edgeWeights[j] / ((nodeWeights[i] * nodeWeights[neighbors[j]]) / totalNodeWeight);
+                normalizedNetwork.edgeWeights.divide(j, ((nodeWeights[i] * nodeWeights[neighbors.get(j)]) / totalNodeWeight));
 
         normalizedNetwork.totalEdgeWeightSelfLinks = 0;
 
@@ -771,7 +812,8 @@ public class Network implements Serializable
      */
     public Network createNormalizedNetworkUsingFractionalization()
     {
-        int i, j;
+        int i;
+        long j;
         Network normalizedNetwork;
 
         normalizedNetwork = new Network();
@@ -782,10 +824,10 @@ public class Network implements Serializable
         normalizedNetwork.firstNeighborIndices = firstNeighborIndices;
         normalizedNetwork.neighbors = neighbors;
 
-        normalizedNetwork.edgeWeights = new double[nEdges];
+        normalizedNetwork.edgeWeights = new LargeDoubleArray(nEdges);
         for (i = 0; i < nNodes; i++)
             for (j = firstNeighborIndices[i]; j < firstNeighborIndices[i + 1]; j++)
-                normalizedNetwork.edgeWeights[j] = edgeWeights[j] / (2 / (nNodes / nodeWeights[i] + nNodes / nodeWeights[neighbors[j]]));
+                normalizedNetwork.edgeWeights.divide(j, (2 / (nNodes / nodeWeights[i] + nNodes / nodeWeights[neighbors.get(j)])));
 
         normalizedNetwork.totalEdgeWeightSelfLinks = 0;
 
@@ -829,8 +871,10 @@ public class Network implements Serializable
     public Network createPrunedNetwork(int maxNEdges, Random random)
     {
         double edgeWeightThreshold, randomNumberThreshold;
-        double[] edgeWeights, randomNumbers, randomNumbersEdgesAtThreshold;
-        int i, j, k, nEdgesAboveThreshold, nEdgesAtThreshold;
+        LargeDoubleArray edgeWeights;
+        double[] randomNumbers, randomNumbersEdgesAtThreshold;
+        int i, j, nEdgesAboveThreshold, nEdgesAtThreshold;
+        long k;
         Network prunedNetwork;
 
         maxNEdges *= 2;
@@ -838,26 +882,26 @@ public class Network implements Serializable
         if (maxNEdges >= nEdges)
             return this;
 
-        edgeWeights = new double[nEdges / 2];
+        edgeWeights = new LargeDoubleArray(nEdges / 2);
         i = 0;
         for (j = 0; j < nNodes; j++)
         {
             k = firstNeighborIndices[j];
-            while ((k < firstNeighborIndices[j + 1]) && (neighbors[k] < j))
+            while ((k < firstNeighborIndices[j + 1]) && (neighbors.get(k) < j))
             {
-                edgeWeights[i] = this.edgeWeights[k];
+                edgeWeights.set(i, this.edgeWeights.get(k));
                 i++;
                 k++;
             }
         }
-        Arrays.sort(edgeWeights);
-        edgeWeightThreshold = edgeWeights[(nEdges - maxNEdges) / 2];
+        edgeWeights.sort();
+        edgeWeightThreshold = edgeWeights.get((nEdges - maxNEdges) / 2);
 
         nEdgesAboveThreshold = 0;
-        while (edgeWeights[nEdges / 2 - nEdgesAboveThreshold - 1] > edgeWeightThreshold)
+        while (edgeWeights.get(nEdges / 2 - nEdgesAboveThreshold - 1) > edgeWeightThreshold)
             nEdgesAboveThreshold++;
         nEdgesAtThreshold = 0;
-        while ((nEdgesAboveThreshold + nEdgesAtThreshold < nEdges / 2) && (edgeWeights[nEdges / 2 - nEdgesAboveThreshold - nEdgesAtThreshold - 1] == edgeWeightThreshold))
+        while ((nEdgesAboveThreshold + nEdgesAtThreshold < nEdges / 2) && (edgeWeights.get(nEdges / 2 - nEdgesAboveThreshold - nEdgesAtThreshold - 1) == edgeWeightThreshold))
             nEdgesAtThreshold++;
 
         randomNumbers = nl.cwts.util.Arrays.createDoubleArrayOfRandomNumbers(nNodes * nNodes, random);
@@ -867,11 +911,11 @@ public class Network implements Serializable
         for (j = 0; j < nNodes; j++)
         {
             k = firstNeighborIndices[j];
-            while ((k < firstNeighborIndices[j + 1]) && (neighbors[k] < j))
+            while ((k < firstNeighborIndices[j + 1]) && (neighbors.get(k) < j))
             {
-                if (this.edgeWeights[k] == edgeWeightThreshold)
+                if (this.edgeWeights.get(k) == edgeWeightThreshold)
                 {
-                    randomNumbersEdgesAtThreshold[i] = getRandomNumber(j, neighbors[k], randomNumbers);
+                    randomNumbersEdgesAtThreshold[i] = getRandomNumber(j, neighbors.get(k), randomNumbers);
                     i++;
                 }
                 k++;
@@ -886,17 +930,17 @@ public class Network implements Serializable
         prunedNetwork.nEdges = maxNEdges;
         prunedNetwork.nodeWeights = nodeWeights;
 
-        prunedNetwork.firstNeighborIndices = new int[nNodes + 1];
-        prunedNetwork.neighbors = new int[maxNEdges];
-        prunedNetwork.edgeWeights = new double[maxNEdges];
+        prunedNetwork.firstNeighborIndices = new long[nNodes + 1];
+        prunedNetwork.neighbors = new LargeIntArray(maxNEdges);
+        prunedNetwork.edgeWeights = new LargeDoubleArray(maxNEdges);
         i = 0;
         for (j = 0; j < nNodes; j++)
         {
             for (k = firstNeighborIndices[j]; k < firstNeighborIndices[j + 1]; k++)
-                if ((this.edgeWeights[k] > edgeWeightThreshold) || ((this.edgeWeights[k] == edgeWeightThreshold) && (getRandomNumber(j, neighbors[k], randomNumbers) >= randomNumberThreshold)))
+                if ((this.edgeWeights.get(k) > edgeWeightThreshold) || ((this.edgeWeights.get(k) == edgeWeightThreshold) && (getRandomNumber(j, neighbors.get(k), randomNumbers) >= randomNumberThreshold)))
                 {
-                    prunedNetwork.neighbors[i] = neighbors[k];
-                    prunedNetwork.edgeWeights[i] = this.edgeWeights[k];
+                    prunedNetwork.neighbors.set(i, neighbors.get(k));
+                    prunedNetwork.edgeWeights.set(i, this.edgeWeights.get(k));
                     i++;
                 }
             prunedNetwork.firstNeighborIndices[j + 1] = i;
@@ -916,9 +960,11 @@ public class Network implements Serializable
      */
     public Network createSubnetwork(int[] nodes)
     {
-        double[] subnetworkEdgeWeights;
-        int i, j, k;
-        int[] subnetworkNodes, subnetworkNeighbors;
+        LargeDoubleArray subnetworkEdgeWeights;
+        int i, j;
+        long k;
+        int[] subnetworkNodes;
+        LargeIntArray subnetworkNeighbors;
         Network subnetwork;
 
         subnetwork = new Network();
@@ -930,9 +976,9 @@ public class Network implements Serializable
             subnetwork.nEdges = 0;
             subnetwork.nodeWeights = new double[1];
             subnetwork.nodeWeights[0] = nodeWeights[nodes[0]];
-            subnetwork.firstNeighborIndices = new int[2];
-            subnetwork.neighbors = new int[0];
-            subnetwork.edgeWeights = new double[0];
+            subnetwork.firstNeighborIndices = new long[2];
+            subnetwork.neighbors = new LargeIntArray(0);
+            subnetwork.edgeWeights = new LargeDoubleArray(0);
         }
         else
         {
@@ -943,24 +989,26 @@ public class Network implements Serializable
 
             subnetwork.nEdges = 0;
             subnetwork.nodeWeights = new double[subnetwork.nNodes];
-            subnetwork.firstNeighborIndices = new int[subnetwork.nNodes + 1];
-            subnetworkNeighbors = new int[nEdges];
-            subnetworkEdgeWeights = new double[nEdges];
+            subnetwork.firstNeighborIndices = new long[subnetwork.nNodes + 1];
+            subnetworkNeighbors = new LargeIntArray(nEdges);
+            subnetworkEdgeWeights = new LargeDoubleArray(nEdges);
             for (i = 0; i < subnetwork.nNodes; i++)
             {
                 j = nodes[i];
                 subnetwork.nodeWeights[i] = nodeWeights[j];
                 for (k = firstNeighborIndices[j]; k < firstNeighborIndices[j + 1]; k++)
-                    if (subnetworkNodes[neighbors[k]] >= 0)
+                    if (subnetworkNodes[neighbors.get(k)] >= 0)
                     {
-                        subnetworkNeighbors[subnetwork.nEdges] = subnetworkNodes[neighbors[k]];
-                        subnetworkEdgeWeights[subnetwork.nEdges] = edgeWeights[k];
+                        subnetworkNeighbors.set(subnetwork.nEdges,
+                                                subnetworkNodes[neighbors.get(k)]);
+                        subnetworkEdgeWeights.set(subnetwork.nEdges,
+                                                  edgeWeights.get(k));
                         subnetwork.nEdges++;
                     }
                 subnetwork.firstNeighborIndices[i + 1] = subnetwork.nEdges;
             }
-            subnetwork.neighbors = Arrays.copyOfRange(subnetworkNeighbors, 0, subnetwork.nEdges);
-            subnetwork.edgeWeights = Arrays.copyOfRange(subnetworkEdgeWeights, 0, subnetwork.nEdges);
+            subnetwork.neighbors = subnetworkNeighbors.copyOfRange(0, subnetwork.nEdges);
+            subnetwork.edgeWeights = subnetworkEdgeWeights.copyOfRange(0, subnetwork.nEdges);
         }
 
         subnetwork.totalEdgeWeightSelfLinks = 0;
@@ -1012,14 +1060,15 @@ public class Network implements Serializable
      */
     public Network createSubnetwork(Clustering clustering, int cluster)
     {
-        double[] subnetworkEdgeWeights;
-        int[] subnetworkNeighbors, subnetworkNodes;
+        LargeDoubleArray subnetworkEdgeWeights;
+        LargeIntArray subnetworkNeighbors;
+        int[] subnetworkNodes;
         int[][] nodesPerCluster;
 
         nodesPerCluster = clustering.getNodesPerCluster();
         subnetworkNodes = new int[nNodes];
-        subnetworkNeighbors = new int[nEdges];
-        subnetworkEdgeWeights = new double[nEdges];
+        subnetworkNeighbors = new LargeIntArray(nEdges);
+        subnetworkEdgeWeights = new LargeDoubleArray(nEdges);
         return createSubnetwork(clustering, cluster, nodesPerCluster[cluster], subnetworkNodes, subnetworkNeighbors, subnetworkEdgeWeights);
     }
 
@@ -1032,17 +1081,18 @@ public class Network implements Serializable
      */
     public Network[] createSubnetworks(Clustering clustering)
     {
-        double[] subnetworkEdgeWeights;
+        LargeDoubleArray subnetworkEdgeWeights;
         int i;
-        int[] subnetworkNeighbors, subnetworkNodes;
+        int[] subnetworkNodes;
+        LargeIntArray subnetworkNeighbors;
         int[][] nodesPerCluster;
         Network[] subnetworks;
 
         subnetworks = new Network[clustering.nClusters];
         nodesPerCluster = clustering.getNodesPerCluster();
         subnetworkNodes = new int[nNodes];
-        subnetworkNeighbors = new int[nEdges];
-        subnetworkEdgeWeights = new double[nEdges];
+        subnetworkNeighbors = new LargeIntArray(nEdges);
+        subnetworkEdgeWeights = new LargeDoubleArray(nEdges);
         for (i = 0; i < clustering.nClusters; i++)
             subnetworks[i] = createSubnetwork(clustering, i, nodesPerCluster[i], subnetworkNodes, subnetworkNeighbors, subnetworkEdgeWeights);
         return subnetworks;
@@ -1076,9 +1126,10 @@ public class Network implements Serializable
      */
     public Network createReducedNetwork(Clustering clustering)
     {
-        double[] reducedNetworkEdgeWeights1, reducedNetworkEdgeWeights2;
-        int i, j, k, l, m, n;
-        int[] reducedNetworkNeighbors1, reducedNetworkNeighbors2;
+        LargeDoubleArray reducedNetworkEdgeWeights1, reducedNetworkEdgeWeights2;
+        int i, j, k, l, n;
+        long m;
+        LargeIntArray reducedNetworkNeighbors1, reducedNetworkNeighbors2;
         int[][] nodesPerCluster;
         Network reducedNetwork;
 
@@ -1088,12 +1139,12 @@ public class Network implements Serializable
 
         reducedNetwork.nEdges = 0;
         reducedNetwork.nodeWeights = new double[clustering.nClusters];
-        reducedNetwork.firstNeighborIndices = new int[clustering.nClusters + 1];
+        reducedNetwork.firstNeighborIndices = new long[clustering.nClusters + 1];
         reducedNetwork.totalEdgeWeightSelfLinks = totalEdgeWeightSelfLinks;
-        reducedNetworkNeighbors1 = new int[nEdges];
-        reducedNetworkEdgeWeights1 = new double[nEdges];
-        reducedNetworkNeighbors2 = new int[clustering.nClusters - 1];
-        reducedNetworkEdgeWeights2 = new double[clustering.nClusters];
+        reducedNetworkNeighbors1 = new LargeIntArray(nEdges);
+        reducedNetworkEdgeWeights1 = new LargeDoubleArray(nEdges);
+        reducedNetworkNeighbors2 = new LargeIntArray(clustering.nClusters - 1);
+        reducedNetworkEdgeWeights2 = new LargeDoubleArray(clustering.nClusters);
         nodesPerCluster = clustering.getNodesPerCluster();
         for (i = 0; i < clustering.nClusters; i++)
         {
@@ -1106,32 +1157,32 @@ public class Network implements Serializable
 
                 for (m = firstNeighborIndices[l]; m < firstNeighborIndices[l + 1]; m++)
                 {
-                    n = clustering.clusters[neighbors[m]];
+                    n = clustering.clusters[neighbors.get(m)];
                     if (n != i)
                     {
-                        if (reducedNetworkEdgeWeights2[n] == 0)
+                        if (reducedNetworkEdgeWeights2.get(n) == 0)
                         {
-                            reducedNetworkNeighbors2[j] = n;
+                            reducedNetworkNeighbors2.set(j, n);
                             j++;
                         }
-                        reducedNetworkEdgeWeights2[n] += edgeWeights[m];
+                        reducedNetworkEdgeWeights2.add(n, edgeWeights.get(m));
                     }
                     else
-                        reducedNetwork.totalEdgeWeightSelfLinks += edgeWeights[m];
+                        reducedNetwork.totalEdgeWeightSelfLinks += edgeWeights.get(m);
                 }
             }
 
             for (k = 0; k < j; k++)
             {
-                reducedNetworkNeighbors1[reducedNetwork.nEdges + k] = reducedNetworkNeighbors2[k];
-                reducedNetworkEdgeWeights1[reducedNetwork.nEdges + k] = reducedNetworkEdgeWeights2[reducedNetworkNeighbors2[k]];
-                reducedNetworkEdgeWeights2[reducedNetworkNeighbors2[k]] = 0;
+                reducedNetworkNeighbors1.set(reducedNetwork.nEdges + k, reducedNetworkNeighbors2.get(k));
+                reducedNetworkEdgeWeights1.set(reducedNetwork.nEdges + k, reducedNetworkEdgeWeights2.get(reducedNetworkNeighbors2.get(k)));
+                reducedNetworkEdgeWeights2.set(reducedNetworkNeighbors2.get(k), 0);
             }
             reducedNetwork.nEdges += j;
             reducedNetwork.firstNeighborIndices[i + 1] = reducedNetwork.nEdges;
         }
-        reducedNetwork.neighbors = Arrays.copyOfRange(reducedNetworkNeighbors1, 0, reducedNetwork.nEdges);
-        reducedNetwork.edgeWeights = Arrays.copyOfRange(reducedNetworkEdgeWeights1, 0, reducedNetwork.nEdges);
+        reducedNetwork.neighbors = reducedNetworkNeighbors1.copyOfRange(0, reducedNetwork.nEdges);
+        reducedNetwork.edgeWeights = reducedNetworkEdgeWeights1.copyOfRange(0, reducedNetwork.nEdges);
 
         return reducedNetwork;
     }
@@ -1172,8 +1223,9 @@ public class Network implements Serializable
      */
     public void checkIntegrity() throws IllegalArgumentException
     {
-        boolean[] checked;
-        int i, j, k, l;
+        LargeBooleanArray checked;
+        int i, k;
+        long j, l;
 
         // Check whether variables have a correct value and arrays have a
         // correct length.
@@ -1198,10 +1250,10 @@ public class Network implements Serializable
         if (firstNeighborIndices[nNodes] != nEdges)
             throw new IllegalArgumentException("Last element of firstNeighborIndices array must be equal to nEdges.");
 
-        if (neighbors.length != nEdges)
+        if (neighbors.size() != nEdges)
             throw new IllegalArgumentException("Length of neighbors array must be equal to nEdges.");
 
-        if (edgeWeights.length != nEdges)
+        if (edgeWeights.size() != nEdges)
             throw new IllegalArgumentException("Length of edgeWeights array must be equal to nEdges.");
 
         // Check whether edges are sorted correctly.
@@ -1212,7 +1264,7 @@ public class Network implements Serializable
 
             for (j = firstNeighborIndices[i]; j < firstNeighborIndices[i + 1]; j++)
             {
-                k = neighbors[j];
+                k = neighbors.get(j);
 
                 if (k < 0)
                     throw new IllegalArgumentException("Elements of neighbors array must have non-negative values.");
@@ -1221,7 +1273,7 @@ public class Network implements Serializable
 
                 if (j > firstNeighborIndices[i])
                 {
-                    l = neighbors[j - 1];
+                    l = neighbors.get(j - 1);
                     if (k < l)
                         throw new IllegalArgumentException("For each node, corresponding elements of neighbors array must be in increasing order.");
                     else if (k == l)
@@ -1231,68 +1283,75 @@ public class Network implements Serializable
         }
 
         // Check whether edges are stored in both directions.
-        checked = new boolean[nEdges];
+        checked = new LargeBooleanArray(nEdges);
         for (i = 0; i < nNodes; i++)
             for (j = firstNeighborIndices[i]; j < firstNeighborIndices[i + 1]; j++)
-                if (!checked[j])
+                if (!checked.get(j))
                 {
-                    k = neighbors[j];
+                    k = neighbors.get(j);
 
-                    l = Arrays.binarySearch(neighbors, firstNeighborIndices[k], firstNeighborIndices[k + 1], i);
+                    l = neighbors.binarySearch(firstNeighborIndices[k], firstNeighborIndices[k+1], i);
                     if (l < 0)
                         throw new IllegalArgumentException("Edges must be stored in both directions.");
-                    if (edgeWeights[j] != edgeWeights[l])
+                    if (edgeWeights.get(j) != edgeWeights.get(l))
                         throw new IllegalArgumentException("Edge weights must be the same in both directions.");
 
-                    checked[j] = true;
-                    checked[l] = true;
+                    checked.set(j, true);
+                    checked.set(l, true);
                 }
     }
 
-    private static void sortEdges(int[][] edges, double[] edgeWeights)
+    public static void sortEdges(LargeIntArray[] edges, LargeDoubleArray edgeWeights)
     {
-        class EdgeComparator implements Comparator<Integer>
+        class EdgeComparator
         {
-            int[][] edges;
+            LargeIntArray[] edges;
+            LargeLongArray indices;
 
-            public EdgeComparator(int[][] edges)
+            public EdgeComparator(LargeIntArray[] edges, LargeLongArray indices)
             {
                 this.edges = edges;
+                this.indices = indices;
             }
 
-            public int compare(Integer i, Integer j)
+            public int compare(long i, long j)
             {
-                if (edges[0][i] > edges[0][j])
+                long a = indices.get(i);
+                long b = indices.get(j);
+                if (edges[0].get(a) > edges[0].get(b))
                     return 1;
-                if (edges[0][i] < edges[0][j])
+                if (edges[0].get(a) < edges[0].get(b))
                     return -1;
-                if (edges[1][i] > edges[1][j])
+                if (edges[1].get(a) > edges[1].get(b))
                     return 1;
-                if (edges[1][i] < edges[1][j])
+                if (edges[1].get(a) < edges[1].get(b))
                     return -1;
                 return 0;
             }
         }
 
-        double[] edgeWeightsSorted;
-        int i, nEdges;
-        int[][] edgesSorted;
-        Integer[] indices;
+        LargeDoubleArray edgeWeightsSorted;
+        long i, nEdges;
+        LargeIntArray[] edgesSorted;
+        LargeLongArray indices;
 
-        nEdges = edges[0].length;
+        nEdges = edges[0].size();
 
         // Determine sorting order.
-        indices = new Integer[nEdges];
+        indices = new LargeLongArray(nEdges);
         for (i = 0; i < nEdges; i++)
-            indices[i] = i;
-        Arrays.parallelSort(indices, new EdgeComparator(edges));
+            indices.set(i, i);
+
+        indices.sort(new EdgeComparator(edges, indices)::compare);
 
         // Sort edges.
-        edgesSorted = new int[2][nEdges];
+        edgesSorted = new LargeIntArray[2];
+        edgesSorted[0] = new LargeIntArray(nEdges);
+        edgesSorted[1] = new LargeIntArray(nEdges);
         for (i = 0; i < nEdges; i++)
         {
-            edgesSorted[0][i] = edges[0][indices[i]];
-            edgesSorted[1][i] = edges[1][indices[i]];
+            edgesSorted[0].set(i, edges[0].get(indices.get(i)) );
+            edgesSorted[1].set(i, edges[1].get(indices.get(i)) );
         }
         edges[0] = edgesSorted[0];
         edges[1] = edgesSorted[1];
@@ -1300,10 +1359,10 @@ public class Network implements Serializable
         // Sort edge weights.
         if (edgeWeights != null)
         {
-            edgeWeightsSorted = new double[nEdges];
+            edgeWeightsSorted = new LargeDoubleArray(nEdges);
             for (i = 0; i < nEdges; i++)
-                edgeWeightsSorted[i] = edgeWeights[indices[i]];
-            System.arraycopy(edgeWeightsSorted, 0, edgeWeights, 0, nEdges);
+                edgeWeightsSorted.set(i, edgeWeights.get(indices.get(i)) );
+            edgeWeights.updateFrom(edgeWeightsSorted);
         }
     }
 
@@ -1311,62 +1370,64 @@ public class Network implements Serializable
     {
     }
 
-    private Network(int nNodes, double[] nodeWeights, boolean setNodeWeightsToTotalEdgeWeights, int[][] edges, double[] edgeWeights, boolean sortedEdges, boolean checkIntegrity)
+    private Network(int nNodes, double[] nodeWeights, boolean setNodeWeightsToTotalEdgeWeights, LargeIntArray[] edges, LargeDoubleArray edgeWeights, boolean sortedEdges, boolean checkIntegrity)
     {
-        double[] edgeWeights2;
-        int i, j;
-        int[][] edges2;
+        LargeDoubleArray edgeWeights2;
+        long i, j;
+        int k;
+        LargeIntArray[] edges2;
 
         if (!sortedEdges)
         {
-            edges2 = new int[2][2 * edges[0].length];
-            edgeWeights2 = (edgeWeights != null) ? new double[2 * edges[0].length] : null;
+            edges2 = new LargeIntArray[2];
+            edges2[0] = new LargeIntArray(2 * edges[0].size());
+            edges2[1] = new LargeIntArray(2 * edges[1].size());
+            edgeWeights2 = (edgeWeights != null) ? new LargeDoubleArray(2 * edges[0].size()) : null;
             i = 0;
-            for (j = 0; j < edges[0].length; j++)
+            for (j = 0; j < edges[0].size(); j++)
             {
-                edges2[0][i] = edges[0][j];
-                edges2[1][i] = edges[1][j];
+                edges2[0].set(i, edges[0].get(j));
+                edges2[1].set(i, edges[1].get(j));
                 if (edgeWeights != null)
-                    edgeWeights2[i] = edgeWeights[j];
+                    edgeWeights2.set(i, edgeWeights.get(j));
                 i++;
-                if (edges[0][j] != edges[1][j])
+                if (edges[0].get(j) != edges[1].get(j))
                 {
-                    edges2[0][i] = edges[1][j];
-                    edges2[1][i] = edges[0][j];
+                    edges2[0].set(i, edges[1].get(j));
+                    edges2[1].set(i, edges[0].get(j));
                     if (edgeWeights != null)
-                        edgeWeights2[i] = edgeWeights[j];
+                        edgeWeights2.set(i, edgeWeights.get(j));
                     i++;
                 }
             }
-            edges[0] = Arrays.copyOfRange(edges2[0], 0, i);
-            edges[1] = Arrays.copyOfRange(edges2[1], 0, i);
+            edges = edges2;
             if (edgeWeights != null)
-                edgeWeights = Arrays.copyOfRange(edgeWeights2, 0, i);
+                edgeWeights = edgeWeights2;
             sortEdges(edges, edgeWeights);
         }
 
         this.nNodes = nNodes;
         nEdges = 0;
-        firstNeighborIndices = new int[nNodes + 1];
-        neighbors = new int[edges[0].length];
-        this.edgeWeights = new double[edges[0].length];
+        firstNeighborIndices = new long[nNodes + 1];
+        neighbors = new LargeIntArray(edges[0].size());
+        this.edgeWeights = new LargeDoubleArray(edges[0].size());
         totalEdgeWeightSelfLinks = 0;
-        i = 1;
-        for (j = 0; j < edges[0].length; j++)
-            if (edges[0][j] != edges[1][j])
+        k = 1;
+        for (j = 0; j < edges[0].size(); j++)
+            if (edges[0].get(j) != edges[1].get(j))
             {
-                for (; i <= edges[0][j]; i++)
-                    firstNeighborIndices[i] = nEdges;
-                neighbors[nEdges] = edges[1][j];
-                this.edgeWeights[nEdges] = (edgeWeights != null) ? edgeWeights[j] : 1;
+                for (; k <= edges[0].get(j); k++)
+                    firstNeighborIndices[k] = nEdges;
+                neighbors.set(nEdges, edges[1].get(j));
+                this.edgeWeights.set(nEdges, (edgeWeights != null) ? edgeWeights.get(j) : 1);
                 nEdges++;
             }
             else
-                totalEdgeWeightSelfLinks += (edgeWeights != null) ? edgeWeights[j] : 1;
-        for (; i <= nNodes; i++)
-            firstNeighborIndices[i] = nEdges;
-        neighbors = Arrays.copyOfRange(neighbors, 0, nEdges);
-        this.edgeWeights = Arrays.copyOfRange(this.edgeWeights, 0, nEdges);
+                totalEdgeWeightSelfLinks += (edgeWeights != null) ? edgeWeights.get(j) : 1;
+        for (; k <= nNodes; k++)
+            firstNeighborIndices[k] = nEdges;
+	this.neighbors.resize(nEdges); this.neighbors.shrink();
+        this.edgeWeights.resize(nEdges); this.edgeWeights.shrink();
 
         this.nodeWeights = (nodeWeights != null) ? nodeWeights.clone() : (setNodeWeightsToTotalEdgeWeights ? getTotalEdgeWeightPerNodeHelper() : nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes));
 
@@ -1374,13 +1435,14 @@ public class Network implements Serializable
             checkIntegrity();
     }
 
-    private Network(int nNodes, double[] nodeWeights, boolean setNodeWeightsToTotalEdgeWeights, int[] firstNeighborIndices, int[] neighbors, double[] edgeWeights, boolean checkIntegrity)
+    private Network(int nNodes, double[] nodeWeights, boolean setNodeWeightsToTotalEdgeWeights, long[] firstNeighborIndices, LargeIntArray neighbors, LargeDoubleArray edgeWeights, boolean checkIntegrity)
     {
         this.nNodes = nNodes;
-        nEdges = neighbors.length;
+        nEdges = neighbors.size();
         this.firstNeighborIndices = firstNeighborIndices.clone();
         this.neighbors = neighbors.clone();
-        this.edgeWeights = (edgeWeights != null) ? edgeWeights.clone() : nl.cwts.util.Arrays.createDoubleArrayOfOnes(nEdges);
+        this.edgeWeights = (edgeWeights != null) ? edgeWeights.clone() :
+                new LargeDoubleArray(nEdges, 1);
         totalEdgeWeightSelfLinks = 0;
 
         this.nodeWeights = (nodeWeights != null) ? nodeWeights.clone() : (setNodeWeightsToTotalEdgeWeights ? getTotalEdgeWeightPerNodeHelper() : nl.cwts.util.Arrays.createDoubleArrayOfOnes(nNodes));
@@ -1396,7 +1458,7 @@ public class Network implements Serializable
 
         totalEdgeWeightPerNode = new double[nNodes];
         for (i = 0; i < nNodes; i++)
-            totalEdgeWeightPerNode[i] = nl.cwts.util.Arrays.calcSum(edgeWeights, firstNeighborIndices[i], firstNeighborIndices[i + 1]);
+            totalEdgeWeightPerNode[i] = edgeWeights.calcSum(firstNeighborIndices[i], firstNeighborIndices[i + 1]);
         return totalEdgeWeightPerNode;
     }
 
@@ -1417,9 +1479,10 @@ public class Network implements Serializable
         return randomNumbers[i * nNodes + j];
     }
 
-    protected Network createSubnetwork(Clustering clustering, int cluster, int[] nodes, int[] subnetworkNodes, int[] subnetworkNeighbors, double[] subnetworkEdgeWeights)
+    protected Network createSubnetwork(Clustering clustering, int cluster, int[] nodes, int[] subnetworkNodes, LargeIntArray subnetworkNeighbors, LargeDoubleArray subnetworkEdgeWeights)
     {
-        int i, j, k;
+        int i, j;
+        long k;
         Network subnetwork;
 
         subnetwork = new Network();
@@ -1431,9 +1494,9 @@ public class Network implements Serializable
             subnetwork.nEdges = 0;
             subnetwork.nodeWeights = new double[1];
             subnetwork.nodeWeights[0] = nodeWeights[nodes[0]];
-            subnetwork.firstNeighborIndices = new int[2];
-            subnetwork.neighbors = new int[0];
-            subnetwork.edgeWeights = new double[0];
+            subnetwork.firstNeighborIndices = new long[2];
+            subnetwork.neighbors = new LargeIntArray(0);
+            subnetwork.edgeWeights = new LargeDoubleArray(0);
         }
         else
         {
@@ -1442,26 +1505,70 @@ public class Network implements Serializable
 
             subnetwork.nEdges = 0;
             subnetwork.nodeWeights = new double[subnetwork.nNodes];
-            subnetwork.firstNeighborIndices = new int[subnetwork.nNodes + 1];
+            subnetwork.firstNeighborIndices = new long[subnetwork.nNodes + 1];
             for (i = 0; i < subnetwork.nNodes; i++)
             {
                 j = nodes[i];
                 subnetwork.nodeWeights[i] = nodeWeights[j];
                 for (k = firstNeighborIndices[j]; k < firstNeighborIndices[j + 1]; k++)
-                    if (clustering.clusters[neighbors[k]] == cluster)
+                    if (clustering.clusters[neighbors.get(k)] == cluster)
                     {
-                        subnetworkNeighbors[subnetwork.nEdges] = subnetworkNodes[neighbors[k]];
-                        subnetworkEdgeWeights[subnetwork.nEdges] = edgeWeights[k];
+                        subnetworkNeighbors.set(subnetwork.nEdges,
+                                                subnetworkNodes[neighbors.get(k)]);
+                        subnetworkEdgeWeights.set(subnetwork.nEdges,
+                                                  edgeWeights.get(k));
                         subnetwork.nEdges++;
                     }
                 subnetwork.firstNeighborIndices[i + 1] = subnetwork.nEdges;
             }
-            subnetwork.neighbors = Arrays.copyOfRange(subnetworkNeighbors, 0, subnetwork.nEdges);
-            subnetwork.edgeWeights = Arrays.copyOfRange(subnetworkEdgeWeights, 0, subnetwork.nEdges);
+            subnetwork.neighbors = subnetworkNeighbors.copyOfRange(0, subnetwork.nEdges);
+            subnetwork.edgeWeights = subnetworkEdgeWeights.copyOfRange(0, subnetwork.nEdges);
         }
 
         subnetwork.totalEdgeWeightSelfLinks = 0;
 
         return subnetwork;
+    }
+
+    public class RangeIterable implements Iterable<Long>
+    {
+        long from;
+        long to;
+
+        public RangeIterable(long from, long to)
+        {
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public java.util.Iterator<Long> iterator()
+        {
+            return new RangeIterator(from, to);
+        }
+    }
+
+    public class RangeIterator implements PrimitiveIterator.OfLong
+    {
+        private final long to;
+        private long current;
+
+        public RangeIterator(long from, long to)
+        {
+            this.current = from;
+            this.to = to;
+        }
+
+        @Override
+        public long nextLong()
+        {
+            return current++;
+        }
+
+        @Override
+        public boolean hasNext()
+        {
+            return current < to;
+        }
     }
 }

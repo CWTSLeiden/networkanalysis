@@ -93,7 +93,8 @@ public class FastLocalMovingAlgorithm extends IterativeCPMClusteringAlgorithm
         boolean[] stableNodes;
         double maxQualityValueIncrement, qualityValueIncrement;
         double[] clusterWeights, edgeWeightPerCluster;
-        int bestCluster, currentCluster, i, j, k, l, nNeighboringClusters, nUnstableNodes, nUnusedClusters;
+        int bestCluster, currentCluster, i, j, l, m, nNeighboringClusters, nUnstableNodes, nUnusedClusters;
+        long k;
         int[] neighboringClusters, nNodesPerCluster, nodeOrder, unusedClusters;
 
         if (network.nNodes == 1)
@@ -158,13 +159,13 @@ public class FastLocalMovingAlgorithm extends IterativeCPMClusteringAlgorithm
             nNeighboringClusters = 1;
             for (k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
             {
-                l = clustering.clusters[network.neighbors[k]];
+                l = clustering.clusters[network.neighbors.get(k)];
                 if (edgeWeightPerCluster[l] == 0)
                 {
                     neighboringClusters[nNeighboringClusters] = l;
                     nNeighboringClusters++;
                 }
-                edgeWeightPerCluster[l] += network.edgeWeights[k];
+                edgeWeightPerCluster[l] += network.edgeWeights.get(k);
             }
 
             /*
@@ -180,9 +181,9 @@ public class FastLocalMovingAlgorithm extends IterativeCPMClusteringAlgorithm
              */
             bestCluster = currentCluster;
             maxQualityValueIncrement = edgeWeightPerCluster[currentCluster] - network.nodeWeights[j] * clusterWeights[currentCluster] * resolution;
-            for (k = 0; k < nNeighboringClusters; k++)
+            for (m = 0; m < nNeighboringClusters; m++)
             {
-                l = neighboringClusters[k];
+                l = neighboringClusters[m];
 
                 qualityValueIncrement = edgeWeightPerCluster[l] - network.nodeWeights[j] * clusterWeights[l] * resolution;
                 if (qualityValueIncrement > maxQualityValueIncrement)
@@ -224,11 +225,11 @@ public class FastLocalMovingAlgorithm extends IterativeCPMClusteringAlgorithm
                     clustering.nClusters = bestCluster + 1;
 
                 for (k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
-                    if (stableNodes[network.neighbors[k]] && (clustering.clusters[network.neighbors[k]] != bestCluster))
+                    if (stableNodes[network.neighbors.get(k)] && (clustering.clusters[network.neighbors.get(k)] != bestCluster))
                     {
-                        stableNodes[network.neighbors[k]] = false;
+                        stableNodes[network.neighbors.get(k)] = false;
                         nUnstableNodes++;
-                        nodeOrder[(i + nUnstableNodes < network.nNodes) ? (i + nUnstableNodes) : (i + nUnstableNodes - network.nNodes)] = network.neighbors[k];
+                        nodeOrder[(i + nUnstableNodes < network.nNodes) ? (i + nUnstableNodes) : (i + nUnstableNodes - network.nNodes)] = network.neighbors.get(k);
                     }
 
                 update = true;

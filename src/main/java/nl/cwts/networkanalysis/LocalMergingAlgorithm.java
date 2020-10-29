@@ -132,7 +132,8 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
         boolean[] nonSingletonClusters;
         double maxQualityValueIncrement, qualityValueIncrement, r, totalNodeWeight, totalTransformedQualityValueIncrement;
         double[] clusterWeights, cumTransformedQualityValueIncrementPerCluster, edgeWeightPerCluster, externalEdgeWeightPerCluster;
-        int bestCluster, chosenCluster, i, j, k, l, max_idx, mid_idx, min_idx, nNeighboringClusters;
+        int bestCluster, chosenCluster, i, j, l, m, max_idx, mid_idx, min_idx, nNeighboringClusters;
+        long k;
         int[] neighboringClusters, nodeOrder;
 
         Clustering clustering = new Clustering(network.nNodes);
@@ -184,13 +185,13 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
                 nNeighboringClusters = 1;
                 for (k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
                 {
-                    l = clustering.clusters[network.neighbors[k]];
+                    l = clustering.clusters[network.neighbors.get(k)];
                     if (edgeWeightPerCluster[l] == 0)
                     {
                         neighboringClusters[nNeighboringClusters] = l;
                         nNeighboringClusters++;
                     }
-                    edgeWeightPerCluster[l] += network.edgeWeights[k];
+                    edgeWeightPerCluster[l] += network.edgeWeights.get(k);
                 }
 
                 /*
@@ -208,9 +209,9 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
                 bestCluster = j;
                 maxQualityValueIncrement = 0;
                 totalTransformedQualityValueIncrement = 0;
-                for (k = 0; k < nNeighboringClusters; k++)
+                for (m = 0; m < nNeighboringClusters; m++)
                 {
-                    l = neighboringClusters[k];
+                    l = neighboringClusters[m];
 
                     if (externalEdgeWeightPerCluster[l] >= clusterWeights[l] * (totalNodeWeight - clusterWeights[l]) * resolution)
                     {
@@ -226,7 +227,7 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
                             totalTransformedQualityValueIncrement += FastMath.fastExp(qualityValueIncrement / randomness);
                     }
 
-                    cumTransformedQualityValueIncrementPerCluster[k] = totalTransformedQualityValueIncrement;
+                    cumTransformedQualityValueIncrementPerCluster[m] = totalTransformedQualityValueIncrement;
 
                     edgeWeightPerCluster[l] = 0;
                 }
@@ -260,10 +261,10 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
                 clusterWeights[chosenCluster] += network.nodeWeights[j];
 
                 for (k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
-                    if (clustering.clusters[network.neighbors[k]] == chosenCluster)
-                        externalEdgeWeightPerCluster[chosenCluster] -= network.edgeWeights[k];
+                    if (clustering.clusters[network.neighbors.get(k)] == chosenCluster)
+                        externalEdgeWeightPerCluster[chosenCluster] -= network.edgeWeights.get(k);
                     else
-                        externalEdgeWeightPerCluster[chosenCluster] += network.edgeWeights[k];
+                        externalEdgeWeightPerCluster[chosenCluster] += network.edgeWeights.get(k);
 
                 if (chosenCluster != j)
                 {
