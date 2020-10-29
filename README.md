@@ -19,7 +19,7 @@ To run the clustering algorithms, the command-line tool `RunNetworkClustering` i
 The tool can be run as follows:
 
 ```
-java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkClustering
+java -cp networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkClustering
 ```
 
 If no further arguments are provided, the following usage notice will be displayed:
@@ -83,7 +83,7 @@ To run the layout algorithm, the command-line tool `RunNetworkLayout` is provide
 The tool can be run as follows:
 
 ```
-java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkLayout
+java -cp networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkLayout
 ```
 
 If no further arguments are provided, the following usage notice will be displayed:
@@ -182,7 +182,7 @@ Nodes must be represented by integer numbers starting from 0.
 Assuming that the edge list has been saved in the file `network.txt`, the `RunNetworkClustering` tool can be run as follows:
 
 ```
-java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkClustering -r 0.2 -o clusters.txt network.txt
+java -cp networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkClustering -r 0.2 -o clusters.txt network.txt
 ```
 
 In this case, clusters are identified using the Leiden algorithm.
@@ -207,7 +207,7 @@ Cluster 1 includes nodes 3, 4, and 5.
 The `RunNetworkLayout` tool can be run as follows:
 
 ```
-java -cp networkanalysis.jar cwts.networkanalysis.run.RunNetworkLayout -o layout.txt network.txt
+java -cp networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkLayout -o layout.txt network.txt
 ```
 
 In this case, the default parameter values are used for the VOS layout technique.
@@ -230,25 +230,34 @@ Furthermore, edge weights can be provided by adding a third column to the file `
 
 ## Compilation
 
-The source code can be compiled as follows:
+You must have JDK 1.8+ installed to compile.
+Having Gradle installed is optional as the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) is also included in this repository.
+On Windows, the source code can be compiled as follows:
 
 ```
-javac -d build src/cwts/networkanalysis/*.java src/cwts/networkanalysis/run/*.java src/cwts/util/*.java
+gradlew build
 ```
 
-The compiled `class` files will be output to the directory `build`.
-There are no external dependencies.
-There are two `main` methods, one in the class `cwts.networkanalysis.run.RunNetworkClustering` and one in the class `cwts.networkanalysis.run.RunNetworkLayout`.
+On Linux and MacOS, use the following command:
+
+```
+./gradlew build
+```
+
+The compiled `class` files will be output to the directory `build/classes`.
+The compiled `jar` file will be output to the directory `build/libs`.
+The compiled `javadoc` files will be output to the directory `build/docs`.
+There are two `main` methods, one in the class `nl.cwts.networkanalysis.run.RunNetworkClustering` and one in the class `nl.cwts.networkanalysis.run.RunNetworkLayout`.
 After the code has been compiled, the `RunNetworkClustering` tool can be run as follows:
 
 ```
-java -cp build cwts.networkanalysis.run.RunNetworkClustering
+java -cp build/libs/networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkClustering
 ```
 
 The `RunNetworkLayout` tool can be run as follows:
 
 ```
-java -cp build cwts.networkanalysis.run.RunNetworkLayout
+java -cp build/libs/networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkLayout
 ```
 
 The latest stable version of the code is available from the [`master`](https://github.com/CWTSLeiden/networkanalysis/tree/master) branch on GitHub.
