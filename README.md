@@ -1,3 +1,8 @@
+<!--[![Build master branch](https://github.com/CWTSLeiden/networkanalysis/workflows/Build%20master%20branch/badge.svg?branch=master)](https://github.com/CWTSLeiden/networkanalysis/actions)//-->
+[![License: MIT](https://badgen.net/github/license/CWTSLeiden/networkanalysis?label=License&color=yellow)](https://github.com/CWTSLeiden/networkanalysis/blob/master/LICENSE)
+[![Latest release](https://badgen.net/github/release/CWTSLeiden/networkanalysis?label=Release)](https://github.com/CWTSLeiden/networkanalysis/releases)
+[![DOI](https://zenodo.org/badge/153760626.svg)](https://zenodo.org/badge/latestdoi/153760626)
+
 ## Introduction
 
 This package provides algorithms and data structures for network analysis in `java`.
@@ -6,8 +11,6 @@ In particular, the package contains an implementation of the [Leiden algorithm](
 Only undirected networks are supported.
 
 This package requires `java 1.8.0` or higher.
-
-[![DOI](https://zenodo.org/badge/153760626.svg)](https://zenodo.org/badge/latestdoi/153760626)
 
 ## Usage
 
