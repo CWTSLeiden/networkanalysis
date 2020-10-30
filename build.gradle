@@ -2,7 +2,11 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
+    id 'com.palantir.git-version' version '0.12.3'
 }
+
+group = 'nl.cwts'
+version = gitVersion()
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8

@@ -1,4 +1,4 @@
-<!--[![Build master branch](https://github.com/CWTSLeiden/networkanalysis/workflows/Build%20master%20branch/badge.svg?branch=master)](https://github.com/CWTSLeiden/networkanalysis/actions)//-->
+[![Build master branch](https://github.com/CWTSLeiden/networkanalysis/workflows/Build%20master%20branch/badge.svg?branch=master)](https://github.com/CWTSLeiden/networkanalysis/actions)
 [![License: MIT](https://badgen.net/github/license/CWTSLeiden/networkanalysis?label=License&color=yellow)](https://github.com/CWTSLeiden/networkanalysis/blob/master/LICENSE)
 [![Latest release](https://badgen.net/github/release/CWTSLeiden/networkanalysis?label=Release)](https://github.com/CWTSLeiden/networkanalysis/releases)
 [![DOI](https://zenodo.org/badge/153760626.svg)](https://zenodo.org/badge/latestdoi/153760626)
@@ -250,17 +250,18 @@ On Linux and MacOS, use the following command:
 The compiled `class` files will be output to the directory `build/classes`.
 The compiled `jar` file will be output to the directory `build/libs`.
 The compiled `javadoc` files will be output to the directory `build/docs`.
+
 There are two `main` methods, one in the class `nl.cwts.networkanalysis.run.RunNetworkClustering` and one in the class `nl.cwts.networkanalysis.run.RunNetworkLayout`.
 After the code has been compiled, the `RunNetworkClustering` tool can be run as follows:
 
 ```
-java -cp build/libs/networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkClustering
+java -cp build/libs/networkanalysis-<version>.jar nl.cwts.networkanalysis.run.RunNetworkClustering
 ```
 
 The `RunNetworkLayout` tool can be run as follows:
 
 ```
-java -cp build/libs/networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkLayout
+java -cp build/libs/networkanalysis-<version>.jar nl.cwts.networkanalysis.run.RunNetworkLayout
 ```
 
 The latest stable version of the code is available from the [`master`](https://github.com/CWTSLeiden/networkanalysis/tree/master) branch on GitHub.
