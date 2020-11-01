@@ -1,3 +1,5 @@
+# networkanalysis
+
 [![Build master branch](https://github.com/CWTSLeiden/networkanalysis/workflows/Build%20master%20branch/badge.svg?branch=master)](https://github.com/CWTSLeiden/networkanalysis/actions)
 [![License: MIT](https://badgen.net/github/license/CWTSLeiden/networkanalysis?label=License&color=yellow)](https://github.com/CWTSLeiden/networkanalysis/blob/master/LICENSE)
 [![Latest release](https://badgen.net/github/release/CWTSLeiden/networkanalysis?label=Release)](https://github.com/CWTSLeiden/networkanalysis/releases)
