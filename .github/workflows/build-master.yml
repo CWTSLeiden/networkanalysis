@@ -18,8 +18,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Print version
-      run: gradle printVersion
     - name: Build with Gradle
       run: gradle build
     - name: Generate sources jar with Gradle
