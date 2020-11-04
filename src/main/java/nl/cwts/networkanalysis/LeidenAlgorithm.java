@@ -240,6 +240,7 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
                  * the non-aggregate network.
                  */
                 reducedNetwork = network.createReducedNetwork(refinement);
+
                 /*
                  * Create an initial clustering for the aggregate network based
                  * on the non-refined clustering of the non-aggregate network.
@@ -250,8 +251,9 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
                     clusteringReducedNetwork.clusters[refinement.clusters[i]] = clustering.clusters[i];
 
                 /*
-                 * Set the non-refined clustering to the refined clustering, so that the results correctly
-                 * merged back after recursively applying the algorithm to the aggregate network.
+                 * Set the non-refined clustering to the refined clustering, so
+                 * that the results of recursively applying the algorithm to the
+                 * aggregate network will be correctly merged back.
                  */
                 clustering.clusters = refinement.clusters;
                 clustering.nClusters = refinement.nClusters;
@@ -259,13 +261,14 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
             else
             {
                 /*
-                 * The refinement is a singleton clustering, so we now
-                 * aggregate on the basis of the non-refined clustering
-                 * of the non-aggregate network.
+                 * The refined clustering of the non-aggregate network is a
+                 * singleton clustering, so create an aggregate network based on
+                 * the non-refined clustering.
                  */
                 reducedNetwork = network.createReducedNetwork(clustering);
                 clusteringReducedNetwork = new Clustering(reducedNetwork.nNodes);
             }
+
             /*
              * Recursively apply the algorithm to the aggregate network,
              * starting from the initial clustering created for this network.
