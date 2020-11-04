@@ -15,4 +15,5 @@ test*
 bin/
 .classpath
 .project
-.settings
+.settings/
+.gradle/
