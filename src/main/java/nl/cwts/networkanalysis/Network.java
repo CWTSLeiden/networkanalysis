@@ -1417,7 +1417,7 @@ public class Network implements Serializable
         return randomNumbers[i * nNodes + j];
     }
 
-    private Network createSubnetwork(Clustering clustering, int cluster, int[] nodes, int[] subnetworkNodes, int[] subnetworkNeighbors, double[] subnetworkEdgeWeights)
+    protected Network createSubnetwork(Clustering clustering, int cluster, int[] nodes, int[] subnetworkNodes, int[] subnetworkNeighbors, double[] subnetworkEdgeWeights)
     {
         int i, j, k;
         Network subnetwork;
