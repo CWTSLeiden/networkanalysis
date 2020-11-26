@@ -171,11 +171,39 @@ public final class Arrays
      */
     public static double[] createDoubleArrayOfOnes(int nElements)
     {
-        double[] values;
+        return(repeat(1.0, nElements));
+    }
 
-        values = new double[nElements];
-        java.util.Arrays.fill(values, 1);
-        return values;
+    /**
+     * Creates a double array of repeated elements.
+     *
+     * @param value Element to repeat
+     * @param nElements Number of elements
+     *
+     * @return Array of repeated elements
+     */
+    public static int[] repeat(int value, int nElements)
+    {
+        int[] elements;
+        elements = new int[nElements];
+        java.util.Arrays.fill(elements, value);
+        return elements;
+    }
+
+    /**
+     * Creates an integer array of repeated elements.
+     *
+     * @param value Element to repeat
+     * @param nElements Number of elements
+     *
+     * @return Array of repeated elements
+     */
+    public static double[] repeat(double value, int nElements)
+    {
+        double[] elements;
+        elements = new double[nElements];
+        java.util.Arrays.fill(elements, value);
+        return elements;
     }
 
     /**
