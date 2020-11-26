@@ -15,7 +15,8 @@ import java.util.Map;
  * Clustering of the nodes in a network.
  *
  * <p>
- * Each node belongs to exactly one cluster.
+ * Each node belongs to at most one cluster. Negative clusters are used to
+ * indicate that a node is not assigned to any cluster.
  * </p>
  *
  * @author Ludo Waltman
@@ -152,6 +153,43 @@ public class Clustering implements Cloneable, Serializable
     }
 
     /**
+     * Returns whether cluster is empty or not.
+     *
+     * @return Cluster is empty for each cluster
+     */
+    public boolean[] getClusterIsNotEmpty()
+    {
+        boolean[] clusterNotEmpty = new boolean[nClusters];
+        for (int i = 0; i < nNodes; i++)
+        {
+            int c = clusters[i];
+            if (c >= 0 && !clusterNotEmpty[c])
+                clusterNotEmpty[c] = true;
+        }
+        return clusterNotEmpty;
+    }
+
+    /**
+     * @return Number of non-empty clusters.
+     * @see #getClusterIsNotEmpty()
+     */
+    public int getNNonEmptyClusters()
+    {
+        boolean[] clusterNotEmpty = new boolean[nClusters];
+        int nNonEmptyClusters = 0;
+        for (int i = 0; i < nNodes; i++)
+        {
+            int c = clusters[i];
+            if (c >= 0 && !clusterNotEmpty[c])
+            {
+                clusterNotEmpty[c] = true;
+                nNonEmptyClusters += 1;
+            }
+        }
+        return nNonEmptyClusters;
+    }
+
+   /**
      * Returns the cluster of each node.
      *
      * @return Cluster of each node
@@ -185,7 +223,8 @@ public class Clustering implements Cloneable, Serializable
 
         nNodesPerCluster = new int[nClusters];
         for (i = 0; i < nNodes; i++)
-            nNodesPerCluster[clusters[i]]++;
+            if (clusters[i] >= 0)
+                nNodesPerCluster[clusters[i]]++;
         return nNodesPerCluster;
     }
 
@@ -208,10 +247,12 @@ public class Clustering implements Cloneable, Serializable
             nNodesPerCluster[i] = 0;
         }
         for (i = 0; i < nNodes; i++)
-        {
-            nodesPerCluster[clusters[i]][nNodesPerCluster[clusters[i]]] = i;
-            nNodesPerCluster[clusters[i]]++;
-        }
+            if (clusters[i] >= 0)
+            {
+                nodesPerCluster[clusters[i]][nNodesPerCluster[clusters[i]]] = i;
+                nNodesPerCluster[clusters[i]]++;
+            }
+
         return nodesPerCluster;
     }
 
@@ -250,24 +291,78 @@ public class Clustering implements Cloneable, Serializable
      */
     public void removeEmptyClusters()
     {
-        boolean[] nonEmptyClusters;
+        removeEmptyClustersLargerThan(0);
+    }
+
+    /**
+     * Removes empty clusters and relabels clusters to follow consecutive
+     * numbering only for clusters larger than the specified minimum number of
+     * clusters.
+     *
+     * <p>
+     * Each empty cluster larger that {@code minimumCluster} is reassigned to
+     * the lowest available cluster, in the order of the existing clusters. For
+     * example, if {@code minimumCluster = 5} and cluster 2 and 7 are empty,
+     * then cluster 8 is relabeled to 7 (and 9 to 8, etc...), but clusters 0-4
+     * remain as they are.
+     * </p>
+     *
+     * @param minimumCluster Minimum cluster to start relabeling from.
+     */
+    public void removeEmptyClustersLargerThan(int minimumCluster)
+    {
+        boolean[] clusterNotEmpty;
         int i, j;
         int[] newClusters;
 
-        nonEmptyClusters = new boolean[nClusters];
+        clusterNotEmpty = getClusterIsNotEmpty();
+
+        // Do not relabel until minimumCluster
         newClusters = new int[nClusters];
-        for (i = 0; i < nNodes; i++)
-            nonEmptyClusters[clusters[i]] = true;
-        i = 0;
-        for (j = 0; j < nClusters; j++)
-            if (nonEmptyClusters[j])
+        for (j = 0; j < minimumCluster; j++)
+            newClusters[j] = j;
+
+        // Relabel starting from minimumCluster
+        i = j;
+        for ( ; j < nClusters; j++)
+            if (clusterNotEmpty[j])
             {
                 newClusters[j] = i;
                 i++;
             }
+
         nClusters = i;
         for (i = 0; i < nNodes; i++)
-            clusters[i] = newClusters[clusters[i]];
+            if (clusters[i] >= 0)
+                clusters[i] = newClusters[clusters[i]];
+    }
+
+    /**
+     * Determine the total node weight of all nodes per cluster.
+     *
+     * @param network Network with node weights.
+     * @return Total node weight per cluster.
+     * @see #getClusterWeights(double[] nodeWeight)
+     */
+    public double[] getClusterWeights(Network network)
+    {
+        return getClusterWeights(network.nodeWeights);
+    }
+
+    /**
+     * Determine the total node weight of all nodes per cluster.
+     *
+     * @param nodeWeights Array of node weights.
+     * @return Total node weight per cluster.
+     */
+    public double[] getClusterWeights(double[] nodeWeights)
+    {
+        double[] clusterWeight = new double[nClusters];
+        for (int i = 0; i < nNodes; i++)
+            if (clusters[i] >= 0)
+                clusterWeight[this.clusters[i]] += nodeWeights[i];
+
+        return clusterWeight;
     }
 
     /**
@@ -313,16 +408,14 @@ public class Clustering implements Cloneable, Serializable
         }
 
         Cluster[] clusters;
-        double[] clusterWeights;
+        double[] clusterWeights = getClusterWeights(nodeWeights);
         int i;
         int[] newClusters;
 
-        clusterWeights = new double[nClusters];
-        for (i = 0; i < nNodes; i++)
-            clusterWeights[this.clusters[i]] += nodeWeights[i];
         clusters = new Cluster[nClusters];
         for (i = 0; i < nClusters; i++)
-            clusters[i] = new Cluster(i, clusterWeights[i]);
+            if (this.clusters[i] >= 0)
+                clusters[i] = new Cluster(i, clusterWeights[i]);
 
         java.util.Arrays.sort(clusters);
 
@@ -335,7 +428,8 @@ public class Clustering implements Cloneable, Serializable
         } while ((i < nClusters) && (clusters[i].weight > 0));
         nClusters = i;
         for (i = 0; i < nNodes; i++)
-            this.clusters[i] = newClusters[this.clusters[i]];
+            if (this.clusters[i] >= 0)
+                this.clusters[i] = newClusters[this.clusters[i]];
     }
 
     /**
@@ -348,7 +442,9 @@ public class Clustering implements Cloneable, Serializable
         int i;
 
         for (i = 0; i < nNodes; i++)
-            clusters[i] = clustering.clusters[clusters[i]];
+            if (clusters[i] >= 0)
+                clusters[i] = clustering.clusters[clusters[i]];
+
         nClusters = clustering.nClusters;
     }
 
