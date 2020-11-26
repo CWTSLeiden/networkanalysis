@@ -275,14 +275,30 @@ public final class Arrays
         permutation = new int[nElements];
         for (i = 0; i < nElements; i++)
             permutation[i] = i;
-        for (i = 0; i < nElements; i++)
-        {
-            j = random.nextInt(nElements);
-            k = permutation[i];
-            permutation[i] = permutation[j];
-            permutation[j] = k;
-        }
+        permuteRandomly(permutation, random);
         return permutation;
+    }
+
+    /**
+     * Randomly permutes the elements.
+     *
+     * <p>
+     * Randomly permutes the elements 0, ..., nElements - 1.
+     * </p>
+     *
+     * @param elements Elements
+     * @param random   Random number generator
+     */
+    public static void permuteRandomly(int[] elements, Random random)
+    {
+        int i, j, k;
+        for (i = 0; i < elements.length; i++)
+        {
+            j = random.nextInt(elements.length);
+            k = elements[i];
+            elements[i] = elements[j];
+            elements[j] = k;
+        }
     }
 
     private Arrays()
