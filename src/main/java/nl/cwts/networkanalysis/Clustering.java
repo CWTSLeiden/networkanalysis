@@ -163,7 +163,7 @@ public class Clustering implements Cloneable, Serializable
         for (int i = 0; i < nNodes; i++)
         {
             int c = clusters[i];
-            if (c >= 0 && !clusterNotEmpty[c])
+            if (!clusterNotEmpty[c])
                 clusterNotEmpty[c] = true;
         }
         return clusterNotEmpty;
@@ -180,7 +180,7 @@ public class Clustering implements Cloneable, Serializable
         for (int i = 0; i < nNodes; i++)
         {
             int c = clusters[i];
-            if (c >= 0 && !clusterNotEmpty[c])
+            if (!clusterNotEmpty[c])
             {
                 clusterNotEmpty[c] = true;
                 nNonEmptyClusters += 1;
@@ -223,8 +223,7 @@ public class Clustering implements Cloneable, Serializable
 
         nNodesPerCluster = new int[nClusters];
         for (i = 0; i < nNodes; i++)
-            if (clusters[i] >= 0)
-                nNodesPerCluster[clusters[i]]++;
+            nNodesPerCluster[clusters[i]]++;
         return nNodesPerCluster;
     }
 
@@ -247,11 +246,10 @@ public class Clustering implements Cloneable, Serializable
             nNodesPerCluster[i] = 0;
         }
         for (i = 0; i < nNodes; i++)
-            if (clusters[i] >= 0)
-            {
-                nodesPerCluster[clusters[i]][nNodesPerCluster[clusters[i]]] = i;
-                nNodesPerCluster[clusters[i]]++;
-            }
+        {
+            nodesPerCluster[clusters[i]][nNodesPerCluster[clusters[i]]] = i;
+            nNodesPerCluster[clusters[i]]++;
+        }
 
         return nodesPerCluster;
     }
@@ -333,8 +331,7 @@ public class Clustering implements Cloneable, Serializable
 
         nClusters = i;
         for (i = 0; i < nNodes; i++)
-            if (clusters[i] >= 0)
-                clusters[i] = newClusters[clusters[i]];
+            clusters[i] = newClusters[clusters[i]];
     }
 
     /**
@@ -359,8 +356,7 @@ public class Clustering implements Cloneable, Serializable
     {
         double[] clusterWeight = new double[nClusters];
         for (int i = 0; i < nNodes; i++)
-            if (clusters[i] >= 0)
-                clusterWeight[this.clusters[i]] += nodeWeights[i];
+            clusterWeight[this.clusters[i]] += nodeWeights[i];
 
         return clusterWeight;
     }
@@ -414,8 +410,7 @@ public class Clustering implements Cloneable, Serializable
 
         clusters = new Cluster[nClusters];
         for (i = 0; i < nClusters; i++)
-            if (this.clusters[i] >= 0)
-                clusters[i] = new Cluster(i, clusterWeights[i]);
+            clusters[i] = new Cluster(i, clusterWeights[i]);
 
         java.util.Arrays.sort(clusters);
 
@@ -428,8 +423,7 @@ public class Clustering implements Cloneable, Serializable
         } while ((i < nClusters) && (clusters[i].weight > 0));
         nClusters = i;
         for (i = 0; i < nNodes; i++)
-            if (this.clusters[i] >= 0)
-                this.clusters[i] = newClusters[this.clusters[i]];
+            this.clusters[i] = newClusters[this.clusters[i]];
     }
 
     /**
@@ -442,8 +436,7 @@ public class Clustering implements Cloneable, Serializable
         int i;
 
         for (i = 0; i < nNodes; i++)
-            if (clusters[i] >= 0)
-                clusters[i] = clustering.clusters[clusters[i]];
+            clusters[i] = clustering.clusters[clusters[i]];
 
         nClusters = clustering.nClusters;
     }
