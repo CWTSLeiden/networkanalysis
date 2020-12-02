@@ -269,7 +269,7 @@ public final class Arrays
      */
     public static int[] generateRandomPermutation(int nElements, Random random)
     {
-        int i, j, k;
+        int i;
         int[] permutation;
 
         permutation = new int[nElements];
@@ -292,6 +292,7 @@ public final class Arrays
     public static void permuteRandomly(int[] elements, Random random)
     {
         int i, j, k;
+
         for (i = 0; i < elements.length; i++)
         {
             j = random.nextInt(elements.length);
