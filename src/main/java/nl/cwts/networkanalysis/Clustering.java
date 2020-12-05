@@ -158,7 +158,8 @@ public class Clustering implements Cloneable, Serializable
      */
     public boolean[] getClusterIsNotEmpty()
     {
-        boolean[] clusterIsNotEmpty = new boolean[nClusters];
+        boolean[] clusterIsNotEmpty;
+        clusterIsNotEmpty = new boolean[nClusters];
         for (int i = 0; i < nNodes; i++)
         {
             int c = clusters[i];
@@ -174,7 +175,8 @@ public class Clustering implements Cloneable, Serializable
      */
     public int getNNonEmptyClusters()
     {
-        boolean[] clusterIsNotEmpty = new boolean[nClusters];
+        boolean[] clusterIsNotEmpty;
+        clusterIsNotEmpty = new boolean[nClusters];
         int nNonEmptyClusters = 0;
         for (int i = 0; i < nNodes; i++)
         {
