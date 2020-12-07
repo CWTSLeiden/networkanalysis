@@ -59,11 +59,8 @@ public class Clustering implements Cloneable, Serializable
         ObjectInputStream objectInputStream;
 
         objectInputStream = new ObjectInputStream(new FileInputStream(filename));
-
         clustering = (Clustering)objectInputStream.readObject();
-
         objectInputStream.close();
-
         return clustering;
     }
 
@@ -125,9 +122,7 @@ public class Clustering implements Cloneable, Serializable
         ObjectOutputStream objectOutputStream;
 
         objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename));
-
         objectOutputStream.writeObject(this);
-
         objectOutputStream.close();
     }
 
@@ -159,10 +154,12 @@ public class Clustering implements Cloneable, Serializable
     public boolean[] getClusterIsNotEmpty()
     {
         boolean[] clusterIsNotEmpty;
+        int c, i;
+
         clusterIsNotEmpty = new boolean[nClusters];
-        for (int i = 0; i < nNodes; i++)
+        for (i = 0; i < nNodes; i++)
         {
-            int c = clusters[i];
+            c = clusters[i];
             if (!clusterIsNotEmpty[c])
                 clusterIsNotEmpty[c] = true;
         }
@@ -176,11 +173,13 @@ public class Clustering implements Cloneable, Serializable
     public int getNNonEmptyClusters()
     {
         boolean[] clusterIsNotEmpty;
+        int c, i, nNonEmptyClusters;
+
         clusterIsNotEmpty = new boolean[nClusters];
-        int nNonEmptyClusters = 0;
-        for (int i = 0; i < nNodes; i++)
+        nNonEmptyClusters = 0;
+        for (i = 0; i < nNodes; i++)
         {
-            int c = clusters[i];
+            c = clusters[i];
             if (!clusterIsNotEmpty[c])
             {
                 clusterIsNotEmpty[c] = true;
@@ -354,8 +353,10 @@ public class Clustering implements Cloneable, Serializable
     public double[] getClusterWeights(double[] nodeWeights)
     {
         double[] clusterWeight;
+        int i;
+
         clusterWeight = new double[nClusters];
-        for (int i = 0; i < nNodes; i++)
+        for (i = 0; i < nNodes; i++)
             clusterWeight[this.clusters[i]] += nodeWeights[i];
 
         return clusterWeight;
@@ -387,7 +388,6 @@ public class Clustering implements Cloneable, Serializable
     {
         class Cluster implements Comparable<Cluster>
         {
-
             int cluster;
             double weight;
 
