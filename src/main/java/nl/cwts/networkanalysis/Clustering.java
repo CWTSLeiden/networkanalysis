@@ -59,11 +59,8 @@ public class Clustering implements Cloneable, Serializable
         ObjectInputStream objectInputStream;
 
         objectInputStream = new ObjectInputStream(new FileInputStream(filename));
-
         clustering = (Clustering)objectInputStream.readObject();
-
         objectInputStream.close();
-
         return clustering;
     }
 
@@ -125,9 +122,7 @@ public class Clustering implements Cloneable, Serializable
         ObjectOutputStream objectOutputStream;
 
         objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename));
-
         objectOutputStream.writeObject(this);
-
         objectOutputStream.close();
     }
 
@@ -152,6 +147,49 @@ public class Clustering implements Cloneable, Serializable
     }
 
     /**
+     * Returns whether cluster is empty or not.
+     *
+     * @return Cluster is empty for each cluster
+     */
+    public boolean[] getClusterIsNotEmpty()
+    {
+        boolean[] clusterIsNotEmpty;
+        int c, i;
+
+        clusterIsNotEmpty = new boolean[nClusters];
+        for (i = 0; i < nNodes; i++)
+        {
+            c = clusters[i];
+            if (!clusterIsNotEmpty[c])
+                clusterIsNotEmpty[c] = true;
+        }
+        return clusterIsNotEmpty;
+    }
+
+    /**
+     * @return Number of non-empty clusters.
+     * @see #getClusterIsNotEmpty()
+     */
+    public int getNNonEmptyClusters()
+    {
+        boolean[] clusterIsNotEmpty;
+        int c, i, nNonEmptyClusters;
+
+        clusterIsNotEmpty = new boolean[nClusters];
+        nNonEmptyClusters = 0;
+        for (i = 0; i < nNodes; i++)
+        {
+            c = clusters[i];
+            if (!clusterIsNotEmpty[c])
+            {
+                clusterIsNotEmpty[c] = true;
+                nNonEmptyClusters += 1;
+            }
+        }
+        return nNonEmptyClusters;
+    }
+
+   /**
      * Returns the cluster of each node.
      *
      * @return Cluster of each node
@@ -250,17 +288,41 @@ public class Clustering implements Cloneable, Serializable
      */
     public void removeEmptyClusters()
     {
-        boolean[] nonEmptyClusters;
+        removeEmptyClustersLargerThan(0);
+    }
+
+    /**
+     * Removes empty clusters and relabels clusters to follow consecutive
+     * numbering only for clusters larger than the specified minimum number of
+     * clusters.
+     *
+     * <p>
+     * Each empty cluster larger that {@code minimumCluster} is reassigned to
+     * the lowest available cluster, in the order of the existing clusters. For
+     * example, if {@code minimumCluster = 5} and cluster 2 and 7 are empty,
+     * then cluster 8 is relabeled to 7 (and 9 to 8, etc...), but clusters 0-4
+     * remain as they are.
+     * </p>
+     *
+     * @param minimumCluster Minimum cluster to start relabeling from.
+     */
+    public void removeEmptyClustersLargerThan(int minimumCluster)
+    {
+        boolean[] clusterIsNotEmpty;
         int i, j;
         int[] newClusters;
 
-        nonEmptyClusters = new boolean[nClusters];
+        clusterIsNotEmpty = getClusterIsNotEmpty();
+
+        // Do not relabel until minimumCluster
         newClusters = new int[nClusters];
-        for (i = 0; i < nNodes; i++)
-            nonEmptyClusters[clusters[i]] = true;
-        i = 0;
-        for (j = 0; j < nClusters; j++)
-            if (nonEmptyClusters[j])
+        for (j = 0; j < minimumCluster; j++)
+            newClusters[j] = j;
+
+        // Relabel starting from minimumCluster
+        i = j;
+        for ( ; j < nClusters; j++)
+            if (clusterIsNotEmpty[j])
             {
                 newClusters[j] = i;
                 i++;
@@ -268,6 +330,36 @@ public class Clustering implements Cloneable, Serializable
         nClusters = i;
         for (i = 0; i < nNodes; i++)
             clusters[i] = newClusters[clusters[i]];
+    }
+
+    /**
+     * Determine the total node weight of all nodes per cluster.
+     *
+     * @param network Network with node weights.
+     * @return Total node weight per cluster.
+     * @see #getClusterWeights(double[] nodeWeight)
+     */
+    public double[] getClusterWeights(Network network)
+    {
+        return getClusterWeights(network.nodeWeights);
+    }
+
+    /**
+     * Determine the total node weight of all nodes per cluster.
+     *
+     * @param nodeWeights Array of node weights.
+     * @return Total node weight per cluster.
+     */
+    public double[] getClusterWeights(double[] nodeWeights)
+    {
+        double[] clusterWeight;
+        int i;
+
+        clusterWeight = new double[nClusters];
+        for (i = 0; i < nNodes; i++)
+            clusterWeight[this.clusters[i]] += nodeWeights[i];
+
+        return clusterWeight;
     }
 
     /**
@@ -296,7 +388,6 @@ public class Clustering implements Cloneable, Serializable
     {
         class Cluster implements Comparable<Cluster>
         {
-
             int cluster;
             double weight;
 
@@ -317,9 +408,8 @@ public class Clustering implements Cloneable, Serializable
         int i;
         int[] newClusters;
 
-        clusterWeights = new double[nClusters];
-        for (i = 0; i < nNodes; i++)
-            clusterWeights[this.clusters[i]] += nodeWeights[i];
+    	clusterWeights = getClusterWeights(nodeWeights);
+
         clusters = new Cluster[nClusters];
         for (i = 0; i < nClusters; i++)
             clusters[i] = new Cluster(i, clusterWeights[i]);
