@@ -101,13 +101,8 @@ public class FastLocalMovingAlgorithm extends IterativeCPMClusteringAlgorithm
 
         update = false;
 
-        clusterWeights = new double[network.nNodes];
-        nNodesPerCluster = new int[network.nNodes];
-        for (i = 0; i < network.nNodes; i++)
-        {
-            clusterWeights[clustering.clusters[i]] += network.nodeWeights[i];
-            nNodesPerCluster[clustering.clusters[i]]++;
-        }
+        clusterWeights = clustering.getClusterWeights(network);
+        nNodesPerCluster = clustering.getNNodesPerCluster();
 
         nUnusedClusters = 0;
         unusedClusters = new int[network.nNodes - 1];
