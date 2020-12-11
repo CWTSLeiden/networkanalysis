@@ -132,7 +132,7 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
         boolean[] nonSingletonClusters;
         double maxQualityValueIncrement, qualityValueIncrement, r, totalNodeWeight, totalTransformedQualityValueIncrement;
         double[] clusterWeights, cumTransformedQualityValueIncrementPerCluster, edgeWeightPerCluster, externalEdgeWeightPerCluster;
-        int bestCluster, chosenCluster, i, j, l, m, max_idx, mid_idx, min_idx, nNeighboringClusters;
+        int bestCluster, chosenCluster, i, j, l, m, maxIdx, midIdx, minIdx, nNeighboringClusters;
         long k;
         int[] neighboringClusters, nodeOrder;
 
@@ -239,17 +239,17 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
                 if (totalTransformedQualityValueIncrement < Double.POSITIVE_INFINITY)
                 {
                     r = totalTransformedQualityValueIncrement * random.nextDouble();
-                    min_idx = -1;
-                    max_idx = nNeighboringClusters + 1;
-                    while (min_idx < max_idx - 1)
+                    minIdx = -1;
+                    maxIdx = nNeighboringClusters + 1;
+                    while (minIdx < maxIdx - 1)
                     {
-                        mid_idx = (min_idx + max_idx) / 2;
-                        if (cumTransformedQualityValueIncrementPerCluster[mid_idx] >= r)
-                            max_idx = mid_idx;
+                        midIdx = (minIdx + maxIdx) / 2;
+                        if (cumTransformedQualityValueIncrementPerCluster[midIdx] >= r)
+                            maxIdx = midIdx;
                         else
-                            min_idx = mid_idx;
+                            minIdx = midIdx;
                     }
-                    chosenCluster = neighboringClusters[max_idx];
+                    chosenCluster = neighboringClusters[maxIdx];
                 }
                 else
                     chosenCluster = bestCluster;

@@ -12,11 +12,11 @@ import java.util.Arrays;
  * This class enables arrays of booleans up to 64-bits in size (for the exact
  * maximum size, please see {@link #MAX_SIZE}). As a single array is limited to
  * 32-bits in Java, this is done by having an array of arrays. We use a
- * <code>long</code> to index this array of arrays, and use bitwise operators
+ * {@code long} to index this array of arrays, and use bitwise operators
  * to extract the two indices for the array of arrays. The largest index is
  * extracted using {@link #getSegment} while the smallest index is extracted
  * using {@link #getOffset}, where the actual value is located in
- * <code>values[segment][offset]</code>.
+ * {@code values[segment][offset]}.
  * </p>
  *
  * <p>
@@ -78,10 +78,10 @@ public final class LargeBooleanArray implements Cloneable
      * Constructs a new empty array of specified size.
      *
      * <p>
-     * Both the capacity and the size is being set to <code>size</code>, with
+     * Both the capacity and the size is being set to {@code size}, with
      * all elements initialised to their default value. If instead, you prefer
-     * an empty array, but reserve capacity, pass <code>0</code>
-     * <code>size</code> here and use {@link #ensureCapacity(long)}.
+     * an empty array, but reserve capacity, pass {@code 0}
+     * {@code size} here and use {@link #ensureCapacity(long)}.
      * </p>
      *
      * @param size Size of the array
@@ -90,6 +90,9 @@ public final class LargeBooleanArray implements Cloneable
     {
         int nSegments, segment;
         long remainingLength;
+
+        if (size < 0)
+            throw new IllegalArgumentException("Size cannot be negative.");
 
         this.capacity = Math.max(size, MINIMUM_INITIAL_CAPACITY);
         this.size = size;
@@ -141,6 +144,9 @@ public final class LargeBooleanArray implements Cloneable
         this(values.length);
 
         int offset = 0, segment = 0;
+
+        offset = 0;
+        segment = 0;
 
         for (boolean x : values)
         {
@@ -272,9 +278,10 @@ public final class LargeBooleanArray implements Cloneable
     public void fill(long from, long to, boolean constant)
     {
         // Determine initial indices for this array
-        int segmentTo = getSegment(to);
-        int offsetTo = getOffset(to);
-        int segment;
+        int segmentTo, offsetTo, segment;
+
+        segmentTo = getSegment(to);
+        offsetTo = getOffset(to);
 
         // Fill first segment
         segment = getSegment(from);
@@ -331,7 +338,8 @@ public final class LargeBooleanArray implements Cloneable
      */
     public boolean pop()
     {
-        boolean value = get(size - 1);
+        boolean value;
+        value = get(size - 1);
         size--;
         return value;
     }
@@ -359,7 +367,7 @@ public final class LargeBooleanArray implements Cloneable
     public void ensureCapacity(long minCapacity)
     {
         boolean[][] newValues;
-        int nOldSegments, nOldOffset, nNewSegments, segment;
+        int nOldSegments, nNewSegments, segment;
         long newCapacity, oldCapacity, remainingLength;
 
         oldCapacity = capacity;
@@ -436,23 +444,23 @@ public final class LargeBooleanArray implements Cloneable
     public void shrink()
     {
         boolean[][] newValues;
+        int segment, nNewSegments;
+        long newCapacity, oldCapacity, remainingLength;
 
-        int segment;
-
-        long newCapacity = size;
-        long oldCapacity = capacity;
+        newCapacity = size;
+        oldCapacity = capacity;
 
         if (newCapacity < oldCapacity)
         {
             // Determine the number of new segments
-            int nNewSegments = getSegment(newCapacity);
+            nNewSegments = getSegment(newCapacity);
             if (getOffset(newCapacity) > 0)
                 nNewSegments += 1; // Add one if there was a remainder
             newValues = new boolean[nNewSegments][];
 
             // Simply refer to the previously existing arrays for the first
             // couple of arrays
-            long remainingLength = newCapacity;
+            remainingLength = newCapacity;
             for (segment = 0; segment < nNewSegments - 1; segment++)
             {
                 newValues[segment] = values[segment];
@@ -508,13 +516,16 @@ public final class LargeBooleanArray implements Cloneable
      */
     public void swap(long indexA, long indexB)
     {
-        int segmentA = getSegment(indexA);
-        int offsetA = getOffset(indexA);
+        boolean tmp;
+        int segmentA, offsetA, segmentB, offsetB;
 
-        int segmentB = getSegment(indexB);
-        int offsetB = getOffset(indexB);
+        segmentA = getSegment(indexA);
+        offsetA = getOffset(indexA);
 
-        boolean tmp = values[segmentA][offsetA];
+        segmentB = getSegment(indexB);
+        offsetB = getOffset(indexB);
+
+        tmp = values[segmentA][offsetA];
         values[segmentA][offsetA] = values[segmentB][offsetB];
         values[segmentB][offsetB] = tmp;
     }
@@ -526,19 +537,13 @@ public final class LargeBooleanArray implements Cloneable
      * @param indexB Second element to compare
      *
      * @return Integer indicating which element is considered greater, where
-     * <code>true</code> is considered greater than <code>false</code>. In
-     * particular, it returns -1 if the first is false and the second true, +1
-     * if the first is true and the is false, and 0 if both are equal.
+     * {@code true} is considered greater than {@code false}. In particular, it
+     * returns -1 if the first is false and the second true, +1 if the first is
+     * true and the is false, and 0 if both are equal.
      */
     private int compare(long indexA, long indexB)
     {
-        boolean a = get(indexA);
-        boolean b = get(indexB);
-        if (!a && b)
-            return -1;
-        if (a && !b)
-            return 1;
-        return 0;
+        return Boolean.compare(get(indexA), get(indexB));
     }
 
     /***************************************************************************
@@ -596,29 +601,32 @@ public final class LargeBooleanArray implements Cloneable
     /**
      * Updates this array from the provided array.
      * <p>
-     * Values from other array starting at <code>from</code> until
-     * <code>to</code> (exclusive) will be copied to this array, starting
-     * from the <code>insertionPoint</code> onwards.
+     * Values from other array starting at {@code from} until
+     * {@code to} (exclusive) will be copied to this array, starting
+     * from the {@code insertionPoint} onwards.
      *
      * @param array          Array to update from
-     * @param from           Index in <code>array</code> from where to update,
+     * @param from           Index in {@code array} from where to update,
      *                       inclusive
-     * @param to             Index in <code>array</code> until where to update,
+     * @param to             Index in {@code array} until where to update,
      *                       exclusive
      * @param insertionPoint Starting index in this array to update
      */
     public void updateFrom(LargeBooleanArray array, long from, long to, long insertionPoint)
     {
-        long length = to - from;
+        long length, i;
+        int segmentFrom, offsetFrom, segment, offset;
+
+        length = to - from;
         // Determine initial indices for this array
-        int segmentFrom = getSegment(from);
-        int offsetFrom = getOffset(from);
+        segmentFrom = getSegment(from);
+        offsetFrom = getOffset(from);
 
         // Determine initial indices for new array
-        int segment = getSegment(insertionPoint);
-        int offset = getOffset(insertionPoint);
+        segment = getSegment(insertionPoint);
+        offset = getOffset(insertionPoint);
 
-        for (long i = 0; i < length; i++)
+        for (i = 0; i < length; i++)
         {
             if (offsetFrom >= MAX_SIZE_ARRAY)
             {
@@ -649,35 +657,39 @@ public final class LargeBooleanArray implements Cloneable
      */
     public LargeBooleanArray copyOfRange(long from, long to)
     {
-        long length_new = to - from;
-        LargeBooleanArray copy = new LargeBooleanArray(length_new);
+        long lengthNew, i;
+        int segmentOrig, offsetOrig, segmentNew, offsetNew;
+        LargeBooleanArray copy;
+
+        lengthNew = to - from;
+        copy = new LargeBooleanArray(lengthNew);
 
         // Determine initial indices for this array
-        int segment_orig = getSegment(from);
-        int offset_orig = getOffset(from);
+        segmentOrig = getSegment(from);
+        offsetOrig = getOffset(from);
 
         // Determine initial indices for new array
-        int segment_new = 0;
-        int offset_new = 0;
+        segmentNew = 0;
+        offsetNew = 0;
 
-        for (long i = 0; i < length_new; i++)
+        for (i = 0; i < lengthNew; i++)
         {
-            if (offset_orig >= MAX_SIZE_ARRAY)
+            if (offsetOrig >= MAX_SIZE_ARRAY)
             {
-                offset_orig = 0;
-                segment_orig++;
+                offsetOrig = 0;
+                segmentOrig++;
             }
-            if (offset_new >= MAX_SIZE_ARRAY)
+            if (offsetNew >= MAX_SIZE_ARRAY)
             {
-                offset_new = 0;
-                segment_new++;
+                offsetNew = 0;
+                segmentNew++;
             }
 
             // Copy actual value
-            copy.values[segment_new][offset_new] = this.values[segment_orig][offset_orig];
+            copy.values[segmentNew][offsetNew] = this.values[segmentOrig][offsetOrig];
 
-            offset_orig++;
-            offset_new++;
+            offsetOrig++;
+            offsetNew++;
         }
         return copy;
     }
@@ -711,9 +723,10 @@ public final class LargeBooleanArray implements Cloneable
     public boolean[] toArray(long from, long to)
     {
         // Upper bound of a single array seems to be Integer.MAX_VALUE - 5
-        int length = (int)(to - from), segment, offset, i;
+        int length, segment, offset, i;
         boolean[] array;
 
+        length = (int)(to - from);
         array = new boolean[length];
 
         // Determine initial indices for this array

@@ -13,11 +13,11 @@ import java.util.PrimitiveIterator;
  * This class enables arrays of doubles up to 64-bits in size (for the exact
  * maximum size, please see {@link #MAX_SIZE}). As a single array is limited to
  * 32-bits in Java, this is done by having an array of arrays. We use a
- * <code>long</code> to index this array of arrays, and use bitwise operators
+ * {@code long} to index this array of arrays, and use bitwise operators
  * to extract the two indices for the array of arrays. The largest index is
  * extracted using {@link #getSegment} while the smallest index is extracted
  * using {@link #getOffset}, where the actual value is located in
- * <code>values[segment][offset]</code>.
+ * {@code values[segment][offset]}.
  * </p>
  *
  * <p>
@@ -33,15 +33,15 @@ import java.util.PrimitiveIterator;
  * <p>
  * This class also contains a number of convenience functions to easily {@link
  * #add}, {@link #subtract}, {@link #multiply} and {@link #divide} elements.
- * This is more efficient than calling both <code>set</code> and
- * <code>get</code> because this requires to retrieve indices twice.
+ * This is more efficient than calling both {@code set} and
+ * {@code get} because this requires to retrieve indices twice.
  * </p>
  *
  * <p>
  * To facilitate easy iteration over this array, a few convenience iterables are
  * provided, enabling you to use construct such as
- * <code>for (double x : array)</code> and
- * <code>for (double x : array.fromto(10, 50)</code>
+ * {@code for (double x : array)} and
+ * {@code for (double x : array.fromto(10, 50)}
  * </p>
  */
 public final class LargeDoubleArray implements Cloneable, Iterable<Double>
@@ -93,21 +93,21 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      * Constructs a new empty array of specified size.
      *
      * <p>
-     * Both the capacity and the size is being set to <code>size</code>, with
+     * Both the capacity and the size is being set to {@code size}, with
      * all elements initialised to their default value. If instead, you prefer
-     * an empty array, but reserve capacity, pass <code>0</code>
-     * <code>size</code> here and use {@link #ensureCapacity(long)}.
+     * an empty array, but reserve capacity, pass {@code 0}
+     * {@code size} here and use {@link #ensureCapacity(long)}.
      * </p>
      *
      * @param size Size of the array
      */
     public LargeDoubleArray(long size)
     {
-        if (size < 0)
-            throw new IllegalArgumentException("Size cannot be negative.");
-
         int nSegments, segment;
         long remainingLength;
+
+        if (size < 0)
+            throw new IllegalArgumentException("Size cannot be negative.");
 
         this.capacity = Math.max(size, MINIMUM_INITIAL_CAPACITY);
         this.size = size;
@@ -158,7 +158,10 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
     {
         this(values.length);
 
-        int offset = 0, segment = 0;
+        int offset, segment;
+
+        offset = 0;
+        segment = 0;
 
         for (double x : values)
         {
@@ -290,9 +293,10 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
     public void fill(long from, long to, double constant)
     {
         // Determine initial indices for this array
-        int segmentTo = getSegment(to);
-        int offsetTo = getOffset(to);
-        int segment;
+        int segmentTo, offsetTo, segment;
+
+        segmentTo = getSegment(to);
+        offsetTo = getOffset(to);
 
         // Fill first segment
         segment = getSegment(from);
@@ -349,7 +353,8 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     public double pop()
     {
-        double value = get(size - 1);
+        double value;
+        value = get(size - 1);
         size--;
         return value;
     }
@@ -377,7 +382,7 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
     public void ensureCapacity(long minCapacity)
     {
         double[][] newValues;
-        int nOldSegments, nOldOffset, nNewSegments, segment;
+        int nOldSegments, nNewSegments, segment;
         long newCapacity, oldCapacity, remainingLength;
 
         oldCapacity = capacity;
@@ -455,23 +460,23 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
     public void shrink()
     {
         double[][] newValues;
+        int segment, nNewSegments;
+        long newCapacity, oldCapacity, remainingLength;
 
-        int segment;
-
-        long newCapacity = size;
-        long oldCapacity = capacity;
+        newCapacity = size;
+        oldCapacity = capacity;
 
         if (newCapacity < oldCapacity)
         {
             // Determine the number of new segments
-            int nNewSegments = getSegment(newCapacity);
+            nNewSegments = getSegment(newCapacity);
             if (getOffset(newCapacity) > 0)
                 nNewSegments += 1; // Add one if there was a remainder
             newValues = new double[nNewSegments][];
 
             // Simply refer to the previously existing arrays for the first
             // couple of arrays
-            long remainingLength = newCapacity;
+            remainingLength = newCapacity;
             for (segment = 0; segment < nNewSegments - 1; segment++)
             {
                 newValues[segment] = values[segment];
@@ -584,10 +589,15 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     public double calcSum(long from, long to)
     {
-        double sum = 0.0;
-        int segment = getSegment(from);
-        int offset = getOffset(from);
-        for (long i = from; i < to; i++)
+        double sum;
+        int segment, offset;
+        long i;
+
+        sum = 0.0;
+        segment = getSegment(from);
+        offset = getOffset(from);
+
+        for (i = from; i < to; i++)
         {
             if (offset >= MAX_SIZE_ARRAY)
             {
@@ -619,10 +629,15 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     public double calcMaximum()
     {
-        double max = Double.NEGATIVE_INFINITY;
-        int offset = 0;
-        int segment = 0;
-        for (long i = 0; i < size; i++)
+        double max;
+        int offset, segment;
+        long i;
+
+        max = Double.NEGATIVE_INFINITY;
+        offset = 0;
+        segment = 0;
+
+        for (i = 0; i < size; i++)
         {
             if (offset >= MAX_SIZE_ARRAY)
             {
@@ -643,10 +658,15 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     public double calcMinimum()
     {
-        double min = Double.POSITIVE_INFINITY;
-        int offset = 0;
-        int segment = 0;
-        for (long i = 0; i < size; i++)
+        double min;
+        int offset, segment;
+        long i;
+
+        min = Double.POSITIVE_INFINITY;
+        offset = 0;
+        segment = 0;
+
+        for (i = 0; i < size; i++)
         {
             if (offset >= MAX_SIZE_ARRAY)
             {
@@ -668,13 +688,16 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     public void swap(long indexA, long indexB)
     {
-        int segmentA = getSegment(indexA);
-        int offsetA = getOffset(indexA);
+        double tmp;
+        int segmentA, offsetA, segmentB, offsetB;
 
-        int segmentB = getSegment(indexB);
-        int offsetB = getOffset(indexB);
+        segmentA = getSegment(indexA);
+        offsetA = getOffset(indexA);
 
-        double tmp = values[segmentA][offsetA];
+        segmentB = getSegment(indexB);
+        offsetB = getOffset(indexB);
+
+        tmp = values[segmentA][offsetA];
         values[segmentA][offsetA] = values[segmentB][offsetB];
         values[segmentB][offsetB] = tmp;
     }
@@ -691,13 +714,7 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     private int compare(long indexA, long indexB)
     {
-        double a = get(indexA);
-        double b = get(indexB);
-        if (a < b)
-            return -1;
-        if (a > b)
-            return 1;
-        return 0;
+        return Double.compare(get(indexA), get(indexB));
     }
 
     /***************************************************************************
@@ -798,9 +815,11 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     public long binarySearch(long from, long to, double value)
     {
-        long minIdx = from;
-        long maxIdx = to - 1;
-        long midIdx = -1;
+        long minIdx, maxIdx, midIdx;
+
+        minIdx = from;
+        maxIdx = to - 1;
+        midIdx = -1;
 
         if (value < get(minIdx))
             return -1;
@@ -878,29 +897,32 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
     /**
      * Updates this array from the provided array.
      * <p>
-     * Values from other array starting at <code>from</code> until
-     * <code>to</code> (exclusive) will be copied to this array, starting
-     * from the <code>insertionPoint</code> onwards.
+     * Values from other array starting at {@code from} until
+     * {@code to} (exclusive) will be copied to this array, starting
+     * from the {@code insertionPoint} onwards.
      *
      * @param array          Array to update from
-     * @param from           Index in <code>array</code> from where to update,
+     * @param from           Index in {@code array} from where to update,
      *                       inclusive
-     * @param to             Index in <code>array</code> until where to update,
+     * @param to             Index in {@code array} until where to update,
      *                       exclusive
      * @param insertionPoint Starting index in this array to update
      */
     public void updateFrom(LargeDoubleArray array, long from, long to, long insertionPoint)
     {
-        long length = to - from;
+        long length, i;
+        int segmentFrom, offsetFrom, segment, offset;
+
+        length = to - from;
         // Determine initial indices for this array
-        int segmentFrom = getSegment(from);
-        int offsetFrom = getOffset(from);
+        segmentFrom = getSegment(from);
+        offsetFrom = getOffset(from);
 
         // Determine initial indices for new array
-        int segment = getSegment(insertionPoint);
-        int offset = getOffset(insertionPoint);
+        segment = getSegment(insertionPoint);
+        offset = getOffset(insertionPoint);
 
-        for (long i = 0; i < length; i++)
+        for (i = 0; i < length; i++)
         {
             if (offsetFrom >= MAX_SIZE_ARRAY)
             {
@@ -931,35 +953,39 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     public LargeDoubleArray copyOfRange(long from, long to)
     {
-        long length_new = to - from;
-        LargeDoubleArray copy = new LargeDoubleArray(length_new);
+        long lengthNew, i;
+        int segmentOrig, offsetOrig, segmentNew, offsetNew;
+        LargeDoubleArray copy;
+
+        lengthNew = to - from;
+        copy = new LargeDoubleArray(lengthNew);
 
         // Determine initial indices for this array
-        int segment_orig = getSegment(from);
-        int offset_orig = getOffset(from);
+        segmentOrig = getSegment(from);
+        offsetOrig = getOffset(from);
 
         // Determine initial indices for new array
-        int segment_new = 0;
-        int offset_new = 0;
+        segmentNew = 0;
+        offsetNew = 0;
 
-        for (long i = 0; i < length_new; i++)
+        for (i = 0; i < lengthNew; i++)
         {
-            if (offset_orig >= MAX_SIZE_ARRAY)
+            if (offsetOrig >= MAX_SIZE_ARRAY)
             {
-                offset_orig = 0;
-                segment_orig++;
+                offsetOrig = 0;
+                segmentOrig++;
             }
-            if (offset_new >= MAX_SIZE_ARRAY)
+            if (offsetNew >= MAX_SIZE_ARRAY)
             {
-                offset_new = 0;
-                segment_new++;
+                offsetNew = 0;
+                segmentNew++;
             }
 
             // Copy actual value
-            copy.values[segment_new][offset_new] = this.values[segment_orig][offset_orig];
+            copy.values[segmentNew][offsetNew] = this.values[segmentOrig][offsetOrig];
 
-            offset_orig++;
-            offset_new++;
+            offsetOrig++;
+            offsetNew++;
         }
         return copy;
     }
@@ -993,9 +1019,10 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
     public double[] toArray(long from, long to)
     {
         // Upper bound of a single array seems to be Integer.MAX_VALUE - 5
-        int length = (int)(to - from), segment, offset, i;
+        int length, segment, offset, i;
         double[] array;
 
+        length = (int)(to - from);
         array = new double[length];
 
         // Determine initial indices for this array
@@ -1084,13 +1111,13 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
      */
     public class Iterator implements PrimitiveIterator.OfDouble
     {
-        private int maxSegment = 0;
-        private int maxOffset = 0;
+        private final int maxSegment;
+        private final int maxOffset;
 
-        private int currentMaxOffset = 0;
+        private int currentMaxOffset;
 
-        private int segment = 0;
-        private int offset = 0;
+        private int segment;
+        private int offset;
 
         private boolean hasNext;
 
@@ -1101,6 +1128,9 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
         {
             maxSegment = values.length - 1;
             maxOffset = values[maxSegment].length;
+
+            segment = 0;
+            offset = 0;
 
             currentMaxOffset = values[segment].length;
 
@@ -1161,7 +1191,8 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
         @Override
         public double nextDouble()
         {
-            double val = values[segment][offset];
+            double val;
+            val = values[segment][offset];
             offset++;
             if (offset >= currentMaxOffset)
             {
