@@ -127,9 +127,8 @@ public abstract class CPMClusteringAlgorithm implements Cloneable, QualityCluste
         }
         quality += network.totalEdgeWeightSelfLinks;
 
-        clusterWeights = new double[clustering.nClusters];
-        for (i = 0; i < network.nNodes; i++)
-            clusterWeights[clustering.clusters[i]] += network.nodeWeights[i];
+        clusterWeights = clustering.getClusterWeights(network);
+
         for (i = 0; i < clustering.nClusters; i++)
             quality -= clusterWeights[i] * clusterWeights[i] * resolution;
 
@@ -156,11 +155,11 @@ public abstract class CPMClusteringAlgorithm implements Cloneable, QualityCluste
         double[] clusterWeights, totalEdgeWeightPerCluster;
         int i, j;
 
-        clusterWeights = new double[clustering.nClusters];
+        clusterWeights = clustering.getClusterWeights(network);
+
         totalEdgeWeightPerCluster = new double[clustering.nClusters];
         for (i = 0; i < network.nNodes; i++)
         {
-            clusterWeights[clustering.clusters[i]] += network.nodeWeights[i];
             if (clustering.clusters[i] == cluster)
                 for (j = network.firstNeighborIndices[i]; j < network.firstNeighborIndices[i + 1]; j++)
                     totalEdgeWeightPerCluster[clustering.clusters[network.neighbors[j]]] += network.edgeWeights[j];
