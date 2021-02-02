@@ -17,7 +17,7 @@ public class TestNetworkClustering
     public void setUp()
     {
         int[][] e = {{0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 7},
-                {1, 2, 0, 2, 3, 0, 1, 1, 4, 5, 3, 5, 3, 4, 6, 5, 7, 6}};
+                     {1, 2, 0, 2, 3, 0, 1, 1, 4, 5, 3, 5, 3, 4, 6, 5, 7, 6}};
         LargeIntArray[] edges = new LargeIntArray[2];
         edges[0] = new LargeIntArray(e[0]);
         edges[1] = new LargeIntArray(e[1]);

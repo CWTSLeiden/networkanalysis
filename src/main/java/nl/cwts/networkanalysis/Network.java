@@ -868,12 +868,13 @@ public class Network implements Serializable
      *
      * @return Pruned network
      */
-    public Network createPrunedNetwork(int maxNEdges, Random random)
+    public Network createPrunedNetwork(long maxNEdges, Random random)
     {
         double edgeWeightThreshold, randomNumberThreshold;
         LargeDoubleArray edgeWeights;
-        double[] randomNumbers, randomNumbersEdgesAtThreshold;
-        int i, j, nEdgesAboveThreshold, nEdgesAtThreshold;
+        LargeDoubleArray randomNumbers, randomNumbersEdgesAtThreshold;
+        int j;
+        long i, nEdgesAboveThreshold, nEdgesAtThreshold;
         long k;
         Network prunedNetwork;
 
@@ -904,9 +905,11 @@ public class Network implements Serializable
         while ((nEdgesAboveThreshold + nEdgesAtThreshold < nEdges / 2) && (edgeWeights.get(nEdges / 2 - nEdgesAboveThreshold - nEdgesAtThreshold - 1) == edgeWeightThreshold))
             nEdgesAtThreshold++;
 
-        randomNumbers = nl.cwts.util.Arrays.createDoubleArrayOfRandomNumbers(nNodes * nNodes, random);
+        randomNumbers = new LargeDoubleArray(nNodes * nNodes);
+        for (i = 0; i < randomNumbers.size(); i++)
+            randomNumbers.set(i, random.nextDouble());
 
-        randomNumbersEdgesAtThreshold = new double[nEdgesAtThreshold];
+        randomNumbersEdgesAtThreshold = new LargeDoubleArray(nEdgesAtThreshold);
         i = 0;
         for (j = 0; j < nNodes; j++)
         {
@@ -915,14 +918,17 @@ public class Network implements Serializable
             {
                 if (this.edgeWeights.get(k) == edgeWeightThreshold)
                 {
-                    randomNumbersEdgesAtThreshold[i] = getRandomNumber(j, neighbors.get(k), randomNumbers);
+                    randomNumbersEdgesAtThreshold.set(i,
+                                                      getRandomNumber(j,
+                                                                      neighbors.get(k), randomNumbers));
                     i++;
                 }
                 k++;
             }
         }
-        Arrays.sort(randomNumbersEdgesAtThreshold);
-        randomNumberThreshold = randomNumbersEdgesAtThreshold[nEdgesAboveThreshold + nEdgesAtThreshold - maxNEdges / 2];
+        randomNumbersEdgesAtThreshold.sort();
+        randomNumberThreshold =
+                randomNumbersEdgesAtThreshold.get(nEdgesAboveThreshold + nEdgesAtThreshold - maxNEdges / 2);
 
         prunedNetwork = new Network();
 
@@ -1462,7 +1468,7 @@ public class Network implements Serializable
         return totalEdgeWeightPerNode;
     }
 
-    private double getRandomNumber(int node1, int node2, double[] randomNumbers)
+    private double getRandomNumber(int node1, int node2, LargeDoubleArray randomNumbers)
     {
         int i, j;
 
@@ -1476,7 +1482,7 @@ public class Network implements Serializable
             i = node2;
             j = node1;
         }
-        return randomNumbers[i * nNodes + j];
+        return randomNumbers.get(i * nNodes + j);
     }
 
     protected Network createSubnetwork(Clustering clustering, int cluster, int[] nodes, int[] subnetworkNodes, LargeIntArray subnetworkNeighbors, LargeDoubleArray subnetworkEdgeWeights)
