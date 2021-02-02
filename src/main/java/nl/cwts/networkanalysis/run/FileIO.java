@@ -12,8 +12,8 @@ import java.util.Arrays;
 import nl.cwts.networkanalysis.Clustering;
 import nl.cwts.networkanalysis.Layout;
 import nl.cwts.networkanalysis.Network;
-import nl.cwts.util.DynamicDoubleArray;
-import nl.cwts.util.DynamicIntArray;
+import nl.cwts.util.LargeDoubleArray;
+import nl.cwts.util.LargeIntArray;
 
 /**
  * Utility functions for file I/O.
@@ -45,10 +45,12 @@ public class FileIO
     public static Network readEdgeList(String filename, boolean weightedEdges, boolean sortedEdgeList)
     {
         // Read edge list.
-        DynamicIntArray[] edges = new DynamicIntArray[2];
-        edges[0] = new DynamicIntArray(100);
-        edges[1] = new DynamicIntArray(100);
-        DynamicDoubleArray edgeWeights = weightedEdges ? new DynamicDoubleArray(100) : null;
+        LargeIntArray[] edges = new LargeIntArray[2];
+        edges[0] = new LargeIntArray(0); edges[0].ensureCapacity(100);
+        edges[1] = new LargeIntArray(0); edges[1].ensureCapacity(100);
+        LargeDoubleArray edgeWeights = weightedEdges ? new LargeDoubleArray(0) : null;
+        if (edgeWeights != null)
+            edgeWeights.ensureCapacity(100);
         int nNodes = 0;
         BufferedReader reader = null;
         try
@@ -124,15 +126,12 @@ public class FileIO
 
         // Create network.
         Network network = null;
-        int[][] edges2 = new int[2][];
-        edges2[0] = edges[0].toArray();
-        edges2[1] = edges[1].toArray();
         try
         {
             if (weightedEdges)
-                network = new Network(nNodes, true, edges2, edgeWeights.toArray(), sortedEdgeList, true);
+                network = new Network(nNodes, true, edges, edgeWeights, sortedEdgeList, true);
             else
-                network = new Network(nNodes, true, edges2, sortedEdgeList, true);
+                network = new Network(nNodes, true, edges, sortedEdgeList, true);
         }
         catch (IllegalArgumentException e)
         {

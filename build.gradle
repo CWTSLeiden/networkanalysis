@@ -15,11 +15,30 @@ java {
     withSourcesJar()
 }
 
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'it.unimi.dsi:fastutil:8.4.3'
+    runtime 'it.unimi.dsi:fastutil:8.4.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
 jar {
-   manifest {
+    manifest {
         attributes('Implementation-Title': project.name,
-            'Implementation-Version': project.version)
-   }
+                'Implementation-Version': project.version)
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+test {
+    useJUnitPlatform()
 }
 
 publishing {

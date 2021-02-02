@@ -170,20 +170,21 @@ public abstract class VOSLayoutAlgorithm implements Cloneable, QualityLayoutAlgo
     {
         double distance, distance1, distance2, quality;
         int i, j;
+        long k;
 
         quality = 0;
 
         for (i = 0; i < network.nNodes; i++)
-            for (j = network.firstNeighborIndices[i]; j < network.firstNeighborIndices[i + 1]; j++)
-                if (network.neighbors[j] < i)
+            for (k = network.firstNeighborIndices[i]; k < network.firstNeighborIndices[i + 1]; k++)
+                if (network.neighbors.get(k) < i)
                 {
-                    distance1 = layout.coordinates[0][i] - layout.coordinates[0][network.neighbors[j]];
-                    distance2 = layout.coordinates[1][i] - layout.coordinates[1][network.neighbors[j]];
+                    distance1 = layout.coordinates[0][i] - layout.coordinates[0][network.neighbors.get(k)];
+                    distance2 = layout.coordinates[1][i] - layout.coordinates[1][network.neighbors.get(k)];
                     distance = Math.sqrt(distance1 * distance1 + distance2 * distance2);
                     if (attraction != 0)
-                        quality += network.edgeWeights[j] * FastMath.fastPow(distance, attraction) / attraction;
+                        quality += network.edgeWeights.get(k) * FastMath.fastPow(distance, attraction) / attraction;
                     else
-                        quality += network.edgeWeights[j] * Math.log(distance);
+                        quality += network.edgeWeights.get(k) * Math.log(distance);
                 }
 
         for (i = 0; i < network.nNodes; i++)

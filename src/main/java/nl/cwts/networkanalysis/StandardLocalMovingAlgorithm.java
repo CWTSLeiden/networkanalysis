@@ -86,7 +86,8 @@ public class StandardLocalMovingAlgorithm extends IncrementalCPMClusteringAlgori
         boolean update;
         double maxQualityValueIncrement, qualityValueIncrement;
         double[] clusterWeights, edgeWeightPerCluster;
-        int bestCluster, currentCluster, i, j, k, l, nNeighboringClusters, nUnstableNodes, nUnusedClusters;
+        int bestCluster, currentCluster, i, j, l, m, nNeighboringClusters, nUnstableNodes, nUnusedClusters;
+        long k;
         int[] neighboringClusters, nNodesPerCluster, nodeOrder, unusedClusters;
 
         if (network.nNodes == 1)
@@ -149,13 +150,13 @@ public class StandardLocalMovingAlgorithm extends IncrementalCPMClusteringAlgori
             nNeighboringClusters = 1;
             for (k = network.firstNeighborIndices[j]; k < network.firstNeighborIndices[j + 1]; k++)
             {
-                l = clustering.clusters[network.neighbors[k]];
+                l = clustering.clusters[network.neighbors.get(k)];
                 if (edgeWeightPerCluster[l] == 0)
                 {
                     neighboringClusters[nNeighboringClusters] = l;
                     nNeighboringClusters++;
                 }
-                edgeWeightPerCluster[l] += network.edgeWeights[k];
+                edgeWeightPerCluster[l] += network.edgeWeights.get(k);
             }
 
             /*
@@ -171,9 +172,9 @@ public class StandardLocalMovingAlgorithm extends IncrementalCPMClusteringAlgori
              */
             bestCluster = currentCluster;
             maxQualityValueIncrement = edgeWeightPerCluster[currentCluster] - network.nodeWeights[j] * clusterWeights[currentCluster] * resolution;
-            for (k = 0; k < nNeighboringClusters; k++)
+            for (m = 0; m < nNeighboringClusters; m++)
             {
-                l = neighboringClusters[k];
+                l = neighboringClusters[m];
 
                 qualityValueIncrement = edgeWeightPerCluster[l] - network.nodeWeights[j] * clusterWeights[l] * resolution;
                 if (qualityValueIncrement > maxQualityValueIncrement)
