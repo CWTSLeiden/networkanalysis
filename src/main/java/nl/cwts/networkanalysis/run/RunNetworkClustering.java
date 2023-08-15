@@ -101,7 +101,7 @@ public final class RunNetworkClustering
      * Description text.
      */
     public static final String DESCRIPTION
-        = "RunNetworkClustering version 1.1.0\n"
+        = "RunNetworkClustering version 1.2.0\n"
           + "By Vincent Traag, Ludo Waltman, and Nees Jan van Eck\n"
           + "Centre for Science and Technology Studies (CWTS), Leiden University\n";
 

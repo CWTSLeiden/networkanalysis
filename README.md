@@ -28,14 +28,14 @@ The documentation is also available in a [compiled format](https://CWTSLeiden.gi
 <dependency>
     <groupId>nl.cwts</groupId>
     <artifactId>networkanalysis</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```
-implementation group: 'nl.cwts', name: 'networkanalysis', version: '1.1.0'
+implementation group: 'nl.cwts', name: 'networkanalysis', version: '1.2.0'
 ```
 
 ## Usage
@@ -48,13 +48,13 @@ To run the clustering algorithms, the command-line tool `RunNetworkClustering` i
 The tool can be run as follows:
 
 ```
-java -cp networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkClustering
+java -cp networkanalysis-1.2.0.jar nl.cwts.networkanalysis.run.RunNetworkClustering
 ```
 
 If no further arguments are provided, the following usage notice will be displayed:
 
 ```
-RunNetworkClustering version 1.1.0
+RunNetworkClustering version 1.2.0
 By Vincent Traag, Ludo Waltman, and Nees Jan van Eck
 Centre for Science and Technology Studies (CWTS), Leiden University
 
@@ -112,13 +112,13 @@ To run the layout algorithm, the command-line tool `RunNetworkLayout` is provide
 The tool can be run as follows:
 
 ```
-java -cp networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkLayout
+java -cp networkanalysis-1.2.0.jar nl.cwts.networkanalysis.run.RunNetworkLayout
 ```
 
 If no further arguments are provided, the following usage notice will be displayed:
 
 ```
-RunNetworkLayout version 1.1.0
+RunNetworkLayout version 1.2.0
 By Nees Jan van Eck and Ludo Waltman
 Centre for Science and Technology Studies (CWTS), Leiden University
 
@@ -211,7 +211,7 @@ Nodes must be represented by integer numbers starting from 0.
 Assuming that the edge list has been saved in the file `network.txt`, the `RunNetworkClustering` tool can be run as follows:
 
 ```
-java -cp networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkClustering -r 0.2 -o clusters.txt network.txt
+java -cp networkanalysis-1.2.0.jar nl.cwts.networkanalysis.run.RunNetworkClustering -r 0.2 -o clusters.txt network.txt
 ```
 
 In this case, clusters are identified using the Leiden algorithm.
@@ -236,7 +236,7 @@ Cluster 1 includes nodes 3, 4, and 5.
 The `RunNetworkLayout` tool can be run as follows:
 
 ```
-java -cp networkanalysis-1.1.0.jar nl.cwts.networkanalysis.run.RunNetworkLayout -o layout.txt network.txt
+java -cp networkanalysis-1.2.0.jar nl.cwts.networkanalysis.run.RunNetworkLayout -o layout.txt network.txt
 ```
 
 In this case, the default parameter values are used for the VOS layout technique.

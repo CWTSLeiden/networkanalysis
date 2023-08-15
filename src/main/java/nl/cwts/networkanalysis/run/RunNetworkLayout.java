@@ -101,7 +101,7 @@ public class RunNetworkLayout
      * Description text.
      */
     public static final String DESCRIPTION
-        = "RunNetworkLayout version 1.1.0\n"
+        = "RunNetworkLayout version 1.2.0\n"
           + "By Nees Jan van Eck and Ludo Waltman\n"
           + "Centre for Science and Technology Studies (CWTS), Leiden University\n";
 
