@@ -3,22 +3,45 @@
 [![Build master branch](https://github.com/CWTSLeiden/networkanalysis/workflows/Build%20master%20branch/badge.svg?branch=master)](https://github.com/CWTSLeiden/networkanalysis/actions)
 [![License: MIT](https://badgen.net/github/license/CWTSLeiden/networkanalysis?label=License&color=yellow)](https://github.com/CWTSLeiden/networkanalysis/blob/master/LICENSE)
 [![Latest release](https://badgen.net/github/release/CWTSLeiden/networkanalysis?label=Release)](https://github.com/CWTSLeiden/networkanalysis/releases)
-[![DOI](https://zenodo.org/badge/153760626.svg)](https://zenodo.org/badge/latestdoi/153760626)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1466830.svg)](https://doi.org/10.5281/zenodo.1466830)
 
 ## Introduction
 
-This package provides algorithms and data structures for network analysis in `java`.
+This Java package provides algorithms and data structures for network analysis.
 Currently, the package focuses on clustering (or community detection) and layout (or mapping) of networks.
 In particular, the package contains an implementation of the [Leiden algorithm](https://arxiv.org/abs/1810.08473) and the [Louvain algorithm](https://arxiv.org/abs/0803.0476) for network clustering and the [VOS technique](https://arxiv.org/abs/1003.2551) for network layout.
 Only undirected networks are supported.
 
-This package requires `java 1.8.0` or higher.
+The networkanalysis package was developed by [Nees Jan van Eck](https://orcid.org/0000-0001-8448-4521), [Vincent Traag](https://orcid.org/0000-0003-3170-3879), and [Ludo Waltman](https://orcid.org/0000-0001-8249-1752) at the [Centre for Science and Technology Studies (CWTS)](https://www.cwts.nl) at [Leiden University](https://www.universiteitleiden.nl/en).
+
+## Documentation
+
+Documentation is provided in the source code in `javadoc` format.
+The documentation is also available in a [compiled format](https://CWTSLeiden.github.io/networkanalysis).
+
+## Installation
+
+### Maven
+
+```
+<dependency>
+    <groupId>nl.cwts</groupId>
+    <artifactId>networkanalysis</artifactId>
+    <version>1.1.0</version>
+</dependency>
+```
+
+### Gradle
+
+```
+implementation group: 'nl.cwts', name: 'networkanalysis', version: '1.1.0'
+```
 
 ## Usage
 
-The latest version of this package is available as a pre-compiled `jar` file in the GitHub [release](https://github.com/CWTSLeiden/networkanalysis/releases/latest).
-The source code is also available in this repository.
-You can use it to [compile](#compilation) the code yourself.
+The networkanalysis package requires Java 8 or higher.
+The latest version of the package is available as a pre-compiled `jar` on [Maven Central](https://central.sonatype.com/artifact/nl.cwts/networkanalysis) and [GitHub Packages](https://github.com/CWTSLeiden/networkanalysis/packages).
+Instructions for compiling the source code of the package are provided [below](#development-and-deployment).
 
 To run the clustering algorithms, the command-line tool `RunNetworkClustering` is provided.
 The tool can be run as follows:
@@ -233,10 +256,29 @@ In the above example, the edges in the file `network.txt` have not been sorted.
 To provide a sorted edge list as input, include the edges in both directions and use the option ``--sorted-edge-list``.
 Furthermore, edge weights can be provided by adding a third column to the file `network.txt` and by using the option ``--weighted-edges``.
 
-## Compilation
+## License
 
-You must have JDK 1.8+ installed to compile.
-Having Gradle installed is optional as the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) is also included in this repository.
+The networkanalysis package is distributed under the [MIT license](LICENSE).
+
+## Issues
+
+If you encounter any issues, please report them using the [issue tracker](https://github.com/CWTSLeiden/networkanalysis/issues) on GitHub.
+
+## Contribution
+
+You are welcome to contribute to the development of the networkanalysis package.
+Please follow the typical GitHub workflow: Fork from this repository and make a pull request to submit your changes.
+Make sure that your pull request has a clear description and that your source code has been properly tested.
+
+## Development and deployment
+
+The latest stable version of the source code is available in the [`master`](https://github.com/CWTSLeiden/networkanalysis/tree/master) branch on GitHub.
+The most recent version of the source code, which may be under development, is available in the [`develop`](https://github.com/CWTSLeiden/networkanalysis/tree/develop) branch.
+
+### Compilation
+
+To compile the source code of the networkanalysis package, a [Java Development Kit](https://jdk.java.net) needs to be installed on your system (version 8 or higher). Having [Gradle](https://www.gradle.org) installed is optional as the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) is also included in this repository.
+
 On Windows, the source code can be compiled as follows:
 
 ```
@@ -254,7 +296,7 @@ The compiled `jar` file will be output to the directory `build/libs`.
 The compiled `javadoc` files will be output to the directory `build/docs`.
 
 There are two `main` methods, one in the class `nl.cwts.networkanalysis.run.RunNetworkClustering` and one in the class `nl.cwts.networkanalysis.run.RunNetworkLayout`.
-After the code has been compiled, the `RunNetworkClustering` tool can be run as follows:
+After compiling the source code, the `RunNetworkClustering` tool can be run as follows:
 
 ```
 java -cp build/libs/networkanalysis-<version>.jar nl.cwts.networkanalysis.run.RunNetworkClustering
@@ -266,25 +308,12 @@ The `RunNetworkLayout` tool can be run as follows:
 java -cp build/libs/networkanalysis-<version>.jar nl.cwts.networkanalysis.run.RunNetworkLayout
 ```
 
-The latest stable version of the code is available from the [`master`](https://github.com/CWTSLeiden/networkanalysis/tree/master) branch on GitHub.
-The most recent code, which may be under development, is available from the [`develop`](https://github.com/CWTSLeiden/networkanalysis/tree/develop) branch.
+### References
 
-## Issues
+> Traag, V.A., Waltman, L., & Van Eck, N.J. (2019). From Louvain to Leiden: Guaranteeing well-connected communities. *Scientific Reports*, 9, 5233. https://doi.org/10.1038/s41598-019-41695-z
 
-If you encounter any issues, please report them using the [issue tracker](https://github.com/CWTSLeiden/networkanalysis/issues).
+> Van Eck, N.J., Waltman, L., Dekker, R., & Van den Berg, J. (2010). A comparison of two techniques for bibliometric mapping: Multidimensional scaling and VOS. *Journal of the American Society for Information Science and Technology*, 61(12), 2405-2416. https://doi.org/10.1002/asi.21421
 
-## Documentation
+> Waltman, L., Van Eck, N.J., & Noyons, E.C.M. (2010). A unified approach to mapping and clustering of bibliometric networks. *Journal of Informetrics*, 4(4), 629-635. https://doi.org/10.1016/j.joi.2010.07.002
 
-Documentation of the source code is provided in the code in `javadoc` format.
-The documentation is also available in a [compiled format](https://CWTSLeiden.github.io/networkanalysis).
-
-## Contribution
-
-You are welcome to contribute to this package.
-Please follow the typical GitHub workflow: fork from this repository and make a pull request to submit your changes.
-At the moment, we have not yet set up any continuous integration, so please make sure that any proposed pull request compiles and functions correctly.
-
-## License
-
-This package is distributed under the MIT License.
-Please refer to the [`LICENSE`](LICENSE) file for further details.
+> Van Eck, N.J., & Waltman, L. (2009). How to normalize co-occurrence data? An analysis of some well-known similarity measures. *Journal of the American Society for Information Science and Technology*, 60(8), 1635-1651. https://doi.org/10.1002/asi.21075
