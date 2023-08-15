@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+type: "software"
+authors:
+  - family-names: "Van Eck"
+    given-names: "Nees Jan"
+    orcid: "https://orcid.org/0000-0001-8448-4521"
+    email: "ecknjpvan@cwts.leidenuniv.nl"
+    affiliation: "Centre for Science and Technology Studies (CWTS), Leiden University"
+  - family-names: "Traag"
+    given-names: "Vincent"
+    orcid: "https://orcid.org/0000-0003-3170-3879"
+    email: "v.a.traag@cwts.leidenuniv.nl"
+    affiliation: "Centre for Science and Technology Studies (CWTS), Leiden University"
+  - family-names: "Waltman"
+    given-names: "Ludo"
+    orcid: "https://orcid.org/0000-0001-8249-1752"
+    email: "waltmanlr@cwts.leidenuniv.nl"
+    affiliation: "Centre for Science and Technology Studies (CWTS), Leiden University"
+title: "networkanalysis"
+abstract: "This Java package provides algorithms and data structures for network analysis. Currently, the package focuses on clustering (or community detection) and layout (or mapping) of networks. In particular, the package contains an implementation of the Leiden algorithm and the Louvain algorithm for network clustering and the VOS technique for network layout. Only undirected networks are supported."
+keywords:
+  - network analysis
+  - clustering
+  - community detection
+  - clustering algorithm
+  - Leiden algorithm
+  - Louvain algorithm
+  - layout
+  - mapping
+  - layout algorithm
+  - VOS technique
+  - Java
+url: "https://github.com/CWTSLeiden/networkanalysis#readme"
+repository-code: "https://github.com/CWTSLeiden/networkanalysis"
+repository-artifact: "https://central.sonatype.com/artifact/nl.cwts/networkanalysis/"
+license: MIT
+doi: 10.5281/zenodo.1466830
+version: 1.1.0
+date-released: 2020-11-04
