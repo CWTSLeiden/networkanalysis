@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
-    id 'com.palantir.git-version' version '0.12.3'
+    id 'com.palantir.git-version' version '3.0.0'
 }
 
 group = 'nl.cwts'
