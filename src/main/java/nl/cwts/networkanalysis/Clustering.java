@@ -147,7 +147,7 @@ public class Clustering implements Cloneable, Serializable
     }
 
     /**
-     * Returns whether cluster is empty or not.
+     * Returns whether the cluster is empty or not for each cluster.
      *
      * @return Cluster is empty for each cluster
      */
@@ -167,7 +167,10 @@ public class Clustering implements Cloneable, Serializable
     }
 
     /**
-     * @return Number of non-empty clusters.
+     * Returns the number of non-empty clusters.
+     * 
+     * @return Number of non-empty clusters
+     * 
      * @see #getClusterIsNotEmpty()
      */
     public int getNNonEmptyClusters()
@@ -284,7 +287,6 @@ public class Clustering implements Cloneable, Serializable
      * Clusters are relabeled to follow a strictly consecutive numbering {@code
      * 0, ..., nClusters - 1}.
      * </p>
-     *
      */
     public void removeEmptyClusters()
     {
@@ -304,7 +306,7 @@ public class Clustering implements Cloneable, Serializable
      * remain as they are.
      * </p>
      *
-     * @param minimumCluster Minimum cluster to start relabeling from.
+     * @param minimumCluster Minimum cluster to start relabeling from
      */
     public void removeEmptyClustersLargerThan(int minimumCluster)
     {
@@ -335,8 +337,10 @@ public class Clustering implements Cloneable, Serializable
     /**
      * Determine the total node weight of all nodes per cluster.
      *
-     * @param network Network with node weights.
-     * @return Total node weight per cluster.
+     * @param network Network with node weights
+     * 
+     * @return Total node weight per cluster
+     * 
      * @see #getClusterWeights(double[] nodeWeight)
      */
     public double[] getClusterWeights(Network network)
@@ -347,8 +351,9 @@ public class Clustering implements Cloneable, Serializable
     /**
      * Determine the total node weight of all nodes per cluster.
      *
-     * @param nodeWeights Array of node weights.
-     * @return Total node weight per cluster.
+     * @param nodeWeights Array of node weights
+     * 
+     * @return Total node weight per cluster
      */
     public double[] getClusterWeights(double[] nodeWeights)
     {
