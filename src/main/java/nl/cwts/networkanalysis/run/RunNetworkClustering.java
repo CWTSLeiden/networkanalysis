@@ -165,12 +165,12 @@ public final class RunNetworkClustering
      */
     public static void main(String[] args)
     {
-        System.err.println(DESCRIPTION);
+        System.out.println(DESCRIPTION);
 
         // Process command line arguments.
         if (args.length == 0)
         {
-            System.err.print(USAGE);
+            System.out.print(USAGE);
             System.exit(-1);
         }
 
@@ -359,38 +359,38 @@ public final class RunNetworkClustering
         edgeListFilename = args[argIndex];
 
         // Read edge list from file.
-        System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
+        System.out.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
         long startTimeEdgeListFile = System.currentTimeMillis();
         Network network = FileIO.readEdgeList(edgeListFilename, weightedEdges, sortedEdgeList);
-        System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
-        System.err.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
+        System.out.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
+        System.out.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
 
         // Read initial clustering from file.
         Clustering initialClustering = null;
         if (initialClusteringFilename != null)
         {
-            System.err.println("Reading initial clustering from '" + initialClusteringFilename + "'.");
+            System.out.println("Reading initial clustering from '" + initialClusteringFilename + "'.");
             initialClustering = FileIO.readClustering(initialClusteringFilename, network.getNNodes());
-            System.err.println("Initial clustering consists of " + initialClustering.getNClusters() + " clusters.");
+            System.out.println("Initial clustering consists of " + initialClustering.getNClusters() + " clusters.");
         }
         else
         {
-            System.err.println("Using singleton initial clustering.");
+            System.out.println("Using singleton initial clustering.");
             initialClustering = new Clustering(network.getNNodes());
         }
 
         // Run algorithm for network clustering.
-        System.err.println("Running " + (useLouvain ? ALGORITHM_NAMES[LOUVAIN] : ALGORITHM_NAMES[LEIDEN]) + " algorithm.");
-        System.err.println("Quality function:             " + (useModularity ? QUALITY_FUNCTION_NAMES[MODULARITY] : QUALITY_FUNCTION_NAMES[CPM]));
+        System.out.println("Running " + (useLouvain ? ALGORITHM_NAMES[LOUVAIN] : ALGORITHM_NAMES[LEIDEN]) + " algorithm.");
+        System.out.println("Quality function:             " + (useModularity ? QUALITY_FUNCTION_NAMES[MODULARITY] : QUALITY_FUNCTION_NAMES[CPM]));
         if (!useModularity)
-            System.err.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
-        System.err.println("Resolution parameter:         " + resolution);
-        System.err.println("Minimum cluster size:         " + minClusterSize);
-        System.err.println("Number of random starts:      " + nRandomStarts);
-        System.err.println("Number of iterations:         " + nIterations);
+            System.out.println("Normalization method:         " + NORMALIZATION_NAMES[normalization]);
+        System.out.println("Resolution parameter:         " + resolution);
+        System.out.println("Minimum cluster size:         " + minClusterSize);
+        System.out.println("Number of random starts:      " + nRandomStarts);
+        System.out.println("Number of iterations:         " + nIterations);
         if (!useLouvain)
-            System.err.println("Randomness parameter:         " + randomness);
-        System.err.println("Random number generator seed: " + (useSeed ? seed : "random"));
+            System.out.println("Randomness parameter:         " + randomness);
+        System.out.println("Random number generator seed: " + (useSeed ? seed : "random"));
 
         long startTimeAlgorithm = System.currentTimeMillis();
         if (!useModularity)
@@ -413,7 +413,7 @@ public final class RunNetworkClustering
             algorithm.improveClustering(network, clustering);
             double quality = algorithm.calcQuality(network, clustering);
             if (nRandomStarts > 1)
-                System.err.println("Quality function in random start " + (i + 1) + " equals " + quality + ".");
+                System.out.println("Quality function in random start " + (i + 1) + " equals " + quality + ".");
             if (quality > maxQuality)
             {
                 finalClustering = clustering;
@@ -421,21 +421,21 @@ public final class RunNetworkClustering
             }
         }
         finalClustering.orderClustersByNNodes();
-        System.err.println("Running algorithm took " + (System.currentTimeMillis() - startTimeAlgorithm) / 1000 + "s.");
+        System.out.println("Running algorithm took " + (System.currentTimeMillis() - startTimeAlgorithm) / 1000 + "s.");
         if (nRandomStarts > 1)
-            System.err.println("Maximum value of quality function in " + nRandomStarts + " random starts equals " + maxQuality + ".");
+            System.out.println("Maximum value of quality function in " + nRandomStarts + " random starts equals " + maxQuality + ".");
         else
-            System.err.println("Quality function equals " + maxQuality + ".");
+            System.out.println("Quality function equals " + maxQuality + ".");
         if (minClusterSize > 1)
         {
-            System.err.println("Clustering consists of " + finalClustering.getNClusters() + " clusters.");
-            System.err.println("Removing clusters consisting of fewer than " + minClusterSize + " nodes.");
+            System.out.println("Clustering consists of " + finalClustering.getNClusters() + " clusters.");
+            System.out.println("Removing clusters consisting of fewer than " + minClusterSize + " nodes.");
             algorithm.removeSmallClustersBasedOnNNodes(network, finalClustering, minClusterSize);
         }
-        System.err.println("Final clustering consists of " + finalClustering.getNClusters() + " clusters.");
+        System.out.println("Final clustering consists of " + finalClustering.getNClusters() + " clusters.");
 
         // Write final clustering to file (or to standard output).
-        System.err.println("Writing final clustering to " + ((finalClusteringFilename == null) ? "standard output." : "'" + finalClusteringFilename + "'."));
+        System.out.println("Writing final clustering to " + ((finalClusteringFilename == null) ? "standard output." : "'" + finalClusteringFilename + "'."));
         FileIO.writeClustering(finalClusteringFilename, finalClustering);
     }
 

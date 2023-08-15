@@ -170,12 +170,12 @@ public class RunNetworkLayout
      */
     public static void main(String[] args)
     {
-        System.err.println(DESCRIPTION);
+        System.out.println(DESCRIPTION);
 
         // Process command line arguments.
         if (args.length == 0)
         {
-            System.err.print(USAGE);
+            System.out.print(USAGE);
             System.exit(-1);
         }
 
@@ -408,34 +408,34 @@ public class RunNetworkLayout
         edgeListFilename = args[argIndex];
 
         // Read edge list from file.
-        System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
+        System.out.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list from '" + edgeListFilename + "'.");
         long startTimeEdgeListFile = System.currentTimeMillis();
         Network network = FileIO.readEdgeList(edgeListFilename, weightedEdges, sortedEdgeList);
-        System.err.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
-        System.err.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
+        System.out.println("Reading " + (sortedEdgeList ? "sorted " : "") + "edge list took " + (System.currentTimeMillis() - startTimeEdgeListFile) / 1000 + "s.");
+        System.out.println("Network consists of " + network.getNNodes() + " nodes and " + network.getNEdges() + " edges" + (weightedEdges ? " with a total edge weight of " + network.getTotalEdgeWeight() : "") + ".");
 
         // Read initial layout from file.
         Layout initialLayout = null;
         if (initialLayoutFilename != null)
         {
-            System.err.println("Reading initial layout from '" + initialLayoutFilename + "'.");
+            System.out.println("Reading initial layout from '" + initialLayoutFilename + "'.");
             initialLayout = FileIO.readLayout(initialLayoutFilename, network.getNNodes());
         }
 
         // Run algorithm for network layout.
-        System.err.println("Running gradient descent VOS layout algorithm.");
-        System.err.println("Quality function:                              " + (useLinLog ? QUALITY_FUNCTION_NAMES[LINLOG] : QUALITY_FUNCTION_NAMES[VOS]));
+        System.out.println("Running gradient descent VOS layout algorithm.");
+        System.out.println("Quality function:                              " + (useLinLog ? QUALITY_FUNCTION_NAMES[LINLOG] : QUALITY_FUNCTION_NAMES[VOS]));
         if (!useLinLog)
-            System.err.println("Normalization method:                          " + NORMALIZATION_NAMES[normalization]);
-        System.err.println("Attraction parameter:                          " + attraction);
-        System.err.println("Repulsion parameter:                           " + repulsion);
-        System.err.println("Number of random starts:                       " + nRandomStarts);
-        System.err.println("Maximum number of iterations:                  " + maxNIterations);
-        System.err.println("Initial step size:                             " + initialStepSize);
-        System.err.println("Minimum step size:                             " + minStepSize);
-        System.err.println("Step size reduction:                           " + stepSizeReduction);
-        System.err.println("Required number of quality value improvements: " + requiredNQualityValueImprovements);
-        System.err.println("Random number generator seed:                  " + (useSeed ? seed : "random"));
+            System.out.println("Normalization method:                          " + NORMALIZATION_NAMES[normalization]);
+        System.out.println("Attraction parameter:                          " + attraction);
+        System.out.println("Repulsion parameter:                           " + repulsion);
+        System.out.println("Number of random starts:                       " + nRandomStarts);
+        System.out.println("Maximum number of iterations:                  " + maxNIterations);
+        System.out.println("Initial step size:                             " + initialStepSize);
+        System.out.println("Minimum step size:                             " + minStepSize);
+        System.out.println("Step size reduction:                           " + stepSizeReduction);
+        System.out.println("Required number of quality value improvements: " + requiredNQualityValueImprovements);
+        System.out.println("Random number generator seed:                  " + (useSeed ? seed : "random"));
 
         long startTimeAlgorithm = System.currentTimeMillis();
         if (!useLinLog)
@@ -458,7 +458,7 @@ public class RunNetworkLayout
             algorithm.improveLayout(network, layout);
             double quality = algorithm.calcQuality(network, layout);
             if (nRandomStarts > 1)
-                System.err.println("Quality function in random start " + (i + 1) + " equals " + quality + ".");
+                System.out.println("Quality function in random start " + (i + 1) + " equals " + quality + ".");
             if (quality < minQuality)
             {
                 finalLayout = layout;
@@ -466,14 +466,14 @@ public class RunNetworkLayout
             }
         }
         finalLayout.standardize(true);
-        System.err.println("Running algorithm took " + (System.currentTimeMillis() - startTimeAlgorithm) / 1000 + "s.");
+        System.out.println("Running algorithm took " + (System.currentTimeMillis() - startTimeAlgorithm) / 1000 + "s.");
         if (nRandomStarts > 1)
-            System.err.println("Minimum value of quality function in " + nRandomStarts + " random starts equals " + minQuality + ".");
+            System.out.println("Minimum value of quality function in " + nRandomStarts + " random starts equals " + minQuality + ".");
         else
-            System.err.println("Quality function equals " + minQuality + ".");
+            System.out.println("Quality function equals " + minQuality + ".");
 
         // Write final layout to file (or to standard output).
-        System.err.println("Writing final layout to " + ((finalLayoutFilename == null) ? "standard output." : "'" + finalLayoutFilename + "'."));
+        System.out.println("Writing final layout to " + ((finalLayoutFilename == null) ? "standard output." : "'" + finalLayoutFilename + "'."));
         FileIO.writeLayout(finalLayoutFilename, finalLayout);
     }
 
