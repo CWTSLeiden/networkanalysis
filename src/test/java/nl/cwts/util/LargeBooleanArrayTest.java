@@ -208,8 +208,11 @@ class LargeBooleanArrayTest
     void testClone()
     {
         LargeBooleanArray a2 = a.clone();
-
         for (long i = 0; i < a2.size(); i++)
-            assertEquals(a2.get(i), a.get(i));
+        {
+            assertEquals(a.get(i), a2.get(i));
+            a2.set(i, true);
+            assertEquals(false, a.get(i));
+        }
     }
 }
