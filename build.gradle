@@ -8,6 +8,16 @@ plugins {
 group = 'nl.cwts'
 version = gitVersion()
 
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'it.unimi.dsi:fastutil-core:8.5.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -15,21 +25,10 @@ java {
     withSourcesJar()
 }
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'it.unimi.dsi:fastutil:8.4.3'
-    runtime 'it.unimi.dsi:fastutil:8.4.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-}
-
 jar {
     manifest {
         attributes('Implementation-Title': project.name,
-                'Implementation-Version': project.version)
+            'Implementation-Version': project.version)
     }
 
     from {
