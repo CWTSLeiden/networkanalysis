@@ -774,7 +774,7 @@ public class Network implements Serializable
         normalizedNetwork.firstNeighborIndices = firstNeighborIndices;
         normalizedNetwork.neighbors = neighbors;
 
-        normalizedNetwork.edgeWeights = new LargeDoubleArray(nEdges);
+        normalizedNetwork.edgeWeights = edgeWeights.clone();
         totalNodeWeight = getTotalNodeWeight();
         for (i = 0; i < nNodes; i++)
             for (j = firstNeighborIndices[i]; j < firstNeighborIndices[i + 1]; j++)
@@ -824,7 +824,7 @@ public class Network implements Serializable
         normalizedNetwork.firstNeighborIndices = firstNeighborIndices;
         normalizedNetwork.neighbors = neighbors;
 
-        normalizedNetwork.edgeWeights = new LargeDoubleArray(nEdges);
+        normalizedNetwork.edgeWeights = edgeWeights.clone();
         for (i = 0; i < nNodes; i++)
             for (j = firstNeighborIndices[i]; j < firstNeighborIndices[i + 1]; j++)
                 normalizedNetwork.edgeWeights.divide(j, (2 / (nNodes / nodeWeights[i] + nNodes / nodeWeights[neighbors.get(j)])));
