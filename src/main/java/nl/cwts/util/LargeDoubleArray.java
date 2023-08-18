@@ -1057,7 +1057,9 @@ public final class LargeDoubleArray implements Cloneable, Iterable<Double>
         try
         {
             clonedArray = (LargeDoubleArray)super.clone();
-            clonedArray.values = values.clone();
+            clonedArray.values = new double[values.length][];
+            for (int i = 0; i < values.length; i++)
+                clonedArray.values[i] = values[i].clone();
             return clonedArray;
         }
         catch (CloneNotSupportedException e)

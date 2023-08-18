@@ -761,7 +761,9 @@ public final class LargeBooleanArray implements Cloneable
         try
         {
             clonedArray = (LargeBooleanArray)super.clone();
-            clonedArray.values = values.clone();
+            clonedArray.values = new boolean[values.length][];
+            for (int i = 0; i < values.length; i++)
+                clonedArray.values[i] = values[i].clone();
             return clonedArray;
         }
         catch (CloneNotSupportedException e)

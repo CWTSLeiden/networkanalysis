@@ -1056,7 +1056,9 @@ public final class LargeLongArray implements Cloneable, Iterable<Long>
         try
         {
             clonedArray = (LargeLongArray)super.clone();
-            clonedArray.values = values.clone();
+            clonedArray.values = new long[values.length][];
+            for (int i = 0; i < values.length; i++)
+                clonedArray.values[i] = values[i].clone();
             return clonedArray;
         }
         catch (CloneNotSupportedException e)
