@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'com.palantir.git-version' version '3.0.0'
 }
 
@@ -30,10 +31,15 @@ jar {
         attributes('Implementation-Title': project.name,
             'Implementation-Version': project.version)
     }
+}
 
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+assemble.dependsOn shadowJar
+
+shadowJar {
+    archiveBaseName.set(project.name)
+    archiveClassifier.set('')
+    archiveVersion.set(project.version)
+    minimize()
 }
 
 test {
