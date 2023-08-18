@@ -17,3 +17,6 @@ bin/
 .project
 .settings/
 .gradle/
+fastutil-8.4.2.jar
+.idea/
+*.iml

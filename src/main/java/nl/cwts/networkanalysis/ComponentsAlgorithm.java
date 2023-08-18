@@ -26,7 +26,7 @@ public class ComponentsAlgorithm implements ClusteringAlgorithm
     public Clustering findClustering(Network network)
     {
         boolean[] nodesVisited;
-        int i, j, k, l;
+        int i, j, k;
         int[] nodes;
 
         Clustering clustering = new Clustering(network.getNNodes());
@@ -44,12 +44,12 @@ public class ComponentsAlgorithm implements ClusteringAlgorithm
                 k = 0;
                 do
                 {
-                    for (l = network.firstNeighborIndices[nodes[k]]; l < network.firstNeighborIndices[nodes[k] + 1]; l++)
-                        if (!nodesVisited[network.neighbors[l]])
+                    for (int v : network.neighbors(nodes[k]))
+                        if (!nodesVisited[v])
                         {
-                            clustering.clusters[network.neighbors[l]] = clustering.nClusters;
-                            nodesVisited[network.neighbors[l]] = true;
-                            nodes[j] = network.neighbors[l];
+                            clustering.clusters[v] = clustering.nClusters;
+                            nodesVisited[v] = true;
+                            nodes[j] = v;
                             j++;
                         }
                     k++;

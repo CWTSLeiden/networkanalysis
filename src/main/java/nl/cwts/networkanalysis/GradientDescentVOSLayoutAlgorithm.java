@@ -278,6 +278,7 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm
         double a, b, distance, distance1, distance2, gradient1, gradient2, gradientLength, qualityValue,
                 oldQualityValue, squaredDistance, stepSize;
         int i, j, k, l, nQualityValueImprovements;
+        long e;
         int[] nodeOrder;
 
         nodeOrder = nl.cwts.util.Arrays.generateRandomPermutation(network.nNodes, random);
@@ -299,10 +300,10 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm
                 gradient1 = 0;
                 gradient2 = 0;
 
-                for (l = network.firstNeighborIndices[k]; l < network.firstNeighborIndices[k + 1]; l++)
+                for (e = network.firstNeighborIndices[k]; e < network.firstNeighborIndices[k + 1]; e++)
                 {
-                    distance1 = layout.coordinates[0][k] - layout.coordinates[0][network.neighbors[l]];
-                    distance2 = layout.coordinates[1][k] - layout.coordinates[1][network.neighbors[l]];
+                    distance1 = layout.coordinates[0][k] - layout.coordinates[0][network.neighbors.get(e)];
+                    distance2 = layout.coordinates[1][k] - layout.coordinates[1][network.neighbors.get(e)];
                     squaredDistance = distance1 * distance1 + distance2 * distance2;
 
                     distance = Math.sqrt(squaredDistance);
@@ -310,16 +311,16 @@ public class GradientDescentVOSLayoutAlgorithm extends VOSLayoutAlgorithm
 
                     if (squaredDistance > 0)
                     {
-                        b = network.edgeWeights[l] * a / squaredDistance;
+                        b = network.edgeWeights.get(e) * a / squaredDistance;
                         gradient1 += b * distance1;
                         gradient2 += b * distance2;
                     }
 
-                    if (!visitedNodes[network.neighbors[l]])
+                    if (!visitedNodes[network.neighbors.get(e)])
                         if (attraction != 0)
-                            qualityValue += network.edgeWeights[l] * a / attraction;
+                            qualityValue += network.edgeWeights.get(e) * a / attraction;
                         else
-                            qualityValue += network.edgeWeights[l] * Math.log(distance);
+                            qualityValue += network.edgeWeights.get(e) * Math.log(distance);
                 }
 
                 for (l = 0; l < network.nNodes; l++)
