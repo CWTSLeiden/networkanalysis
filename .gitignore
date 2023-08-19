@@ -6,11 +6,10 @@ build.xml
 nbbuild.xml
 manifest.mf
 nbproject/
-test/
+/test/
 src/PublicationClustering.java
 /dist/
 test_network.ser
-test*
 *.txt
 bin/
 .classpath
