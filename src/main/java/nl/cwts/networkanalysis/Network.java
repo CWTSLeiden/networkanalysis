@@ -1,10 +1,5 @@
 package nl.cwts.networkanalysis;
 
-import nl.cwts.util.LargeBooleanArray;
-import nl.cwts.util.LargeDoubleArray;
-import nl.cwts.util.LargeIntArray;
-import nl.cwts.util.LargeLongArray;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,6 +9,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.PrimitiveIterator;
 import java.util.Random;
+
+import nl.cwts.util.LargeBooleanArray;
+import nl.cwts.util.LargeDoubleArray;
+import nl.cwts.util.LargeIntArray;
+import nl.cwts.util.LargeLongArray;
 
 /**
  * Network.
@@ -38,8 +38,6 @@ import java.util.Random;
 public class Network implements Serializable
 {
     private static final long serialVersionUID = 1;
-
-    public static final long MAX_N_EDGES = LargeDoubleArray.MAX_SIZE / 2;
 
     /**
      * Number of nodes.
@@ -522,6 +520,7 @@ public class Network implements Serializable
      * Returns an iterable over all the neighbors of a node.
      *
      * @param node Node
+     *
      * @return Iterable over neighbors
      */
     public LargeIntArray.FromToIterable neighbors(int node)
@@ -533,7 +532,8 @@ public class Network implements Serializable
      * Returns an iterable over all the incident edges of a node.
      *
      * @param node Node
-     * @return Iterable over incident edges.
+     *
+     * @return Iterable over incident edges
      */
     public RangeIterable incidentEdges(int node)
     {
@@ -638,7 +638,8 @@ public class Network implements Serializable
      * node.
      *
      * @param node Node
-     * @return Iterable over edge weights of a node.
+     *
+     * @return Iterable over edge weights of a node
      */
     public LargeDoubleArray.FromToIterable edgeWeights(int node)
     {
@@ -1307,6 +1308,12 @@ public class Network implements Serializable
                 }
     }
 
+    /**
+     * Sorts a list of edges and the corresponding edge weights.
+     * 
+     * @param edges       Edge list
+     * @param edgeWeights Edge weights
+     */
     public static void sortEdges(LargeIntArray[] edges, LargeDoubleArray edgeWeights)
     {
         class EdgeComparator
@@ -1485,7 +1492,7 @@ public class Network implements Serializable
         return randomNumbers.get(i * nNodes + j);
     }
 
-    protected Network createSubnetwork(Clustering clustering, int cluster, int[] nodes, int[] subnetworkNodes, LargeIntArray subnetworkNeighbors, LargeDoubleArray subnetworkEdgeWeights)
+    private Network createSubnetwork(Clustering clustering, int cluster, int[] nodes, int[] subnetworkNodes, LargeIntArray subnetworkNeighbors, LargeDoubleArray subnetworkEdgeWeights)
     {
         int i, j;
         long k;
@@ -1536,6 +1543,9 @@ public class Network implements Serializable
         return subnetwork;
     }
 
+    /**
+     * Iterable starting from a certain element to a certain element.
+     */
     public class RangeIterable implements Iterable<Long>
     {
         long from;
@@ -1554,6 +1564,9 @@ public class Network implements Serializable
         }
     }
 
+    /**
+     * Iterator capable of iterating over a specified range.
+     */
     public class RangeIterator implements PrimitiveIterator.OfLong
     {
         private final long to;

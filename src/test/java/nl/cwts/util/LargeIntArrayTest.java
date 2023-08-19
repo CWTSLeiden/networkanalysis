@@ -1,12 +1,12 @@
 package nl.cwts.util;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class LargeIntArrayTest
 {
@@ -79,8 +79,7 @@ class LargeIntArrayTest
     {
         long c = a.capacity();
         a.ensureCapacity(a.capacity() + 1);
-        assertEquals(a.capacity(),
-                     c * (1 + LargeIntArray.RELATIVE_CAPACITY_INCREASE));
+        assertEquals(a.capacity(), c * (1 + LargeIntArray.RELATIVE_CAPACITY_INCREASE));
     }
 
     @Test
@@ -170,7 +169,7 @@ class LargeIntArrayTest
     @Test
     void swap()
     {
-        a.set(0,42);
+        a.set(0, 42);
         a.set(1, 59);
         a.swap(0, 1);
         assertEquals(a.get(0), 59);
@@ -252,7 +251,7 @@ class LargeIntArrayTest
         // Search all other items
         for (long i = 1; i < n - 1; i++)
         {
-            x = (int)(a.get(i)/2.0 + a.get(i - 1)/2.0);
+            x = (int)(a.get(i) / 2.0 + a.get(i - 1) / 2.0);
             j = a.binarySearch(x);
 
             if (j < 0)
@@ -285,7 +284,6 @@ class LargeIntArrayTest
         }
     }
 
-
     @Test
     void iterator()
     {
@@ -297,7 +295,7 @@ class LargeIntArrayTest
     @Test
     void from()
     {
-        long i = a.size()/2;
+        long i = a.size() / 2;
         for (int x : a.from(i))
             assertEquals(x, a.get(i++));
     }
@@ -305,8 +303,8 @@ class LargeIntArrayTest
     @Test
     void fromTo()
     {
-        long i = a.size()/3;
-        for (int x : a.fromTo(i, i + a.size()/3))
+        long i = a.size() / 3;
+        for (int x : a.fromTo(i, i + a.size() / 3))
             assertEquals(x, a.get(i++));
     }
 
@@ -314,11 +312,11 @@ class LargeIntArrayTest
     void updateFrom()
     {
         Random r = new Random(0);
-        LargeIntArray a2 = new LargeIntArray(a.size()/2);
+        LargeIntArray a2 = new LargeIntArray(a.size() / 2);
         for (long i = 0; i < a2.size(); i++)
             a2.set(i, r.nextInt());
 
-        long insertionPoint = a.size()/4;
+        long insertionPoint = a.size() / 4;
         a.updateFrom(a2, 0, a2.size(), insertionPoint);
 
         for (long i = 0; i < a2.size(); i++)
@@ -332,8 +330,8 @@ class LargeIntArrayTest
         for (long i = 0; i < a.size(); i++)
             a.set(i, r.nextInt());
 
-        long from = (long)(0.25*a.size());
-        long to = (long)(0.75*a.size());
+        long from = (long)(0.25 * a.size());
+        long to = (long)(0.75 * a.size());
         LargeIntArray a2 = a.copyOfRange(from, to);
 
         for (long i = 0; i < a2.size(); i++)
@@ -347,8 +345,8 @@ class LargeIntArrayTest
         for (long i = 0; i < a.size(); i++)
             a.set(i, r.nextInt());
 
-        long from = (long)(0.2*a.size());
-        long to = (long)(0.4*a.size());
+        long from = (long)(0.2 * a.size());
+        long to = (long)(0.4 * a.size());
         int[] a2 = a.toArray(from, to);
 
         for (int i = 0; i < a2.length; i++)

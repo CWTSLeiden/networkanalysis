@@ -1,11 +1,10 @@
 package nl.cwts.util;
 
-/* We need the fastutil package for sorting purposes */
+import java.util.Arrays;
 
+/* We need the fastutil package for sorting purposes. */
 import it.unimi.dsi.fastutil.BigArrays;
 import it.unimi.dsi.fastutil.longs.LongComparator;
-
-import java.util.Arrays;
 
 /**
  * <p>
@@ -28,15 +27,18 @@ import java.util.Arrays;
  * (indicated by {@link #MINIMUM_INITIAL_CAPACITY}). This dynamic array then
  * also supports {@link #push} and {@link #pop} operations.
  * </p>
+ * 
+ * @author Vincent Traag
+ * @author Nees Jan van Eck
  */
 public final class LargeBooleanArray implements Cloneable
 {
     /**
-     * The number of bits to use for each individual array
+     * The number of bits to use for each individual array.
      */
     public static final byte ARRAY_BIT_SIZE = 30;
     /**
-     * The maximum size of each individual array
+     * The maximum size of each individual array.
      */
     public static final int MAX_SIZE_ARRAY = 1 << ARRAY_BIT_SIZE;
     /**
@@ -108,8 +110,8 @@ public final class LargeBooleanArray implements Cloneable
         segment = 0;
         while (remainingLength > MAX_SIZE_ARRAY)
         {
-            // As long as longer than a single array, we allocate
-            // up until MAX_SIZE_ARRAY
+            // As long as longer than a single array, we allocate up until
+            // MAX_SIZE_ARRAY
             this.values[segment] = new boolean[MAX_SIZE_ARRAY];
             remainingLength -= MAX_SIZE_ARRAY;
             segment++;
@@ -236,7 +238,7 @@ public final class LargeBooleanArray implements Cloneable
     }
 
     /**
-     * Sets element to value for indicated index
+     * Sets element to value for indicated index.
      *
      * @param index Index of element
      * @param value Value
@@ -286,7 +288,7 @@ public final class LargeBooleanArray implements Cloneable
         // Fill first segment
         segment = getSegment(from);
         Arrays.fill(this.values[segment], getOffset(from),
-                    segment == segmentTo ? getOffset(to) : this.values[segment].length, constant);
+                segment == segmentTo ? getOffset(to) : this.values[segment].length, constant);
         segment++;
 
         // Fill subsequent segments
@@ -295,8 +297,7 @@ public final class LargeBooleanArray implements Cloneable
 
         // Fill last segment
         if (segment == segmentTo && offsetTo > 0)
-            Arrays.fill(this.values[segment], 0,
-                        offsetTo, constant);
+            Arrays.fill(this.values[segment], 0, offsetTo, constant);
     }
 
     /***************************************************************************
@@ -389,8 +390,8 @@ public final class LargeBooleanArray implements Cloneable
             if (getOffset(oldCapacity) > 0)
                 nOldSegments += 1; // Add one if there was a remainder
 
-            // Simply refer to the previously existing segments for all
-            // segments except for the last one.
+            // Simply refer to the previously existing segments for all segments
+            // except for the last one.
             remainingLength = newCapacity;
             for (segment = 0; segment < nOldSegments - 1; segment++)
             {
@@ -400,11 +401,9 @@ public final class LargeBooleanArray implements Cloneable
 
             // We now need to copy only the last old segment
             if (remainingLength > MAX_SIZE_ARRAY)
-                newValues[segment] = Arrays.copyOf(values[segment],
-                                                   MAX_SIZE_ARRAY);
+                newValues[segment] = Arrays.copyOf(values[segment], MAX_SIZE_ARRAY);
             else
-                newValues[segment] = Arrays.copyOf(values[segment],
-                                                   (int)remainingLength);
+                newValues[segment] = Arrays.copyOf(values[segment], (int)remainingLength);
             remainingLength -= newValues[segment].length;
             segment++;
 
@@ -431,6 +430,7 @@ public final class LargeBooleanArray implements Cloneable
 
     /**
      * Resizes array.
+     *
      * @param size New size
      */
     public void resize(long size)
@@ -473,8 +473,7 @@ public final class LargeBooleanArray implements Cloneable
 
             // Truncate the last segment to the new capacity
             if (remainingLength > 0)
-                newValues[segment] = Arrays.copyOf(values[segment],
-                                                   (int)remainingLength);
+                newValues[segment] = Arrays.copyOf(values[segment], (int)remainingLength);
 
             // Assign to actual values
             this.values = newValues;
@@ -484,6 +483,7 @@ public final class LargeBooleanArray implements Cloneable
 
     /**
      * Gets size of array.
+     *
      * <p>This is always less than or equal to the capacity.</p>
      *
      * @return Size
@@ -495,6 +495,7 @@ public final class LargeBooleanArray implements Cloneable
 
     /**
      * Gets capacity of array.
+     *
      * <p>This is always greater than or equal to the size.</p>
      *
      * @return Capacity
@@ -555,9 +556,7 @@ public final class LargeBooleanArray implements Cloneable
      */
     public void mergeSort()
     {
-        BigArrays.mergeSort(0, capacity,
-                            this::compare,
-                            this::swap);
+        BigArrays.mergeSort(0, capacity, this::compare, this::swap);
     }
 
     /**
@@ -565,9 +564,7 @@ public final class LargeBooleanArray implements Cloneable
      */
     public void quickSort()
     {
-        BigArrays.quickSort(0, capacity,
-                            this::compare,
-                            this::swap);
+        BigArrays.quickSort(0, capacity, this::compare, this::swap);
     }
 
     /**
@@ -600,10 +597,12 @@ public final class LargeBooleanArray implements Cloneable
 
     /**
      * Updates this array from the provided array.
+     * 
      * <p>
      * Values from other array starting at {@code from} until
      * {@code to} (exclusive) will be copied to this array, starting
      * from the {@code insertionPoint} onwards.
+     * </p>
      *
      * @param array          Array to update from
      * @param from           Index in {@code array} from where to update,
@@ -640,8 +639,7 @@ public final class LargeBooleanArray implements Cloneable
             }
 
             // Copy actual value
-            this.values[segment][offset] =
-                    array.values[segmentFrom][offsetFrom];
+            this.values[segment][offset] = array.values[segmentFrom][offsetFrom];
 
             offsetFrom++;
             offset++;
@@ -653,6 +651,7 @@ public final class LargeBooleanArray implements Cloneable
      *
      * @param from From index, inclusive
      * @param to   To index, exclusive
+     *
      * @return New array
      */
     public LargeBooleanArray copyOfRange(long from, long to)
@@ -771,6 +770,4 @@ public final class LargeBooleanArray implements Cloneable
             return null;
         }
     }
-
 }
-

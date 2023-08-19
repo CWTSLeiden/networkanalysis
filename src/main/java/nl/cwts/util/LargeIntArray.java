@@ -1,12 +1,11 @@
 package nl.cwts.util;
 
-/* We need the fastutil package for sorting purposes */
-
-import it.unimi.dsi.fastutil.BigArrays;
-import it.unimi.dsi.fastutil.longs.LongComparator;
-
 import java.util.Arrays;
 import java.util.PrimitiveIterator;
+
+/* We need the fastutil package for sorting purposes. */
+import it.unimi.dsi.fastutil.BigArrays;
+import it.unimi.dsi.fastutil.longs.LongComparator;
 
 /**
  * <p>
@@ -43,15 +42,18 @@ import java.util.PrimitiveIterator;
  * {@code for (int x : array)} and
  * {@code for (int x : array.fromto(10, 50)}
  * </p>
+ * 
+ * @author Vincent Traag
+ * @author Nees Jan van Eck
  */
 public final class LargeIntArray implements Cloneable, Iterable<Integer>
 {
     /**
-     * The number of bits to use for each individual array
+     * The number of bits to use for each individual array.
      */
     public static final byte ARRAY_BIT_SIZE = 30;
     /**
-     * The maximum size of each individual array
+     * The maximum size of each individual array.
      */
     public static final int MAX_SIZE_ARRAY = 1 << ARRAY_BIT_SIZE;
     /**
@@ -251,7 +253,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
     }
 
     /**
-     * Sets element to value for indicated index
+     * Sets element to value for indicated index.
      *
      * @param index Index of element
      * @param value Value
@@ -301,7 +303,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
         // Fill first segment
         segment = getSegment(from);
         Arrays.fill(this.values[segment], getOffset(from),
-                    segment == segmentTo ? getOffset(to) : this.values[segment].length, constant);
+                segment == segmentTo ? getOffset(to) : this.values[segment].length, constant);
         segment++;
 
         // Fill subsequent segments
@@ -310,8 +312,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
 
         // Fill last segment
         if (segment == segmentTo && offsetTo > 0)
-            Arrays.fill(this.values[segment], 0,
-                        offsetTo, constant);
+            Arrays.fill(this.values[segment], 0, offsetTo, constant);
     }
 
     /***************************************************************************
@@ -404,8 +405,8 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
             if (getOffset(oldCapacity) > 0)
                 nOldSegments += 1; // Add one if there was a remainder
 
-            // Simply refer to the previously existing segments for all
-            // segments except for the last one.
+            // Simply refer to the previously existing segments for all segments
+            // except for the last one.
             remainingLength = newCapacity;
             for (segment = 0; segment < nOldSegments - 1; segment++)
             {
@@ -415,11 +416,9 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
 
             // We now need to copy only the last old segment
             if (remainingLength > MAX_SIZE_ARRAY)
-                newValues[segment] = Arrays.copyOf(values[segment],
-                                                   MAX_SIZE_ARRAY);
+                newValues[segment] = Arrays.copyOf(values[segment], MAX_SIZE_ARRAY);
             else
-                newValues[segment] = Arrays.copyOf(values[segment],
-                                                   (int)remainingLength);
+                newValues[segment] = Arrays.copyOf(values[segment], (int)remainingLength);
             remainingLength -= newValues[segment].length;
             segment++;
 
@@ -446,6 +445,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
 
     /**
      * Resizes array.
+     *
      * @param size New size
      */
     public void resize(long size)
@@ -488,8 +488,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
 
             // Truncate the last segment to the new capacity
             if (remainingLength > 0)
-                newValues[segment] = Arrays.copyOf(values[segment],
-                                                   (int)remainingLength);
+                newValues[segment] = Arrays.copyOf(values[segment], (int)remainingLength);
 
             // Assign to actual values
             this.values = newValues;
@@ -499,6 +498,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
 
     /**
      * Gets size of array.
+     *
      * <p>This is always less than or equal to the capacity.</p>
      *
      * @return Size
@@ -510,6 +510,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
 
     /**
      * Gets capacity of array.
+     *
      * <p>This is always greater than or equal to the size.</p>
      *
      * @return Capacity
@@ -566,7 +567,6 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
     {
         this.values[getSegment(index)][getOffset(index)] /= divisor;
     }
-
 
     /**
      * Calculates the sum of all elements.
@@ -724,9 +724,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
      */
     public void mergeSort()
     {
-        BigArrays.mergeSort(0, capacity,
-                            this::compare,
-                            this::swap);
+        BigArrays.mergeSort(0, capacity, this::compare, this::swap);
     }
 
     /**
@@ -734,9 +732,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
      */
     public void quickSort()
     {
-        BigArrays.quickSort(0, capacity,
-                            this::compare,
-                            this::swap);
+        BigArrays.quickSort(0, capacity, this::compare, this::swap);
     }
 
     /**
@@ -765,14 +761,11 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
      * it is not sorted, the results are undefined. If the array contains
      * multiple elements with the specified value, there is no guarantee which
      * one will be found.
-     * <p>
-     * Parameters: a - the array to be searched key - the value to be searched
-     * for Returns:
      * </p>
      *
      * @param value The value to search for
      *
-     * @return index of the search key, if it is contained in the array;
+     * @return Index of the search key, if it is contained in the array;
      * otherwise, (-(insertion point) - 1). The insertion point is defined as
      * the point at which the key would be inserted into the array: the index of
      * the first element greater than the key, or the total size if all elements
@@ -794,16 +787,13 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
      * making this call. If it is not sorted, the results are undefined. If the
      * array contains multiple elements with the specified value, there is no
      * guarantee which one will be found.
-     * <p>
-     * Parameters: a - the array to be searched key - the value to be searched
-     * for Returns:
      * </p>
      *
      * @param from  From index, inclusive
      * @param to    To index, exclusive
      * @param value The value to search for
      *
-     * @return index of the search key, if it is contained in the array;
+     * @return Index of the search key, if it is contained in the array;
      * otherwise, (-(insertion point) - 1). The insertion point is defined as
      * the point at which the key would be inserted into the array: the index of
      * the first element greater than the key, or the total size if all elements
@@ -894,10 +884,12 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
 
     /**
      * Updates this array from the provided array.
+     *
      * <p>
      * Values from other array starting at {@code from} until
      * {@code to} (exclusive) will be copied to this array, starting
      * from the {@code insertionPoint} onwards.
+     * </p>
      *
      * @param array          Array to update from
      * @param from           Index in {@code array} from where to update,
@@ -934,8 +926,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
             }
 
             // Copy actual value
-            this.values[segment][offset] =
-                    array.values[segmentFrom][offsetFrom];
+            this.values[segment][offset] = array.values[segmentFrom][offsetFrom];
 
             offsetFrom++;
             offset++;
@@ -947,6 +938,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
      *
      * @param from From index, inclusive
      * @param to   To index, exclusive
+     *
      * @return New array
      */
     public LargeIntArray copyOfRange(long from, long to)
@@ -1067,7 +1059,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
     }
 
     /**
-     * Iterable starting from a certain element
+     * Iterable starting from a certain element.
      */
     public class FromIterable implements Iterable<Integer>
     {
@@ -1086,7 +1078,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
     }
 
     /**
-     * Iterable starting from a certain element to a certain element
+     * Iterable starting from a certain element to a certain element.
      */
     public class FromToIterable implements Iterable<Integer>
     {
@@ -1107,7 +1099,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
     }
 
     /**
-     * Iterator capable of iterating over specified range.
+     * Iterator capable of iterating over a specified range.
      */
     public class Iterator implements PrimitiveIterator.OfInt
     {
@@ -1184,7 +1176,7 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
         }
 
         /**
-         * Provides next value in array
+         * Provides next value in array.
          *
          * @return Next value
          */
@@ -1222,6 +1214,4 @@ public final class LargeIntArray implements Cloneable, Iterable<Integer>
             return hasNext;
         }
     }
-
 }
-

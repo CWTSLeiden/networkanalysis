@@ -1,12 +1,12 @@
 package nl.cwts.util;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class LargeBooleanArrayTest
 {
@@ -79,8 +79,7 @@ class LargeBooleanArrayTest
     {
         long c = a.capacity();
         a.ensureCapacity(a.capacity() + 1);
-        assertEquals(a.capacity(),
-                     c * (1 + LargeBooleanArray.RELATIVE_CAPACITY_INCREASE));
+        assertEquals(a.capacity(), c * (1 + LargeBooleanArray.RELATIVE_CAPACITY_INCREASE));
     }
 
     @Test
@@ -123,8 +122,7 @@ class LargeBooleanArrayTest
 
         a.mergeSort();
         for (long i = 1; i < a.size(); i++)
-            assertTrue((a.get(i) && !a.get(i - 1)) ||
-                               (a.get(i) == a.get(i - 1)));
+            assertTrue((a.get(i) && !a.get(i - 1)) || (a.get(i) == a.get(i - 1)));
     }
 
     @Test
@@ -139,8 +137,7 @@ class LargeBooleanArrayTest
 
         a.quickSort();
         for (long i = 1; i < a.size(); i++)
-            assertTrue((a.get(i) && !a.get(i - 1)) ||
-                               (a.get(i) == a.get(i - 1)));
+            assertTrue((a.get(i) && !a.get(i - 1)) || (a.get(i) == a.get(i - 1)));
     }
 
     @Test
@@ -155,19 +152,18 @@ class LargeBooleanArrayTest
 
         a.sort();
         for (long i = 1; i < a.size(); i++)
-            assertTrue((a.get(i) && !a.get(i - 1)) ||
-                               (a.get(i) == a.get(i - 1)));
+            assertTrue((a.get(i) && !a.get(i - 1)) || (a.get(i) == a.get(i - 1)));
     }
 
     @Test
     void updateFrom()
     {
         Random r = new Random(0);
-        LargeBooleanArray a2 = new LargeBooleanArray(a.size()/2);
+        LargeBooleanArray a2 = new LargeBooleanArray(a.size() / 2);
         for (long i = 0; i < a2.size(); i++)
             a2.set(i, r.nextBoolean());
 
-        long insertionPoint = a.size()/4;
+        long insertionPoint = a.size() / 4;
         a.updateFrom(a2, 0, a2.size(), insertionPoint);
 
         for (long i = 0; i < a2.size(); i++)
@@ -181,8 +177,8 @@ class LargeBooleanArrayTest
         for (long i = 0; i < a.size(); i++)
             a.set(i, r.nextBoolean());
 
-        long from = (long)(0.25*a.size());
-        long to = (long)(0.75*a.size());
+        long from = (long)(0.25 * a.size());
+        long to = (long)(0.75 * a.size());
         LargeBooleanArray a2 = a.copyOfRange(from, to);
 
         for (long i = 0; i < a2.size(); i++)
@@ -196,8 +192,8 @@ class LargeBooleanArrayTest
         for (long i = 0; i < a.size(); i++)
             a.set(i, r.nextBoolean());
 
-        long from = (long)(0.2*a.size());
-        long to = (long)(0.4*a.size());
+        long from = (long)(0.2 * a.size());
+        long to = (long)(0.4 * a.size());
         boolean[] a2 = a.toArray(from, to);
 
         for (int i = 0; i < a2.length; i++)
