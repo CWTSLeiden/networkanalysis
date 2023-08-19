@@ -36,5 +36,5 @@ repository-code: "https://github.com/CWTSLeiden/networkanalysis"
 repository-artifact: "https://central.sonatype.com/artifact/nl.cwts/networkanalysis/"
 license: MIT
 doi: 10.5281/zenodo.1466830
-version: 1.2.0
-date-released: 2023-08-15
+version: 1.3.0
+date-released: 2023-08-19
