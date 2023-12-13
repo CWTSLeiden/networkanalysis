@@ -1224,8 +1224,8 @@ public class Network implements Serializable
                     l = neighbors[j - 1];
                     if (k < l)
                         throw new IllegalArgumentException("For each node, corresponding elements of neighbors array must be in increasing order.");
-                    else if (k == l)
-                        throw new IllegalArgumentException("For each node, corresponding elements of neighbors array must not include duplicate values.");
+                    // else if (k == l)
+                    //     throw new IllegalArgumentException("For each node, corresponding elements of neighbors array must not include duplicate values.");
                 }
             }
         }
