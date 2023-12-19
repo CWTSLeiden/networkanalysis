@@ -420,7 +420,7 @@ public final class RunNetworkClustering
                 maxQuality = quality;
             }
         }
-        finalClustering.orderClustersByNNodes();
+
         System.out.println("Running algorithm took " + (System.currentTimeMillis() - startTimeAlgorithm) / 1000 + "s.");
         if (nRandomStarts > 1)
             System.out.println("Maximum value of quality function in " + nRandomStarts + " random starts equals " + maxQuality + ".");
@@ -433,6 +433,8 @@ public final class RunNetworkClustering
             algorithm.removeSmallClustersBasedOnNNodes(network, finalClustering, minClusterSize);
         }
         System.out.println("Final clustering consists of " + finalClustering.getNClusters() + " clusters.");
+
+        finalClustering.orderClustersByNNodes();
 
         // Write final clustering to file (or to standard output).
         System.out.println("Writing final clustering to " + ((finalClusteringFilename == null) ? "standard output." : "'" + finalClusteringFilename + "'."));
